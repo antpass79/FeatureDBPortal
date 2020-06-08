@@ -20,56 +20,30 @@ steps:
       echo 'git loop all branches'
       git branch -r | grep -v '\->' | while read remote; do git branch --track "${remote#origin/}" "$remote"; done
       echo 'git push all branches'
-      git push https://$XML2DBTOKEN@dev.azure.com/antpass79/FeatureDBPortal/_git/FeatureDBPortal -u --all
+      git push https://$SYNC@dev.azure.com/antpass79/FeatureDBPortal/_git/FeatureDBPortal -u --all
   env:
-    XML2DBTOKEN: $(xml2dbtoken)
+    SYNC: $(sync)
     
-# - task: UseGitVersion@5
-#   displayName: 'Git Version updates SharedAssemblyInfo for FeatureDBPortal'
-#   inputs:
-#     versionSpec: '5.x'
-#     updateAssemblyInfo: true
-#     updateAssemblyInfoFilename: '$(system.defaultworkingdirectory)\Library\SharedAssemblyInfo.cs'
-
 - task: DotNetCoreCLI@2
   displayName: Restore packages
   inputs:
     command: restore
     projects: 'FeatureDBPortal.sln'
-    versioningScheme: byBuildNumber
 
 - task: DotNetCoreCLI@2
   displayName: 'Build FeatureDBPortal Solution'
   inputs:
-    command: 'build'
-    arguments: '--configuration $(BuildConfiguration) /p:Version=$(GitVersion.NuGetVersion)'
+    command: 'build'  
+    arguments: '--configuration $(BuildConfiguration)'
     projects: FeatureDBPortal.sln
-    versioningScheme: byBuildNumber
-
-# - task: VSTest@2
-#   displayName: 'Run all Tests'
-#   inputs:
-#     testSelector: 'testAssemblies'
-#     testAssemblyVer2: |
-#       **\*.Tests.dll
-#       !**\*TestAdapter.dll
-#       !**\obj\**
-#     searchFolder: '$(System.DefaultWorkingDirectory)\Library'
 
 - task: DotNetCoreCLI@2
-  displayName: 'Pack FeatureDBPortal'
+  displayName: 'Publishing Blazor App'
   inputs:
-    command: 'pack'
-    arguments: --output $(build.artifactstagingdirectory) --configuration $(buildConfiguration)
-    packagesToPack: 'FeatureDBPortal.sln'
-    versioningScheme: byEnvVar
-    versionEnvVar: GitVersion.NuGetVersion
+    command: publish
+    publishWebProjects: true
+    arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+    zipAfterPublish: false
 
-- task: DotNetCoreCLI@2
-  displayName: 'Push artifacts in $(azureDevOpsProjectName)/$(feedName) feed'
-  inputs:
-    command: 'push'
-    nuGetFeedType: 'internal'
-    packagesToPush: '$(build.artifactStagingDirectory)/*.nupkg'
-    publishVstsFeed: '$(azureDevOpsProjectName)/$(feedName)'
-    versioningScheme: byBuildNumber
+- task: PublishBuildArtifacts@1
+  displayName: 'Publishing Build Artifacts'
