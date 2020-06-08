@@ -1,0 +1,75 @@
+# Build Pipeline - which build, test and publish artifact
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  buildConfiguration: 'Release'
+  azureDevOpsProjectName: 'FeatureDBPortal'
+  feedName: 'FeatureDBPortal'
+
+steps:
+- task: Bash@3
+  displayName: 'Synchronize Azure DevOps to Github'
+  inputs:
+    targetType: inline
+    script: |
+      echo 'git config'
+      git config --global user.email ""
+      git config --global user.name ""
+      echo 'git loop all branches'
+      git branch -r | grep -v '\->' | while read remote; do git branch --track "${remote#origin/}" "$remote"; done
+      echo 'git push all branches'
+      git push https://$XML2DBTOKEN@dev.azure.com/antpass79/FeatureDBPortal/_git/FeatureDBPortal -u --all
+  env:
+    XML2DBTOKEN: $(xml2dbtoken)
+    
+# - task: UseGitVersion@5
+#   displayName: 'Git Version updates SharedAssemblyInfo for FeatureDBPortal'
+#   inputs:
+#     versionSpec: '5.x'
+#     updateAssemblyInfo: true
+#     updateAssemblyInfoFilename: '$(system.defaultworkingdirectory)\Library\SharedAssemblyInfo.cs'
+
+- task: DotNetCoreCLI@2
+  displayName: Restore packages
+  inputs:
+    command: restore
+    projects: 'FeatureDBPortal.sln'
+    versioningScheme: byBuildNumber
+
+- task: DotNetCoreCLI@2
+  displayName: 'Build FeatureDBPortal Solution'
+  inputs:
+    command: 'build'
+    arguments: '--configuration $(BuildConfiguration) /p:Version=$(GitVersion.NuGetVersion)'
+    projects: FeatureDBPortal.sln
+    versioningScheme: byBuildNumber
+
+# - task: VSTest@2
+#   displayName: 'Run all Tests'
+#   inputs:
+#     testSelector: 'testAssemblies'
+#     testAssemblyVer2: |
+#       **\*.Tests.dll
+#       !**\*TestAdapter.dll
+#       !**\obj\**
+#     searchFolder: '$(System.DefaultWorkingDirectory)\Library'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Pack FeatureDBPortal'
+  inputs:
+    command: 'pack'
+    arguments: --output $(build.artifactstagingdirectory) --configuration $(buildConfiguration)
+    packagesToPack: 'FeatureDBPortal.sln'
+    versioningScheme: byEnvVar
+    versionEnvVar: GitVersion.NuGetVersion
+
+- task: DotNetCoreCLI@2
+  displayName: 'Push artifacts in $(azureDevOpsProjectName)/$(feedName) feed'
+  inputs:
+    command: 'push'
+    nuGetFeedType: 'internal'
+    packagesToPush: '$(build.artifactStagingDirectory)/*.nupkg'
+    publishVstsFeed: '$(azureDevOpsProjectName)/$(feedName)'
+    versioningScheme: byBuildNumber
