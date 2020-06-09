@@ -1,0 +1,17 @@
+mode: Mainline 
+next-version: 1.0.0 
+
+major-version-bump-message: '\+semver:\s?(breaking|major)'
+minor-version-bump-message: '\+semver:\s?(feature|minor)'
+patch-version-bump-message: '\+semver:\s?(fix|patch)'
+
+branches:
+ feature:
+   tag: alpha
+   increment: Minor
+
+ master:
+   tag: ''
+
+ignore:
+ sha: []
