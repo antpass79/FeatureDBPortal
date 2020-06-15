@@ -20,7 +20,7 @@ namespace FeatureDBPortal.Client.Services
             _httpClient = httpClient;
         }
 
-        async public Task<IEnumerable<CombinationDTO>> GetCombinations(CombinationSearchDTO search)
+        async public Task<CombinationDTO> GetCombinations(CombinationSearchDTO search)
         {
             var message = await _httpClient.SendAsync(new HttpRequestMessage
             {
@@ -29,7 +29,7 @@ namespace FeatureDBPortal.Client.Services
                 RequestUri = new Uri(_httpClient.BaseAddress + AVAILABILITY_COMBINATION_ENDPOINT)
             });
 
-            return await message.GetValue<IEnumerable<CombinationDTO>>();
+            return await message.GetValue<CombinationDTO>();
         }
     }
 }

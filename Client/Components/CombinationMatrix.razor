@@ -1,0 +1,79 @@
+﻿@inherits CombinationMatrixDataModel
+
+<style>
+    .spinner-container {
+        display: flex;
+        position: absolute;
+        z-index: 999;
+        width: 100%;
+        height: 100%;
+        background: lightgray;
+        opacity: 0.3;
+        align-items: center;
+    }
+</style>
+
+@if (Combination == null)
+{
+    <p class="logo-text"><em>No Available Combinations</em></p>
+}
+else if (Combination.GroupBy == FeatureDBPortal.Shared.GroupByDTO.Any)
+{
+    <div>
+        <p>@Combination.Description</p>
+        <p>@Combination.Allow</p>
+    </div>
+}
+else if (Combination.GroupBy == FeatureDBPortal.Shared.GroupByDTO.One)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                @foreach (var column in Columns)
+                {
+                    <th>
+                        @column.Name
+                    </th>
+                }
+                <th>
+                    Allow
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var combination in Combination.Combinations)
+            {
+                <tr>
+                    <td>@combination.Description</td>
+                    <td>@combination.Allow</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else if (Combination.GroupBy == FeatureDBPortal.Shared.GroupByDTO.Two)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                </th>
+                    @foreach (var column in Columns)
+                    {
+                        <th>
+                            @column.Name
+                        </th>
+                    }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var combination in Combination.Combinations)
+            {
+                <tr>
+                    <td>@combination.Description</td>
+                    <td>@combination.Allow</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

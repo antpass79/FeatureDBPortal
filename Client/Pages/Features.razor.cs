@@ -1,5 +1,4 @@
-﻿using FeatureDBPortal.Client.Components;
-using FeatureDBPortal.Client.Services;
+﻿using FeatureDBPortal.Client.Services;
 using FeatureDBPortal.Shared;
 using Microsoft.AspNetCore.Components;
 using System;
@@ -18,6 +17,7 @@ namespace FeatureDBPortal.Client.Pages
         protected IAvailabilityCombinationService AvailabilityCombinationService { get; set; }
 
         protected bool FiltersBusy { get; set; }
+        protected bool CombinationsBusy { get; set; }
 
         protected IEnumerable<ApplicationDTO> Applications { get; set; }
         protected ApplicationDTO SelectedApplication { get; private set; } = new ApplicationDTO();
@@ -48,6 +48,19 @@ namespace FeatureDBPortal.Client.Pages
         protected LayoutTypeDTO SelectedColumnLayout { get; set; }
         protected LayoutTypeDTO SelectedCellLayout { get; set; }
 
+        protected CombinationDTO Combination { get; private set; }
+
+        protected LayoutTypeDTO CurrentHeader { get; set; }
+
+        protected bool DisableApplication => SelectedRowLayout == LayoutTypeDTO.Application || SelectedColumnLayout == LayoutTypeDTO.Application || SelectedCellLayout == LayoutTypeDTO.Application;
+        protected bool DisableProbe => SelectedRowLayout == LayoutTypeDTO.Probe || SelectedColumnLayout == LayoutTypeDTO.Probe || SelectedCellLayout == LayoutTypeDTO.Probe;
+        protected bool DisableModel => SelectedRowLayout == LayoutTypeDTO.Model || SelectedColumnLayout == LayoutTypeDTO.Model || SelectedCellLayout == LayoutTypeDTO.Model;
+        protected bool DisableKit => SelectedRowLayout == LayoutTypeDTO.Kit || SelectedColumnLayout == LayoutTypeDTO.Kit || SelectedCellLayout == LayoutTypeDTO.Kit;
+        protected bool DisableOption => SelectedRowLayout == LayoutTypeDTO.Option || SelectedColumnLayout == LayoutTypeDTO.Option || SelectedCellLayout == LayoutTypeDTO.Option;
+        protected bool DisableVersion => SelectedRowLayout == LayoutTypeDTO.Version || SelectedColumnLayout == LayoutTypeDTO.Version || SelectedCellLayout == LayoutTypeDTO.Version;
+        protected bool DisableCountry => SelectedRowLayout == LayoutTypeDTO.Country || SelectedColumnLayout == LayoutTypeDTO.Country || SelectedCellLayout == LayoutTypeDTO.Country;
+        protected bool DisableUserLevel => SelectedRowLayout == LayoutTypeDTO.UserLevel || SelectedColumnLayout == LayoutTypeDTO.UserLevel || SelectedCellLayout == LayoutTypeDTO.UserLevel;
+
         protected override async Task OnInitializedAsync()
         {
             FiltersBusy = true;
@@ -71,20 +84,26 @@ namespace FeatureDBPortal.Client.Pages
 
         async protected Task OnSearch()
         {
-            var combinations = await AvailabilityCombinationService.GetCombinations(new CombinationSearchDTO
+            CombinationsBusy = true;
+
+            Combination = await AvailabilityCombinationService.GetCombinations(new CombinationSearchDTO
             {
-                Application = SelectedApplication,
-                Probe = SelectedProbe,
-                Country = SelectedCountry,
-                Version = SelectedVersion,
-                Model = SelectedModel,
-                Option = SelectedOption,
-                Kit = SelectedKit,
-                UserLevel = SelectedUserLevel,
+                Application = SelectedRowLayout == LayoutTypeDTO.Application || SelectedColumnLayout == LayoutTypeDTO.Application || SelectedCellLayout == LayoutTypeDTO.Application ? null : SelectedApplication,
+                Probe = SelectedRowLayout == LayoutTypeDTO.Probe || SelectedColumnLayout == LayoutTypeDTO.Probe || SelectedCellLayout == LayoutTypeDTO.Probe ? null : SelectedProbe,
+                Country = SelectedRowLayout == LayoutTypeDTO.Country || SelectedColumnLayout == LayoutTypeDTO.Country || SelectedCellLayout == LayoutTypeDTO.Country ? null : SelectedCountry,
+                Version = SelectedRowLayout == LayoutTypeDTO.Version || SelectedColumnLayout == LayoutTypeDTO.Version || SelectedCellLayout == LayoutTypeDTO.Version ? null : SelectedVersion,
+                Model = SelectedRowLayout == LayoutTypeDTO.Model || SelectedColumnLayout == LayoutTypeDTO.Model || SelectedCellLayout == LayoutTypeDTO.Model ? null : SelectedModel,
+                Option = SelectedRowLayout == LayoutTypeDTO.Option || SelectedColumnLayout == LayoutTypeDTO.Option || SelectedCellLayout == LayoutTypeDTO.Option ? null : SelectedOption,
+                Kit = SelectedRowLayout == LayoutTypeDTO.Kit || SelectedColumnLayout == LayoutTypeDTO.Kit || SelectedCellLayout == LayoutTypeDTO.Kit ? null : SelectedKit,
+                UserLevel = SelectedRowLayout == LayoutTypeDTO.UserLevel || SelectedColumnLayout == LayoutTypeDTO.UserLevel || SelectedCellLayout == LayoutTypeDTO.UserLevel ? UserLevelDTO.None: SelectedUserLevel,
                 RowLayout = SelectedRowLayout,
                 ColumnLayout = SelectedColumnLayout,
                 CellLayout = SelectedCellLayout
             });
+
+            CurrentHeader = SelectedRowLayout;
+
+            CombinationsBusy = false;
         }
     }
 }
