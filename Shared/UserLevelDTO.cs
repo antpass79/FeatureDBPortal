@@ -2,6 +2,7 @@
 {
     public enum UserLevelDTO
     {
+        None = -2,
         Unknown = -1,
         RS = 0,
         Service = 1,
