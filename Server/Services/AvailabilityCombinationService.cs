@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FeatureDBPortal.Client.Extensions;
 using FeatureDBPortal.Server.Data;
 using FeatureDBPortal.Server.Data.Models;
 using FeatureDBPortal.Server.Extensions;
@@ -9,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using SQLitePCL;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -27,6 +29,10 @@ namespace FeatureDBPortal.Server.Services
 
         async public Task<CombinationDTO> Get(CombinationSearchDTO search)
         {
+            var start = DateTime.Now;
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
             try
             {
                 IEnumerable<LayoutType> groupBy = GetGroups(search);
@@ -44,6 +50,11 @@ namespace FeatureDBPortal.Server.Services
             {
                 return await Task.FromResult<CombinationDTO>(null);
             }
+            finally
+            {
+                Trace.WriteLine(string.Empty);
+                Trace.WriteLine($"Process starts at {start} and stops at {DateTime.Now} with duration of {stopwatch.Elapsed}");
+            }
         }
 
         async public Task<CombinationDTO> GroupByAny(CombinationSearchDTO search)
@@ -54,12 +65,29 @@ namespace FeatureDBPortal.Server.Services
 
             var allow = normalRules.All(normalRule => normalRule.Allow != 0);
 
-            return await Task.FromResult(new CombinationDTO
+            var matrix = new MatrixDTO();
+            var row = new MatrixRowDTO();
+            row.Columns.Add(-1, new CellDTO() { RowId = -1, ColumnId = -1, Allow = allow });
+            matrix.Rows.Add(-1, row);
+
+            var combination = new CombinationDTO
             {
-                Description = string.Empty,
-                Allow = allow,
+                Headers = new List<TitleDTO>
+                {
+                    new TitleDTO { Id = -1, Name = "Allow" },
+                },
+                Rows = matrix.Rows.Values.Select(item => new RowDTO
+                {
+                    TitleCell = new CellDTO(),
+                    Cells = item.Columns.Select(innerItem => new CellDTO
+                    {
+                        Allow = innerItem.Value.Allow
+                    }).ToList()
+                }).ToList(),
                 GroupBy = GroupByDTO.Any
-            });
+            };
+
+            return await Task.FromResult(combination);
         }
 
         async public Task<CombinationDTO> GroupByOne(CombinationSearchDTO search, IEnumerable<LayoutType> groupBy)
@@ -75,28 +103,40 @@ namespace FeatureDBPortal.Server.Services
 
             var nullGroup = groups.SingleOrDefault(group => group.Key == null);
 
-            var combinations = groups
-                .Select(group => new CombinationDTO
-                {
-                    Description = selectedRowField.Single(item => item.Id == group.Key).Name,
-                    // If there aren't rules?
-                    Allow = nullGroup == null ? group.All(normalRule => normalRule.Allow != 0) : group.Union(nullGroup).All(normalRule => normalRule.Allow != 0),
-                })
-                .OrderBy(combination => combination.Description)
+            var orderedSelectedRowField = selectedRowField
+                .ToList()
+                .OrderBy(item => item.Name)
                 .ToList();
 
-            var combination = new CombinationDTO()
-            {
-                Description = firstLayoutGroup.ToString(),
-                Combinations = combinations,
-                GroupBy = GroupByDTO.One,
-                Columns = new List<ColumnDTO>
+            var matrix = new MatrixDTO();
+            orderedSelectedRowField
+                .ForEach(rowItem =>
                 {
-                    new ColumnDTO
+                    var row = new MatrixRowDTO() { Name = rowItem.Name };
+                    matrix.Rows.Add(rowItem.Id, row);
+                });
+
+            groups
+                .ToList()
+                .ForEach(group =>
+                {
+                    matrix.Rows[group.Key].Columns.Add(group.Key, new CellDTO
                     {
-                        Name = "Allow"
-                    }
-                }
+                        RowId = group.Key,
+                        ColumnId = group.Key,
+                        Allow = nullGroup == null ? group.All(normalRule => normalRule.Allow != 0) : group.Union(nullGroup).All(normalRule => normalRule.Allow != 0)
+                    });
+                });
+
+            var combination = new CombinationDTO
+            {
+                Headers = new List<TitleDTO>
+                {
+                    new TitleDTO { Id = -1, Name = firstLayoutGroup.ToString() },
+                    new TitleDTO { Id = -1, Name = "Allow" }
+                },
+                Rows = matrix.ToRows(),
+                GroupBy = GroupByDTO.One
             };
 
             return await Task.FromResult(combination);
@@ -112,43 +152,98 @@ namespace FeatureDBPortal.Server.Services
 
             IEnumerable<NormalRule> normalRules = FilterNormalRules(search);
 
-            var firstGroups = normalRules
-                .Join(selectedRowField, a => a.GetPropertyValue<int?>(firstLayoutGroup + "Id"), b => b.Id, (a, b) => new
+            var groups = normalRules
+                .GroupBy(normalRule => normalRule.GetPropertyValue<int?>(firstLayoutGroup + "Id"))
+                .Select(group => new
                 {
-                    Name = b.Name,
-                    Rule = a,
-                })
-                .ToList()
-                .GroupBy(item => item.Name)
-                .Select(secondGroup => new
-                {
-                    Description = secondGroup.Key,
-                    Combinations = secondGroup.Select(group => new
+                    RowId = group.Key,
+                    RowName = selectedRowField.SingleOrDefault(item => item.Id == group.Key)?.Name,
+                    Combinations = group.Select(groupItem => new
                     {
-                        Description = selectedColumnField.SingleOrDefault(p => p.Id == group.Rule.GetPropertyValue<int?>(secondLayoutGroup + "Id"))?.Name,
-                        Allow = secondGroup.All(item => item.Rule.Allow != 0)
+                        RowId = group.Key,
+                        Allow = group.All(item => item.Allow != 0),
+                        ColumnId = groupItem.GetPropertyValue<int?>(secondLayoutGroup + "Id")
                     }).ToList()
                 });
 
-            var combination = new CombinationDTO()
-            {
-                Columns = selectedColumnField.ToList().Select(item => new ColumnDTO
+            var orderedSelectedRowField = selectedRowField
+                .ToList()
+                .OrderBy(item => item.Name)
+                .ToList();
+            var orderedSelectedColumnField = selectedColumnField
+                .ToList()
+                .OrderBy(item => item.Name)
+                .ToList();
+
+            var matrix = new MatrixDTO();
+            orderedSelectedRowField
+                .ForEach(rowItem =>
                 {
-                    Id = item.Id,
-                    Name = item.Name
-                })
-                .OrderBy(item => item.Name),
-                Combinations = firstGroups.Select(group => new CombinationDTO
-                {
-                    Description = group.Description,
-                    Combinations = group.Combinations.Select(item => new CombinationDTO
+                    var row = new MatrixRowDTO();
+                    row.Name = rowItem.Name;
+                    orderedSelectedColumnField
+                    .ForEach(columnItem =>
                     {
-                        Description = item.Description,
-                        Allow = item.Allow
-                    })
-                    .OrderBy(item => item.Description)
-                })
-                .OrderBy(item => item.Description),
+                        row.Columns.Add(columnItem.Id, new CellDTO
+                        {
+                            RowId = rowItem.Id,
+                            ColumnId = columnItem.Id
+                        });
+                    });
+                    matrix.Rows.Add(rowItem.Id, row);
+                });
+
+            for (var x = 0; x < groups.Count(); x++)
+            {
+                var rowA = groups.ElementAt(x);
+                for (var y = 0; y < rowA.Combinations.Count(); y++)
+                {
+                    var columnA = rowA.Combinations.ElementAt(y);
+
+                    var rowKey = columnA.RowId.HasValue ? columnA.RowId : -1;
+                    var columnKey = columnA.ColumnId.HasValue ? columnA.ColumnId : -1;
+
+                    if (matrix.Rows.ContainsKey(rowKey))
+                    {
+                        var selectedRow = matrix.Rows[rowKey];
+
+                        if (selectedRow.Columns.ContainsKey(columnKey))
+                        {
+                            matrix.Rows[rowKey].Columns[columnKey] = new CellDTO
+                            {
+                                RowId = rowKey,
+                                ColumnId = columnKey,
+                                Allow = columnA.Allow
+                            };
+                        }
+                        else
+                        {
+                            matrix.Rows[rowKey].Columns.Add(columnKey,  new CellDTO
+                            {
+                                RowId = rowKey,
+                                ColumnId = columnKey,
+                                Allow = columnA.Allow
+                            });
+                        }
+                    }
+                    else
+                    {
+                        var newRow = new MatrixRowDTO();
+                        newRow.Columns.Add(columnKey,  new CellDTO()
+                        {
+                            RowId = rowKey,
+                            ColumnId = columnKey,
+                            Allow = columnA.Allow
+                        });
+                        matrix.Rows.Add(rowKey, newRow);
+                    }
+                }
+            }
+
+            var combination = new CombinationDTO
+            {
+                Headers = selectedColumnField.Select(item => new TitleDTO { Id = item.Id, Name = item.Name }),
+                Rows = matrix.ToRows(),
                 GroupBy = GroupByDTO.Two
             };
 
@@ -190,21 +285,21 @@ namespace FeatureDBPortal.Server.Services
                     })
                 });
 
-            var combination = new CombinationDTO()
-            {
-                Combinations = firstGroups.Select(group => new CombinationDTO
-                {
-                    Description = group.Description,
-                    Combinations = group.Probes.Select(item => new CombinationDTO
-                    {
-                        Description = item.Description,
-                        Allow = item.Versions.All(element => element.Allow)
-                    })
-                }),
-                GroupBy = GroupByDTO.Three
-            };
+            //var combination = new CombinationDTO()
+            //{
+            //    Combinations = firstGroups.Select(group => new CombinationDTO
+            //    {
+            //        Description = group.Description,
+            //        Combinations = group.Probes.Select(item => new CombinationDTO
+            //        {
+            //            Description = item.Description,
+            //            Allow = item.Versions.All(element => element.Allow)
+            //        })
+            //    }),
+            //    GroupBy = GroupByDTO.Three
+            //};
 
-            return await Task.FromResult(combination);
+            return await Task.FromResult(new CombinationDTO());
         }
 
         #region Private Functions

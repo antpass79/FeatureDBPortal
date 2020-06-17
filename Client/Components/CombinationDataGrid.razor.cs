@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace FeatureDBPortal.Client.Components
 {
-    public class CombinationMatrixDataModel : ComponentBase
+    public class CombinationDataGridDataModel : ComponentBase
     {
         [Parameter]
         public CombinationDTO Combination { get; set; }

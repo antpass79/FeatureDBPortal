@@ -1,0 +1,68 @@
+﻿@inherits CombinationDataGridDataModel
+
+<style>
+    .spinner-container {
+        display: flex;
+        position: absolute;
+        z-index: 999;
+        width: 100%;
+        height: 100%;
+        background: lightgray;
+        opacity: 0.3;
+        align-items: center;
+    }
+
+    .combination-matrix {
+
+    }
+</style>
+
+<div class="combination-matrix">
+    @if (Combination == null)
+    {
+        <p class="logo-text"><em>No Available Combinations</em></p>
+    }
+    else if (Combination.GroupBy == FeatureDBPortal.Shared.GroupByDTO.Any)
+    {
+        <div>
+            <p>@Combination.Rows[0].Cells[0].Allow</p>
+        </div>
+    }
+    else if (Combination.GroupBy == FeatureDBPortal.Shared.GroupByDTO.One)
+    {
+        <RadzenGrid Data="@Combination.Rows" TItem="FeatureDBPortal.Shared.RowDTO">
+            <Columns>
+                <RadzenGridColumn Context="data" TItem="FeatureDBPortal.Shared.RowDTO">
+                    <Template>
+                        @data.TitleCell.Name
+                    </Template>
+                </RadzenGridColumn>
+                <RadzenGridColumn Context="data" TItem="FeatureDBPortal.Shared.RowDTO" Property="TitleCell" Title="Allow">
+                    <Template>
+                        @data.Cells[0].Allow
+                    </Template>
+                </RadzenGridColumn>
+            </Columns>
+        </RadzenGrid>
+    }
+    else if (Combination.GroupBy == FeatureDBPortal.Shared.GroupByDTO.Two)
+    {
+        <RadzenGrid Data="@Combination.Rows" TItem="FeatureDBPortal.Shared.RowDTO">
+            <Columns>
+                <RadzenGridColumn Context="data" TItem="FeatureDBPortal.Shared.RowDTO">
+                    <Template>
+                        @data.TitleCell.Name
+                    </Template>
+                </RadzenGridColumn>
+                @foreach (var header in @Combination.Headers)
+                {
+                    <RadzenGridColumn Context="data" TItem="FeatureDBPortal.Shared.TitleDTO">
+                        <Template>
+                            @data.Name
+                        </Template>
+                    </RadzenGridColumn>
+                }
+            </Columns>
+        </RadzenGrid>
+    }
+</div>

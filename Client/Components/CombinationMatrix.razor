@@ -11,69 +11,63 @@
         opacity: 0.3;
         align-items: center;
     }
+
+    tr:nth-child(even) {
+        background-color: lightgray;
+    }
+
+    .table td, .table th {
+        padding: .35rem;
+    }
+
+    th.rotate {
+        height: 140px;
+        white-space: nowrap;
+    }
+
+        th.rotate > div {
+            transform: translate(0px, 0px) rotate(315deg);
+            width: 0px;
+        }
+
+            th.rotate > div > span {
+                padding: 5px 10px;
+            }
+
+    .combination-matrix {
+    }
 </style>
 
-@if (Combination == null)
-{
-    <p class="logo-text"><em>No Available Combinations</em></p>
-}
-else if (Combination.GroupBy == FeatureDBPortal.Shared.GroupByDTO.Any)
-{
-    <div>
-        <p>@Combination.Description</p>
-        <p>@Combination.Allow</p>
-    </div>
-}
-else if (Combination.GroupBy == FeatureDBPortal.Shared.GroupByDTO.One)
-{
-    <table class="table">
-        <thead>
-            <tr>
-                @foreach (var column in Columns)
-                {
-                    <th>
-                        @column.Name
-                    </th>
-                }
-                <th>
-                    Allow
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var combination in Combination.Combinations)
-            {
+<div class="combination-matrix">
+    @if (Combination == null)
+    {
+        <p class="logo-text"><em>No Available Combinations</em></p>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
                 <tr>
-                    <td>@combination.Description</td>
-                    <td>@combination.Allow</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-else if (Combination.GroupBy == FeatureDBPortal.Shared.GroupByDTO.Two)
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>
-                </th>
-                    @foreach (var column in Columns)
+                    @foreach (var header in Combination.Headers)
                     {
-                        <th>
-                            @column.Name
+                        <th class="rotate">
+                            <div><span>@header.Name</span></div>
                         </th>
                     }
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var combination in Combination.Combinations)
-            {
-                <tr>
-                    <td>@combination.Description</td>
-                    <td>@combination.Allow</td>
                 </tr>
-            }
-        </tbody>
-    </table>
-}
+            </thead>
+            <tbody>
+                @foreach (var row in Combination.Rows)
+                {
+                    <tr>
+                        <td>@row.TitleCell.Name</td>
+                        @foreach (var cell in row.Cells)
+                        {
+                            <td>@cell.Allow</td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
