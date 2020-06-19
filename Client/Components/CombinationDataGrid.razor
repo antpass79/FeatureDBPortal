@@ -12,8 +12,29 @@
         align-items: center;
     }
 
-    .combination-matrix {
+    tr:nth-child(even) {
+        background-color: lightgray;
+    }
 
+    .table td, .table th {
+        padding: .35rem;
+    }
+
+    th.rotate {
+        height: 140px;
+        white-space: nowrap;
+    }
+
+        th.rotate > div {
+            transform: translate(0px, 0px) rotate(315deg);
+            width: 0px;
+        }
+
+            th.rotate > div > span {
+                padding: 5px 10px;
+            }
+
+    .combination-matrix {
     }
 </style>
 
@@ -22,47 +43,24 @@
     {
         <p class="logo-text"><em>No Available Combinations</em></p>
     }
-    else if (Combination.GroupBy == FeatureDBPortal.Shared.GroupByDTO.Any)
+    else
     {
-        <div>
-            <p>@Combination.Rows[0].Cells[0].Allow</p>
-        </div>
-    }
-    else if (Combination.GroupBy == FeatureDBPortal.Shared.GroupByDTO.One)
-    {
-        <RadzenGrid Data="@Combination.Rows" TItem="FeatureDBPortal.Shared.RowDTO">
-            <Columns>
-                <RadzenGridColumn Context="data" TItem="FeatureDBPortal.Shared.RowDTO">
-                    <Template>
-                        @data.TitleCell.Name
-                    </Template>
-                </RadzenGridColumn>
-                <RadzenGridColumn Context="data" TItem="FeatureDBPortal.Shared.RowDTO" Property="TitleCell" Title="Allow">
-                    <Template>
-                        @data.Cells[0].Allow
-                    </Template>
-                </RadzenGridColumn>
-            </Columns>
-        </RadzenGrid>
-    }
-    else if (Combination.GroupBy == FeatureDBPortal.Shared.GroupByDTO.Two)
-    {
-        <RadzenGrid Data="@Combination.Rows" TItem="FeatureDBPortal.Shared.RowDTO">
-            <Columns>
-                <RadzenGridColumn Context="data" TItem="FeatureDBPortal.Shared.RowDTO">
-                    <Template>
-                        @data.TitleCell.Name
-                    </Template>
-                </RadzenGridColumn>
-                @foreach (var header in @Combination.Headers)
+        <MatTable Items="@Combination.Rows" class="table mat-elevation-z5" ShowPaging="false">
+            <MatTableHeader>
+                @foreach (var header in Combination.Headers)
                 {
-                    <RadzenGridColumn Context="data" TItem="FeatureDBPortal.Shared.TitleDTO">
-                        <Template>
-                            @data.Name
-                        </Template>
-                    </RadzenGridColumn>
+                    <th class="rotate">
+                        <div><span>@header.Name</span></div>
+                    </th>
                 }
-            </Columns>
-        </RadzenGrid>
+            </MatTableHeader>
+            <MatTableRow>
+                <td>@context.TitleCell.Name</td>
+                @foreach (var cell in @context.Cells)
+                    {
+                    <td>@cell.Allow</td>
+                    }
+            </MatTableRow>
+        </MatTable>
     }
 </div>

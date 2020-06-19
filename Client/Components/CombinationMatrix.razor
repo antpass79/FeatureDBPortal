@@ -63,7 +63,19 @@
                         <td>@row.TitleCell.Name</td>
                         @foreach (var cell in row.Cells)
                         {
-                            <td>@cell.Allow</td>
+                            if (cell.Items == null)
+                            {
+                                <td>@cell.Allow</td>
+                            }
+                            else
+                            {
+                                <td>
+                                    @foreach (var item in cell.Items)
+                                    {
+                                        <span>@item.Name</span>
+                                    }
+                                </td>
+                            }
                         }
                     </tr>
                 }

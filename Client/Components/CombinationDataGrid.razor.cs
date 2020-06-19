@@ -1,4 +1,4 @@
-﻿using FeatureDBPortal.Shared;
+﻿using FeatureDBPortal.Client.Models;
 using Microsoft.AspNetCore.Components;
 
 namespace FeatureDBPortal.Client.Components
@@ -6,6 +6,6 @@ namespace FeatureDBPortal.Client.Components
     public class CombinationDataGridDataModel : ComponentBase
     {
         [Parameter]
-        public CombinationDTO Combination { get; set; }
+        public Combination Combination { get; set; }
     }
 }
