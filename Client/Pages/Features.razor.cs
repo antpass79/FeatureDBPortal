@@ -1,4 +1,6 @@
-﻿using FeatureDBPortal.Client.Services;
+﻿using FeatureDBPortal.Client.Extensions;
+using FeatureDBPortal.Client.Models;
+using FeatureDBPortal.Client.Services;
 using FeatureDBPortal.Shared;
 using Microsoft.AspNetCore.Components;
 using System;
@@ -48,7 +50,7 @@ namespace FeatureDBPortal.Client.Pages
         protected LayoutTypeDTO SelectedColumnLayout { get; set; }
         protected LayoutTypeDTO SelectedCellLayout { get; set; }
 
-        protected CombinationDTO Combination { get; private set; }
+        protected Combination Combination { get; private set; }
 
         protected LayoutTypeDTO CurrentHeader { get; set; }
 
@@ -86,7 +88,7 @@ namespace FeatureDBPortal.Client.Pages
         {
             CombinationsBusy = true;
 
-            Combination = await AvailabilityCombinationService.GetCombinations(new CombinationSearchDTO
+            var combinationDTO = await AvailabilityCombinationService.GetCombinations(new CombinationSearchDTO
             {
                 Application = SelectedRowLayout == LayoutTypeDTO.Application || SelectedColumnLayout == LayoutTypeDTO.Application || SelectedCellLayout == LayoutTypeDTO.Application ? null : SelectedApplication,
                 Probe = SelectedRowLayout == LayoutTypeDTO.Probe || SelectedColumnLayout == LayoutTypeDTO.Probe || SelectedCellLayout == LayoutTypeDTO.Probe ? null : SelectedProbe,
@@ -101,6 +103,7 @@ namespace FeatureDBPortal.Client.Pages
                 CellLayout = SelectedCellLayout
             });
 
+            Combination = combinationDTO.ToModel();
             CurrentHeader = SelectedRowLayout;
 
             CombinationsBusy = false;
