@@ -24,9 +24,9 @@ namespace FeatureDBPortal.Server.Services
 
             var allow = normalRules.All(normalRule => normalRule.Allow != 0);
 
-            var matrix = new CombinationDictionary();
-            matrix.Add(-1, new RowDictionary());
-            matrix[-1].Add(-1, new CombinationCell() { Allow = allow });
+            var matrix = new CombinationDictionary(1);
+            matrix[-1] = new RowDictionary(1);
+            matrix[-1][-1] = new CombinationCell() { Allow = allow };
 
             var combination = new CombinationDTO
             {

@@ -16,12 +16,16 @@
         background-color: lightgray;
     }
 
+    .table {
+        height: 100%;
+    }
     .table td, .table th {
         padding: .35rem;
     }
 
     th.rotate {
         height: 140px;
+        min-width: 50px;
         white-space: nowrap;
     }
 
@@ -34,7 +38,14 @@
                 padding: 5px 10px;
             }
 
+    td.row-title {
+        font-weight: bold;
+        vertical-align: middle;
+    }
+
     .combination-matrix {
+        overflow: auto;
+        height: 100%;
     }
 </style>
 
@@ -59,25 +70,29 @@
             <tbody>
                 @foreach (var row in Combination.Rows)
                 {
-                    <tr>
-                        <td>@row.TitleCell.Name</td>
-                        @foreach (var cell in row.Cells)
+                <tr>
+                    <td class="row-title">
+                        @row.TitleCell.Name
+                    </td>
+                    @foreach (var cell in row.Cells)
+                    {
+                        //if (cell.Items == null)
+                        if (string.IsNullOrWhiteSpace(cell.AggregateItems))
                         {
-                            if (cell.Items == null)
-                            {
-                                <td>@cell.Allow</td>
-                            }
-                            else
-                            {
-                                <td>
-                                    @foreach (var item in cell.Items)
-                                    {
-                                        <span>@item.Name</span>
-                                    }
-                                </td>
-                            }
+                            <td>@cell.Allow</td>
                         }
-                    </tr>
+                        else
+                        {
+                            <td>@cell.AggregateItems</td>
+                            @*<td>
+                                @foreach (var item in cell.Items)
+                                {
+                                    <span>@item.Name</span>
+                                }
+                            </td>*@
+                        }
+                    }
+                </tr>
                 }
             </tbody>
         </table>

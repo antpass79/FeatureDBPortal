@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq.Expressions;
-using System.Reflection;
-
-namespace FeatureDBPortal.Server.Extensions
+﻿namespace FeatureDBPortal.Server.Extensions
 {
     public static class ObjectPropertyExtensions
     {
