@@ -18,13 +18,14 @@ namespace FeatureDBPortal.Client.Extensions
                         ColumnId = cell.ColumnId,
                         Allow = cell.Allow,
                         Name = cell.Name,
-                        Items = cell.Items?.Select(item => new CombinationItem
-                        {
-                            RowId = item.RowId,
-                            ColumnId = item.ColumnId,
-                            ItemId = item.ItemId,
-                            Name = item.Name,
-                        })
+                        AggregateItems = cell.Items == null ? string.Empty : string.Join(System.Environment.NewLine, cell.Items.Select(item => item.Name)),
+                        //Items = cell.Items?.Select(item => new CombinationItem
+                        //{
+                        //    RowId = item.RowId,
+                        //    ColumnId = item.ColumnId,
+                        //    ItemId = item.ItemId,
+                        //    Name = item.Name
+                        //})
                     }).ToList(),
                     TitleCell = new CombinationCell()
                     {

@@ -1,5 +1,8 @@
-﻿namespace FeatureDBPortal.Shared
+﻿using System;
+
+namespace FeatureDBPortal.Shared
 {
+    [Serializable]
     public class ColumnTitleDTO
     {
         public int? Id { get; set; }

@@ -50,6 +50,7 @@ namespace FeatureDBPortal.Server.Services
                     3 => await _combinationGroupByThreeService.Combine(search, groupBy),
                     _ => throw new NotImplementedException()
                 };
+
                 return combination;
             }
             catch (Exception e)

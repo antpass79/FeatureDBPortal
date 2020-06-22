@@ -1,5 +1,7 @@
 ﻿using FeatureDBPortal.Server.Models;
 using FeatureDBPortal.Shared;
+using FluentValidation.Validators;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,7 +9,7 @@ namespace FeatureDBPortal.Server.Extensions
 {
     public static class CombinationDictionaryExtensions
     {
-        public static IList<RowDTO> ToRows(this CombinationDictionary matrix)
+        public static IEnumerable<RowDTO> ToRows(this CombinationDictionary matrix)
         {
             return matrix.Values.Select(row => new RowDTO
             {
@@ -22,8 +24,8 @@ namespace FeatureDBPortal.Server.Extensions
                         ItemId = itemCell.ItemId,
                         Name = itemCell.Name
                     })
-                }).ToList()
-            }).ToList();
+                })
+            });
         }
     }
 }

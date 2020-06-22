@@ -16,3 +16,7 @@
 
 - <https://chrissainty.com/a-detailed-look-at-data-binding-in-blazor/>
 - <https://blazor-tutorial.net/two-way-data-binding>
+
+## Json Serializer
+
+- <https://michaelscodingspot.com/the-battle-of-c-to-json-serializers-in-net-core-3/>

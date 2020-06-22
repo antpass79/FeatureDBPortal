@@ -6,6 +6,6 @@ namespace FeatureDBPortal.Client.Models
     {
         public IEnumerable<ColumnTitle> Headers { get; set; }
 
-        public IList<Row> Rows { get; set; }
+        public IEnumerable<Row> Rows { get; set; }
     }
 }
