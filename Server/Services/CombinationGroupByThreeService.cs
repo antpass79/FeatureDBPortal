@@ -1,6 +1,7 @@
 ﻿using FeatureDBPortal.Server.Data.Models;
 using FeatureDBPortal.Server.Extensions;
 using FeatureDBPortal.Server.Models;
+using FeatureDBPortal.Server.Utils;
 using FeatureDBPortal.Shared;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -29,8 +30,11 @@ namespace FeatureDBPortal.Server.Services
 
             IEnumerable<NormalRule> normalRules = FilterNormalRules(search);
 
+            var firstGroupExpression = PropertyExpressionBuilder.Build<NormalRule, int?>(firstLayoutGroup + "Id").Compile();
+            var thirdGroupExpression = PropertyExpressionBuilder.Build<NormalRule, int?>(thirdLayoutGroup + "Id").Compile();
+
             var groups = normalRules
-                .GroupBy(normalRule => normalRule.GetPropertyValue<int?>(firstLayoutGroup + "Id"))
+                .GroupBy(firstGroupExpression)
                 .Select(group => new
                 {
                     RowId = group.Key,
@@ -40,13 +44,13 @@ namespace FeatureDBPortal.Server.Services
                         RowId = group.Key,
                         ColumnId = groupItem.GetPropertyValue<int?>(secondLayoutGroup + "Id"),
                         Allow = group.All(item => item.Allow != 0),
-                        Items = group.GroupBy(element => element.GetPropertyValue<int?>(thirdLayoutGroup + "Id")).Select(thirdGroup => new
+                        Items = group.GroupBy(thirdGroupExpression).Select(thirdGroup => new
                         {
                             ItemName = selectedCellField.SingleOrDefault(cellItem => cellItem.Id == thirdGroup.Key)?.Name,
                             Allow = thirdGroup.All(i => i.Allow != 0)
                         })
                     }).ToList()
-                });
+                }).ToList();
 
             var orderedSelectedRowField = selectedRowField
                 .ToList()
@@ -59,12 +63,12 @@ namespace FeatureDBPortal.Server.Services
 
             CombinationDictionary matrix = PrepareMatrix(orderedSelectedRowField, orderedSelectedColumnField);
 
-            for (var x = 0; x < groups.Count(); x++)
+            for (var x = 0; x < groups.Count; x++)
             {
-                var rowA = groups.ElementAt(x);
-                for (var y = 0; y < rowA.Combinations.Count(); y++)
+                var rowA = groups[x];
+                for (var y = 0; y < rowA.Combinations.Count; y++)
                 {
-                    var columnA = rowA.Combinations.ElementAt(y);
+                    var columnA = rowA.Combinations[y];
 
                     var rowKey = columnA.RowId.HasValue ? columnA.RowId : -1;
                     var columnKey = columnA.ColumnId.HasValue ? columnA.ColumnId : -1;
@@ -110,8 +114,8 @@ namespace FeatureDBPortal.Server.Services
                     }
                     else
                     {
-                        var newRow = new RowDictionary();
-                        newRow.Add(columnKey, new CombinationCell()
+                        var newRow = new RowDictionary(1);
+                        newRow[columnKey] = new CombinationCell()
                         {
                             RowId = rowKey,
                             ColumnId = columnKey,
@@ -124,17 +128,20 @@ namespace FeatureDBPortal.Server.Services
                                     ColumnId = columnKey,
                                     Name = cellItem.ItemName
                                 })
-                        });
-                        matrix.Add(rowKey, newRow);
+                        };
+                        matrix[rowKey] = newRow;
                     }
                 }
             }
-
-            var firstHeaderItem = new List<ColumnTitleDTO> { new ColumnTitleDTO { Name = firstLayoutGroup.ToString() } };
+            
+            var firstHeaderItem = new List<ColumnTitleDTO> { new ColumnTitleDTO
+            {
+                Name = $"{firstLayoutGroup} - {secondLayoutGroup} - {thirdLayoutGroup}"
+            } };
 
             var combination = new CombinationDTO
             {
-                Headers = firstHeaderItem.Union(selectedColumnField.Select(item => new ColumnTitleDTO { Id = item.Id, Name = item.Name })),
+                Headers = firstHeaderItem.Union(orderedSelectedColumnField.Select(item => new ColumnTitleDTO { Id = item.Id, Name = item.Name })),
                 Rows = matrix.ToRows()
             };
 
@@ -143,23 +150,23 @@ namespace FeatureDBPortal.Server.Services
 
         private static CombinationDictionary PrepareMatrix(List<IQueryableCombination> orderedSelectedRowField, List<IQueryableCombination> orderedSelectedColumnField)
         {
-            var matrix = new CombinationDictionary();
+            var matrix = new CombinationDictionary(orderedSelectedRowField.Count);
 
             orderedSelectedRowField
                 .ForEach(rowItem =>
                 {
-                    var row = new RowDictionary();
+                    var row = new RowDictionary(orderedSelectedColumnField.Count);
                     row.Name = rowItem.Name;
                     orderedSelectedColumnField
                     .ForEach(columnItem =>
                     {
-                        row.Add(columnItem.Id, new CombinationCell
+                        row[columnItem.Id] = new CombinationCell
                         {
                             RowId = rowItem.Id,
                             ColumnId = columnItem.Id
-                        });
+                        };
                     });
-                    matrix.Add(rowItem.Id, row);
+                    matrix[rowItem.Id] = row;
                 });
             return matrix;
         }

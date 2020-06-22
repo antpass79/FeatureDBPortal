@@ -2,9 +2,8 @@
 @inherits FeaturesDataModel
 
 <style>
-    .features-container {
-        display: flex;
-        flex-direction: column;
+    .combination-container {
+        height: calc(100% - 200px);
     }
 
     .features-options {
@@ -64,241 +63,241 @@
 
 <p>Check feature availability for a specific combination</p>
 
-<div class="features-container">
-
-    @if (FiltersBusy)
-    {
-        <div class="logo">
-            <SpinKitCircle />
-            <p class="logo-text"><em>Loading Filters...</em></p>
-        </div>
-    }
-    else
-    {
-        <div class="features-options">
-            <div class="options-filter">
-                <h5>Filters</h5>
-                <div class="filter-row">
-                    <div class="filter-item">
-                        <a>Models</a>
-                        @if (Models == null)
-                        {
-                            <p><em>Loading...</em></p>
-                        }
-                        else
-                        {
-                            <select @bind="SelectedModel.Id" disabled="@DisableModel">
-                                @foreach (var model in Models)
-                                {
-                                    <option value="@model.Id">@model.Name</option>
-                                }
-                            </select>
-                        }
-                    </div>
-
-                    <div class="filter-item">
-                        <a>Countries</a>
-                        @if (Countries == null)
-                        {
-                            <p><em>Loading...</em></p>
-                        }
-                        else
-                        {
-                            <select @bind="SelectedCountry.Id" disabled="@DisableCountry">
-                                @foreach (var country in Countries)
-                                {
-                                    <option value="@country.Id">@country.Name</option>
-                                }
-                            </select>
-                        }
-                    </div>
-
-                    <div class="filter-item">
-                        <a>Users</a>
-                        @if (UserLevels == null)
-                        {
-                            <p><em>Loading...</em></p>
-                        }
-                        else
-                        {
-                            <select @bind="SelectedUserLevel" disabled="@DisableUserLevel">
-                                @foreach (var userLevel in UserLevels)
-                                {
-                                    <option value="@userLevel">@userLevel</option>
-                                }
-                            </select>
-                        }
-                    </div>
-
-                    <div class="filter-item">
-                        <a>Applications</a>
-                        @if (Applications == null)
-                        {
-                            <p><em>Loading...</em></p>
-                        }
-                        else
-                        {
-                            <select @bind="SelectedApplication.Id" disabled="@DisableApplication">
-                                <option></option>
-                                @foreach (var application in Applications)
-                                {
-                                    <option value="@application.Id">@application.Name</option>
-                                }
-                            </select>
-                        }
-                    </div>
-                </div>
-
-                <div class="filter-row">
-                    <div class="filter-item">
-                        <a>Probes</a>
-                        @if (Probes == null)
-                        {
-                            <p><em>Loading...</em></p>
-                        }
-                        else
-                        {
-                            <select @bind="SelectedProbe.Id" disabled="@DisableProbe">
-                                <option></option>
-                                @foreach (var probe in Probes)
-                                {
-                                    <option value="@probe.Id">@probe.Name</option>
-                                }
-                            </select>
-                        }
-                    </div>
-
-                    <div class="filter-item">
-                        <a>Kits</a>
-                        @if (Kits == null)
-                        {
-                            <p><em>Loading...</em></p>
-                        }
-                        else
-                        {
-                            <select @bind="SelectedKit.Id" disabled="@DisableKit">
-                                <option></option>
-                                @foreach (var kit in Kits)
-                                {
-                                    <option value="@kit.Id">@kit.Name</option>
-                                }
-                            </select>
-                        }
-                    </div>
-
-                    <div class="filter-item">
-                        <a>Options</a>
-                        @if (Options == null)
-                        {
-                            <p><em>Loading...</em></p>
-                        }
-                        else
-                        {
-                            <select @bind="SelectedOption.Id" disabled="@DisableOption">
-                                <option></option>
-                                @foreach (var option in Options)
-                                {
-                                    <option value="@option.Id">@option.Name</option>
-                                }
-                            </select>
-                        }
-                    </div>
-
-                    <div class="filter-item">
-                        <a>Versions</a>
-                        @if (Versions == null)
-                        {
-                            <p><em>Loading...</em></p>
-                        }
-                        else
-                        {
-                            <select @bind="SelectedVersion.Id" disabled="@DisableVersion">
-                                <option></option>
-                                @foreach (var version in Versions)
-                                {
-                                    <option value="@version.Id">@version.BuildVersion</option>
-                                }
-                            </select>
-                        }
-                    </div>
-                </div>
-            </div>
-
-            <div class="options-layout">
-                <h5>Layout</h5>
+@if (FiltersBusy)
+{
+    <div class="logo">
+        <SpinKitCircle />
+        <p class="logo-text"><em>Loading Filters...</em></p>
+    </div>
+}
+else
+{
+    <div class="features-options">
+        <div class="options-filter">
+            <h5>Filters</h5>
+            <div class="filter-row">
                 <div class="filter-item">
-                    <a>Rows</a>
-                    @if (LayoutViews == null)
+                    <a>Models</a>
+                    @if (Models == null)
                     {
                         <p><em>Loading...</em></p>
                     }
                     else
                     {
-                        <select @bind="SelectedRowLayout">
-                            <option></option>
-                            @foreach (var layoutView in LayoutViews)
+                        <select @bind="SelectedModel.Id" disabled="@DisableModel">
+                            @foreach (var model in Models)
                             {
-                                <option value="@layoutView">@layoutView</option>
+                                <option value="@model.Id">@model.Name</option>
                             }
                         </select>
                     }
                 </div>
+
                 <div class="filter-item">
-                    <a>Columns</a>
-                    @if (LayoutViews == null)
+                    <a>Countries</a>
+                    @if (Countries == null)
                     {
                         <p><em>Loading...</em></p>
                     }
                     else
                     {
-                        <select @bind="SelectedColumnLayout">
-                            <option></option>
-                            @foreach (var layoutView in LayoutViews)
+                        <select @bind="SelectedCountry.Id" disabled="@DisableCountry">
+                            @foreach (var country in Countries)
                             {
-                                <option value="@layoutView">@layoutView</option>
+                                <option value="@country.Id">@country.Name</option>
                             }
                         </select>
                     }
                 </div>
+
                 <div class="filter-item">
-                    <a>Cells</a>
-                    @if (LayoutViews == null)
+                    <a>Users</a>
+                    @if (UserLevels == null)
                     {
                         <p><em>Loading...</em></p>
                     }
                     else
                     {
-                        <select @bind="SelectedCellLayout">
-                            <option></option>
-                            @foreach (var layoutView in LayoutViews)
+                        <select @bind="SelectedUserLevel" disabled="@DisableUserLevel">
+                            @foreach (var userLevel in UserLevels)
                             {
-                                <option value="@layoutView">@layoutView</option>
+                                <option value="@userLevel">@userLevel</option>
+                            }
+                        </select>
+                    }
+                </div>
+
+                <div class="filter-item">
+                    <a>Applications</a>
+                    @if (Applications == null)
+                    {
+                        <p><em>Loading...</em></p>
+                    }
+                    else
+                    {
+                        <select @bind="SelectedApplication.Id" disabled="@DisableApplication">
+                            <option></option>
+                            @foreach (var application in Applications)
+                            {
+                                <option value="@application.Id">@application.Name</option>
                             }
                         </select>
                     }
                 </div>
             </div>
 
-            <div class="options-search">
-                <button class="btn btn-info" @onclick="OnSearch">
-                    <i class="fa fa-search"></i>
-                </button>
+            <div class="filter-row">
+                <div class="filter-item">
+                    <a>Probes</a>
+                    @if (Probes == null)
+                    {
+                        <p><em>Loading...</em></p>
+                    }
+                    else
+                    {
+                        <select @bind="SelectedProbe.Id" disabled="@DisableProbe">
+                            <option></option>
+                            @foreach (var probe in Probes)
+                            {
+                                <option value="@probe.Id">@probe.Name</option>
+                            }
+                        </select>
+                    }
+                </div>
+
+                <div class="filter-item">
+                    <a>Kits</a>
+                    @if (Kits == null)
+                    {
+                        <p><em>Loading...</em></p>
+                    }
+                    else
+                    {
+                        <select @bind="SelectedKit.Id" disabled="@DisableKit">
+                            <option></option>
+                            @foreach (var kit in Kits)
+                            {
+                                <option value="@kit.Id">@kit.Name</option>
+                            }
+                        </select>
+                    }
+                </div>
+
+                <div class="filter-item">
+                    <a>Options</a>
+                    @if (Options == null)
+                    {
+                        <p><em>Loading...</em></p>
+                    }
+                    else
+                    {
+                        <select @bind="SelectedOption.Id" disabled="@DisableOption">
+                            <option></option>
+                            @foreach (var option in Options)
+                            {
+                                <option value="@option.Id">@option.Name</option>
+                            }
+                        </select>
+                    }
+                </div>
+
+                <div class="filter-item">
+                    <a>Versions</a>
+                    @if (Versions == null)
+                    {
+                        <p><em>Loading...</em></p>
+                    }
+                    else
+                    {
+                        <select @bind="SelectedVersion.Id" disabled="@DisableVersion">
+                            <option></option>
+                            @foreach (var version in Versions)
+                            {
+                                <option value="@version.Id">@version.BuildVersion</option>
+                            }
+                        </select>
+                    }
+                </div>
             </div>
-
         </div>
-    }
 
-    @if (CombinationsBusy)
-    {
-        <div class="logo">
-            <SpinKitCircle />
-            <p class="logo-text"><em>Loading Data...</em></p>
+        <div class="options-layout">
+            <h5>Layout</h5>
+            <div class="filter-item">
+                <a>Rows</a>
+                @if (LayoutViews == null)
+                {
+                    <p><em>Loading...</em></p>
+                }
+                else
+                {
+                    <select @bind="SelectedRowLayout">
+                        <option></option>
+                        @foreach (var layoutView in LayoutViews)
+                        {
+                            <option value="@layoutView">@layoutView</option>
+                        }
+                    </select>
+                }
+            </div>
+            <div class="filter-item">
+                <a>Columns</a>
+                @if (LayoutViews == null)
+                {
+                    <p><em>Loading...</em></p>
+                }
+                else
+                {
+                    <select @bind="SelectedColumnLayout">
+                        <option></option>
+                        @foreach (var layoutView in LayoutViews)
+                        {
+                            <option value="@layoutView">@layoutView</option>
+                        }
+                    </select>
+                }
+            </div>
+            <div class="filter-item">
+                <a>Cells</a>
+                @if (LayoutViews == null)
+                {
+                    <p><em>Loading...</em></p>
+                }
+                else
+                {
+                    <select @bind="SelectedCellLayout">
+                        <option></option>
+                        @foreach (var layoutView in LayoutViews)
+                        {
+                            <option value="@layoutView">@layoutView</option>
+                        }
+                    </select>
+                }
+            </div>
         </div>
-    }
-    else
-    {
-        @*<CombinationDataGrid Combination="@Combination"></CombinationDataGrid>*@
-        <CombinationMatrix Combination="@Combination"></CombinationMatrix>
-    }
+
+        <div class="options-search">
+            <button class="btn btn-info" @onclick="OnSearch">
+                <i class="fa fa-search"></i>
+            </button>
+        </div>
+
+    </div>
+}
+
+<div class="combination-container">
+
+        @if (CombinationsBusy)
+        {
+            <div class="logo">
+                <SpinKitCircle />
+                <p class="logo-text"><em>Loading Data...</em></p>
+            </div>
+        }
+        else
+        {
+            @*<CombinationDataGrid Combination="@Combination"></CombinationDataGrid>*@
+            <CombinationMatrix Combination="@Combination"></CombinationMatrix>
+        }
 
 </div>

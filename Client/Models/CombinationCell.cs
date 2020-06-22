@@ -14,6 +14,7 @@ namespace FeatureDBPortal.Client.Models
 
         public string Name { get; set; }
         public bool? Allow { get; set; }
+        public string AggregateItems { get; set; }
         public IEnumerable<CombinationItem> Items { get; set; }
 
         public int? RowId { get; set; }

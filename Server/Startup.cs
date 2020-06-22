@@ -1,20 +1,16 @@
+using AutoMapper;
+using FeatureDBPortal.Server.Data.Models;
+using FeatureDBPortal.Server.Options;
+using FeatureDBPortal.Server.Repositories;
+using FeatureDBPortal.Server.Services;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System.Linq;
-using FeatureDBPortal.Server.Options;
-using FeatureDBPortal.Server.Data.Models;
-using AutoMapper;
-using FeatureDBPortal.Server.Repositories;
-using Microsoft.EntityFrameworkCore;
-using FeatureDBPortal.Shared;
 using System;
-using FeatureDBPortal.Server.Services;
-using FluentValidation.AspNetCore;
 using System.Reflection;
 
 namespace FeatureDBPortal.Server
