@@ -9,12 +9,14 @@
 
   <ItemGroup>
     <PackageReference Include="Faso.Blazor.SpinKit" Version="1.0.1" />
+    <PackageReference Include="Grpc.Net.Client.Web" Version="2.29.0" />
     <PackageReference Include="MatBlazor" Version="2.6.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="3.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Build" Version="3.2.0" PrivateAssets="all" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="3.2.0" PrivateAssets="all" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="System.Net.Http.Json" Version="3.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Blazor.Mono" Version="3.2.0-preview1.20052.1" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,5 +1,6 @@
 using AutoMapper;
 using FeatureDBPortal.Server.Data.Models;
+using FeatureDBPortal.Server.gRPC;
 using FeatureDBPortal.Server.Options;
 using FeatureDBPortal.Server.Repositories;
 using FeatureDBPortal.Server.Services;
@@ -70,6 +71,8 @@ namespace FeatureDBPortal.Server
                     options.RegisterValidatorsFromAssembly(Assembly.GetExecutingAssembly());
                 });
             services.AddRazorPages();
+
+            services.AddGrpc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -93,11 +96,15 @@ namespace FeatureDBPortal.Server
 
             app.UseRouting();
 
+            app.UseGrpcWeb();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
                 endpoints.MapControllers();
                 endpoints.MapFallbackToFile("index.html");
+                endpoints.MapGrpcService<CombinationService>().EnableGrpcWeb();
+                endpoints.MapGrpcService<FilterService>().EnableGrpcWeb();
             });
         }
     }

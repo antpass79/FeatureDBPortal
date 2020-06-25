@@ -13,7 +13,6 @@ namespace FeatureDBPortal.Server.Controllers
     public class AvailabilityCombinationController : ControllerBase
     {
         private readonly ILogger<AvailabilityCombinationController> _logger;
-        private readonly IMapper _mapper;
         private readonly IAvailabilityCombinationService _availabilityCombinationService;
 
         public AvailabilityCombinationController(

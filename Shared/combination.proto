@@ -1,0 +1,154 @@
+﻿syntax = "proto3";
+option csharp_namespace = "GrpcCombination";
+package combiner;
+import "google/protobuf/wrappers.proto";
+
+service Combiner {
+  rpc GetCombination (CombinationSearchGRPC) returns (CombinationGRPC);
+}
+
+service Filter {
+  rpc GetApplications (EmptyParam) returns (ApplicationReplay);
+  rpc GetModels (EmptyParam) returns (ModelReplay);
+  rpc GetVersions (EmptyParam) returns (VersionReplay);
+  rpc GetProbes (EmptyParam) returns (ProbeReplay);
+  rpc GetKits (EmptyParam) returns (KitReplay);
+  rpc GetOptions (EmptyParam) returns (OptionsReplay);
+  rpc GetCountries (EmptyParam) returns (CountryReplay);
+}
+
+message EmptyParam {
+}
+
+message ApplicationReplay {
+    repeated ApplicationGRPC Applications = 1;
+}
+
+message ModelReplay {
+    repeated ModelGRPC Models = 1;
+}
+
+message ProbeReplay {
+    repeated ProbeGRPC Probes = 1;
+}
+
+message VersionReplay {
+    repeated VersionGRPC Versions = 1;
+}
+
+message CountryReplay {
+    repeated CountryGRPC Countries = 1;
+}
+
+message KitReplay {
+    repeated KitGRPC Kits = 1;
+}
+
+message OptionsReplay {
+    repeated OptionGRPC Options = 1;
+}
+
+message ApplicationGRPC {
+    google.protobuf.Int32Value Id = 1;
+    google.protobuf.StringValue Name = 2;
+}
+
+message OptionGRPC {
+    google.protobuf.Int32Value Id = 1;
+    google.protobuf.StringValue Name = 2;
+}
+
+message ModelGRPC {
+    google.protobuf.Int32Value Id = 1;
+    google.protobuf.StringValue Name = 2;
+}
+
+message CountryGRPC {
+    google.protobuf.Int32Value Id = 1;
+    google.protobuf.StringValue Name = 2;
+}
+
+message ProbeGRPC {
+    google.protobuf.Int32Value Id = 1;
+    google.protobuf.StringValue Name = 2;
+}
+
+message VersionGRPC {
+    google.protobuf.Int32Value Id = 1;
+    google.protobuf.StringValue BuildVersion = 2;
+}
+
+message KitGRPC {
+    google.protobuf.Int32Value Id = 1;
+    google.protobuf.StringValue Name = 2;
+}
+
+enum UserLevelGRPC {
+    USER_LEVEL_GRPC_RS = 0;
+    USER_LEVEL_GRPC_Service = 1;
+    USER_LEVEL_GRPC_Standard = 2;
+    USER_LEVEL_GRPC_Test = 3;
+    USER_LEVEL_GRPC_WIP = 4;
+    USER_LEVEL_GRPC_Unknown = -1;
+    USER_LEVEL_GRPC_None = -2;
+}
+
+enum LayoutTypeGRPC {
+    LAYOUT_TYPE_GRPC_Unused = 0;
+    LAYOUT_TYPE_GRPC_None = 1;
+    LAYOUT_TYPE_GRPC_Application = 2;
+    LAYOUT_TYPE_GRPC_Country = 3;
+    LAYOUT_TYPE_GRPC_Feature = 4;
+    LAYOUT_TYPE_GRPC_Kit = 5;
+    LAYOUT_TYPE_GRPC_License = 6;
+    LAYOUT_TYPE_GRPC_Model = 7;
+    LAYOUT_TYPE_GRPC_Option = 8;
+    LAYOUT_TYPE_GRPC_Probe = 9;
+    LAYOUT_TYPE_GRPC_UserLevel = 10;
+    LAYOUT_TYPE_GRPC_Version = 11;
+}
+
+message CombinationSearchGRPC {
+    ApplicationGRPC Application = 1;
+    ProbeGRPC Probe  = 2;
+    CountryGRPC Country  = 3;
+    VersionGRPC Version  = 4;
+    ModelGRPC Model  = 5;
+    OptionGRPC Option  = 6;
+    KitGRPC Kit  = 7;
+
+    UserLevelGRPC UserLevel  = 8;
+    LayoutTypeGRPC RowLayout  = 9;
+    LayoutTypeGRPC ColumnLayout  = 10;
+    LayoutTypeGRPC CellLayout  = 11;
+}
+
+message ColumnTitleGRPC {
+    google.protobuf.Int32Value Id = 1;
+    google.protobuf.StringValue Name = 2;
+}
+
+message CombinationItemGRPC {
+    google.protobuf.StringValue Name = 1;
+    google.protobuf.Int32Value RowId = 2;
+    google.protobuf.Int32Value ColumnId = 3;
+    google.protobuf.Int32Value ItemId = 4;
+}
+
+message CombinationCellGRPC {
+    google.protobuf.StringValue Name = 1;
+    google.protobuf.BoolValue Allow = 2;
+    google.protobuf.Int32Value RowId = 3;
+    google.protobuf.Int32Value ColumnId = 4;
+    repeated CombinationItemGRPC Items = 5;
+}
+
+message RowGRPC {
+    CombinationCellGRPC TitleCell = 1;
+    repeated CombinationCellGRPC Cells = 2;
+}
+
+message CombinationGRPC {
+    repeated ColumnTitleGRPC Headers = 1;
+    repeated RowGRPC Rows = 2;
+}
