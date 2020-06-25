@@ -2,7 +2,6 @@
 
 namespace FeatureDBPortal.Shared
 {
-    [Serializable]
     public class ColumnTitleDTO
     {
         public int? Id { get; set; }

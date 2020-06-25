@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 namespace FeatureDBPortal.Shared
 {
-    [Serializable]
     public class CombinationCellDTO
     {
         public string Name { get; set; }

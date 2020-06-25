@@ -2,7 +2,6 @@
 
 namespace FeatureDBPortal.Shared
 {
-    [Serializable]
     public class CombinationItemDTO
     {
         public CombinationItemDTO()

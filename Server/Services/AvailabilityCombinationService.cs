@@ -55,6 +55,7 @@ namespace FeatureDBPortal.Server.Services
             }
             catch (Exception e)
             {
+                Trace.WriteLine(e.Message);
                 return await Task.FromResult<CombinationDTO>(null);
             }
             finally
