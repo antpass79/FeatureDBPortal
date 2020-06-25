@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -63,6 +64,9 @@ namespace FeatureDBPortal.Client.Pages
         protected bool DisableCountry => SelectedRowLayout == LayoutTypeDTO.Country || SelectedColumnLayout == LayoutTypeDTO.Country || SelectedCellLayout == LayoutTypeDTO.Country;
         protected bool DisableUserLevel => SelectedRowLayout == LayoutTypeDTO.UserLevel || SelectedColumnLayout == LayoutTypeDTO.UserLevel || SelectedCellLayout == LayoutTypeDTO.UserLevel;
 
+        private bool IsOutputLayoutTypeSelected(LayoutTypeDTO layoutType) => SelectedRowLayout == layoutType || SelectedColumnLayout == layoutType || SelectedCellLayout == layoutType;
+
+
         protected override async Task OnInitializedAsync()
         {
             FiltersBusy = true;
@@ -86,18 +90,22 @@ namespace FeatureDBPortal.Client.Pages
 
         async protected Task OnSearch()
         {
+            var start = DateTime.Now;
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
             CombinationsBusy = true;
 
             var combinationDTO = await AvailabilityCombinationService.GetCombinations(new CombinationSearchDTO
             {
-                Application = SelectedRowLayout == LayoutTypeDTO.Application || SelectedColumnLayout == LayoutTypeDTO.Application || SelectedCellLayout == LayoutTypeDTO.Application ? null : SelectedApplication,
-                Probe = SelectedRowLayout == LayoutTypeDTO.Probe || SelectedColumnLayout == LayoutTypeDTO.Probe || SelectedCellLayout == LayoutTypeDTO.Probe ? null : SelectedProbe,
-                Country = SelectedRowLayout == LayoutTypeDTO.Country || SelectedColumnLayout == LayoutTypeDTO.Country || SelectedCellLayout == LayoutTypeDTO.Country ? null : SelectedCountry,
-                Version = SelectedRowLayout == LayoutTypeDTO.Version || SelectedColumnLayout == LayoutTypeDTO.Version || SelectedCellLayout == LayoutTypeDTO.Version ? null : SelectedVersion,
-                Model = SelectedRowLayout == LayoutTypeDTO.Model || SelectedColumnLayout == LayoutTypeDTO.Model || SelectedCellLayout == LayoutTypeDTO.Model ? null : SelectedModel,
-                Option = SelectedRowLayout == LayoutTypeDTO.Option || SelectedColumnLayout == LayoutTypeDTO.Option || SelectedCellLayout == LayoutTypeDTO.Option ? null : SelectedOption,
-                Kit = SelectedRowLayout == LayoutTypeDTO.Kit || SelectedColumnLayout == LayoutTypeDTO.Kit || SelectedCellLayout == LayoutTypeDTO.Kit ? null : SelectedKit,
-                UserLevel = SelectedRowLayout == LayoutTypeDTO.UserLevel || SelectedColumnLayout == LayoutTypeDTO.UserLevel || SelectedCellLayout == LayoutTypeDTO.UserLevel ? UserLevelDTO.None: SelectedUserLevel,
+                Application = IsOutputLayoutTypeSelected(LayoutTypeDTO.Application) ? null : SelectedApplication,
+                Probe = IsOutputLayoutTypeSelected(LayoutTypeDTO.Probe) ? null : SelectedProbe,
+                Country = IsOutputLayoutTypeSelected(LayoutTypeDTO.Country) || SelectedCellLayout == LayoutTypeDTO.Country ? null : SelectedCountry,
+                Version = IsOutputLayoutTypeSelected(LayoutTypeDTO.Version) ? null : SelectedVersion,
+                Model = IsOutputLayoutTypeSelected(LayoutTypeDTO.Model) ? null : SelectedModel,
+                Option = IsOutputLayoutTypeSelected(LayoutTypeDTO.Option) ? null : SelectedOption,
+                Kit = IsOutputLayoutTypeSelected(LayoutTypeDTO.Kit) ? null : SelectedKit,
+                UserLevel = IsOutputLayoutTypeSelected(LayoutTypeDTO.UserLevel) ? UserLevelDTO.None : SelectedUserLevel,
                 RowLayout = SelectedRowLayout,
                 ColumnLayout = SelectedColumnLayout,
                 CellLayout = SelectedCellLayout
@@ -107,6 +115,9 @@ namespace FeatureDBPortal.Client.Pages
             CurrentHeader = SelectedRowLayout;
 
             CombinationsBusy = false;
+
+            Trace.WriteLine(string.Empty);
+            Trace.WriteLine($"FEATURE: Process starts at {start} and stops at {DateTime.Now} with duration of {stopwatch.Elapsed}");
         }
     }
 }

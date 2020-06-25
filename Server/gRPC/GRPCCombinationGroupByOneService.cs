@@ -3,24 +3,22 @@ using FeatureDBPortal.Server.Extensions;
 using FeatureDBPortal.Server.Models;
 using FeatureDBPortal.Server.Utils;
 using FeatureDBPortal.Shared;
+using GrpcCombination;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
-namespace FeatureDBPortal.Server.Services
+namespace FeatureDBPortal.Server.gRPC
 {
-    public class CombinationGroupByOneService : CombinationGroupService
+    public class GRPCCombinationGroupByOneService : GRPCCombinationGroupService
     {
-        public CombinationGroupByOneService(DbContext context)
+        public GRPCCombinationGroupByOneService(DbContext context)
             : base(context)
         {
         }
 
-        async override public Task<CombinationDTO> Combine(CombinationSearchDTO search, IEnumerable<LayoutType> groupBy)
+        async override public Task<CombinationGRPC> Combine(CombinationSearchGRPC search, IEnumerable<LayoutType> groupBy)
         {
             var firstLayoutGroup = groupBy
                 .ElementAt(0)
@@ -59,15 +57,13 @@ namespace FeatureDBPortal.Server.Services
                     };
                 });
 
-            var combination = new CombinationDTO
-            {
-                Headers = new List<ColumnTitleDTO>
+            var combination = new CombinationGRPC();
+            combination.Headers.AddRange(new List<ColumnTitleGRPC>
                 {
-                    new ColumnTitleDTO { Id = -1, Name = firstLayoutGroup },
-                    new ColumnTitleDTO { Id = -1, Name = "Allow" }
-                },
-                Rows = matrix.ToRows()
-            };
+                    new ColumnTitleGRPC { Id = -1, Name = firstLayoutGroup },
+                    new ColumnTitleGRPC { Id = -1, Name = "Allow" }
+                });
+            combination.Rows.AddRange(matrix.ToGRPCRows());
 
             return await Task.FromResult(combination);
         }
