@@ -24,14 +24,31 @@ namespace FeatureDBPortal.Server.Services
             var secondLayoutGroup = groupBy.ElementAt(1);
             var thirdLayoutGroup = groupBy.ElementAt(2);
 
+            var firstPropertyNameId = firstLayoutGroup + "Id";
+            var secondPropertyNameId = secondLayoutGroup + "Id";
+            var thirdPropertyNameId = thirdLayoutGroup + "Id";
+
             var selectedRowField = Context.GetPropertyValue<IQueryable<IQueryableCombination>>(firstLayoutGroup.ToString());
             var selectedColumnField = Context.GetPropertyValue<IQueryable<IQueryableCombination>>(secondLayoutGroup.ToString());
             var selectedCellField = Context.GetPropertyValue<IQueryable<IQueryableCombination>>(thirdLayoutGroup.ToString());
 
-            IEnumerable<NormalRule> normalRules = FilterNormalRules(search);
+            IQueryable<NormalRule> normalRules = FilterNormalRules(search);
 
-            var firstGroupExpression = PropertyExpressionBuilder.Build<NormalRule, int?>(firstLayoutGroup + "Id").Compile();
-            var thirdGroupExpression = PropertyExpressionBuilder.Build<NormalRule, int?>(thirdLayoutGroup + "Id").Compile();
+            var firstGroupExpression = PropertyExpressionBuilder.Build<NormalRule, int?>(firstPropertyNameId).Compile();
+            var thirdGroupExpression = PropertyExpressionBuilder.Build<NormalRule, int?>(thirdPropertyNameId).Compile();
+
+            Func<NormalRule, string, int?> getPropertyValue = (NormalRule nr, string propertyName) =>
+            {
+                var result = propertyName switch
+                {
+                    "ApplicationId" => nr.ApplicationId,
+                    "ProbeId" => nr.ProbeId,
+                    "OptionId" => nr.OptionId,
+                    _ => throw new NotSupportedException()
+                };
+
+                return result;
+            };
 
             var groups = normalRules
                 .GroupBy(firstGroupExpression)
@@ -39,11 +56,14 @@ namespace FeatureDBPortal.Server.Services
                 {
                     RowId = group.Key,
                     RowName = selectedRowField.SingleOrDefault(item => item.Id == group.Key)?.Name,
-                    Combinations = group.Select(groupItem => new
+                    Cells = group.Select(groupItem => new
                     {
                         RowId = group.Key,
-                        ColumnId = groupItem.GetPropertyValue<int?>(secondLayoutGroup + "Id"),
-                        Allow = group.All(item => item.Allow != 0),
+                        ColumnId = getPropertyValue(groupItem, secondPropertyNameId),
+                        //ColumnId = groupItem.GetPropertyValue<int?>(secondPropertyNameId),
+                        Available = group.All(item => (AllowMode)item.Allow != AllowMode.No),
+                        Visible = group.All(item => (AllowMode)item.Allow == AllowMode.A),
+                        AllowMode = Allower.GetMode(group.All(item => (AllowMode)item.Allow == AllowMode.A), group.All(item => (AllowMode)item.Allow != AllowMode.No)),
                         Items = group.GroupBy(thirdGroupExpression).Select(thirdGroup => new
                         {
                             ItemName = selectedCellField.SingleOrDefault(cellItem => cellItem.Id == thirdGroup.Key)?.Name,
@@ -66,9 +86,9 @@ namespace FeatureDBPortal.Server.Services
             for (var x = 0; x < groups.Count; x++)
             {
                 var rowA = groups[x];
-                for (var y = 0; y < rowA.Combinations.Count; y++)
+                for (var y = 0; y < rowA.Cells.Count; y++)
                 {
-                    var columnA = rowA.Combinations[y];
+                    var columnA = rowA.Cells[y];
 
                     var rowKey = columnA.RowId.HasValue ? columnA.RowId : -1;
                     var columnKey = columnA.ColumnId.HasValue ? columnA.ColumnId : -1;
@@ -83,7 +103,9 @@ namespace FeatureDBPortal.Server.Services
                             {
                                 RowId = rowKey,
                                 ColumnId = columnKey,
-                                Allow = columnA.Allow,
+                                Available = columnA.Available,
+                                Visible = columnA.Visible,
+                                AllowMode = columnA.AllowMode,
                                 Items = columnA.Items?
                                     .Where(cellItem => cellItem.Allow)
                                 .Select(cellItem => new CombinationItem
@@ -100,7 +122,9 @@ namespace FeatureDBPortal.Server.Services
                             {
                                 RowId = rowKey,
                                 ColumnId = columnKey,
-                                Allow = columnA.Allow,
+                                Available = columnA.Available,
+                                Visible = columnA.Visible,
+                                AllowMode = columnA.AllowMode,
                                 Items = columnA.Items?
                                     .Where(cellItem => cellItem.Allow)
                                 .Select(cellItem => new CombinationItem
@@ -119,7 +143,9 @@ namespace FeatureDBPortal.Server.Services
                         {
                             RowId = rowKey,
                             ColumnId = columnKey,
-                            Allow = columnA.Allow,
+                            Available = columnA.Available,
+                            Visible = columnA.Visible,
+                            AllowMode = columnA.AllowMode,
                             Items = columnA.Items?
                                 .Where(cellItem => cellItem.Allow)
                                 .Select(cellItem => new CombinationItem

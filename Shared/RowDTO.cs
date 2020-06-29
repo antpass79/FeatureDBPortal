@@ -7,5 +7,6 @@ namespace FeatureDBPortal.Shared
     {
         public CombinationCellDTO TitleCell { get; set; }
         public IEnumerable<CombinationCellDTO> Cells { get; set; }
+        public int? RowId { get; set; }
     }
 }

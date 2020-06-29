@@ -40,7 +40,7 @@ namespace FeatureDBPortal.Server.gRPC
                 {
                     RowId = group.Key,
                     RowName = selectedRowField.SingleOrDefault(item => item.Id == group.Key)?.Name,
-                    Combinations = group.Select(groupItem => new
+                    Cells = group.Select(groupItem => new
                     {
                         RowId = group.Key,
                         ColumnId = groupItem.GetPropertyValue<int?>(secondLayoutGroup + "Id"),
@@ -67,9 +67,9 @@ namespace FeatureDBPortal.Server.gRPC
             for (var x = 0; x < groups.Count; x++)
             {
                 var rowA = groups[x];
-                for (var y = 0; y < rowA.Combinations.Count; y++)
+                for (var y = 0; y < rowA.Cells.Count; y++)
                 {
-                    var columnA = rowA.Combinations[y];
+                    var columnA = rowA.Cells[y];
 
                     var rowKey = columnA.RowId.HasValue ? columnA.RowId : -1;
                     var columnKey = columnA.ColumnId.HasValue ? columnA.ColumnId : -1;
@@ -84,7 +84,7 @@ namespace FeatureDBPortal.Server.gRPC
                             {
                                 RowId = rowKey,
                                 ColumnId = columnKey,
-                                Allow = columnA.Allow,
+                                Available = columnA.Allow,
                                 Items = columnA.Items?
                                     .Where(cellItem => cellItem.Allow)
                                 .Select(cellItem => new CombinationItem
@@ -101,7 +101,7 @@ namespace FeatureDBPortal.Server.gRPC
                             {
                                 RowId = rowKey,
                                 ColumnId = columnKey,
-                                Allow = columnA.Allow,
+                                Available = columnA.Allow,
                                 Items = columnA.Items?
                                     .Where(cellItem => cellItem.Allow)
                                 .Select(cellItem => new CombinationItem
@@ -120,7 +120,7 @@ namespace FeatureDBPortal.Server.gRPC
                         {
                             RowId = rowKey,
                             ColumnId = columnKey,
-                            Allow = columnA.Allow,
+                            Available = columnA.Allow,
                             Items = columnA.Items?
                                 .Where(cellItem => cellItem.Allow)
                                 .Select(cellItem => new CombinationItem
@@ -155,6 +155,7 @@ namespace FeatureDBPortal.Server.gRPC
                 .ForEach(rowItem =>
                 {
                     var row = new RowDictionary(orderedSelectedColumnField.Count);
+                    row.RowId = rowItem.Id;
                     row.Name = rowItem.Name;
                     orderedSelectedColumnField
                     .ForEach(columnItem =>

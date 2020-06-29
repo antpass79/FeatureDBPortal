@@ -27,7 +27,7 @@ namespace FeatureDBPortal.Server.gRPC
 
             var matrix = new CombinationDictionary(1);
             matrix[-1] = new RowDictionary(1);
-            matrix[-1][-1] = new CombinationCell() { Allow = allow };
+            matrix[-1][-1] = new CombinationCell() { Available = allow };
 
             var combination = new CombinationGRPC();
             combination.Headers.Add(new ColumnTitleGRPC { Id = -1, Name = "Allow" });
@@ -37,7 +37,7 @@ namespace FeatureDBPortal.Server.gRPC
                 newRow.TitleCell = new CombinationCellGRPC();
                 newRow.Cells.AddRange(item.Values.Select(innerItem => new CombinationCellGRPC
                 {
-                    Allow = innerItem.Allow
+                    Allow = innerItem.Available
                 }));
 
                 return newRow;

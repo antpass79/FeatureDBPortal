@@ -1,0 +1,37 @@
+﻿[
+  {
+    "Title": "FILTERS: Model/Country/Probe/User - GROUPS: Application",
+    "FirstGroup": "Application",
+    "Model": {
+      "Id": 50,
+      "Name": "APSARAS"
+    },
+    "Country": {
+      "Id": 3,
+      "Name": "AFGHANISTAN"
+    },
+    "User": "RS",
+    "Result": {
+      "ExpectedHeaderCount": 2,
+      "ExpectedRowCount": 47,
+      "ExpectedTitleCell": {
+        "ExpectedName": "Abdominal"
+      },
+      "ExpectedHeaders": [
+        {
+          "ForId": -1,
+          "ExpectedName": "Allow"
+        }
+      ],
+      "ExpectedCells": [
+        {
+          "ForRowName": "Abdominal bovine",
+          "ForColumnName": "Allow",
+          "ExpectedAllowMode": "No",
+          "ExpectedVisibility": "false",
+          "ExpectedAvailability": "false"
+        }
+      ]
+    }
+  }
+]
