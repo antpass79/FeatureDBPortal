@@ -12,12 +12,12 @@
 
 - <http://janholinka.net/Blog/Article/9>
 
-## Blazor
+### Blazor
 
 - <https://chrissainty.com/a-detailed-look-at-data-binding-in-blazor/>
 - <https://blazor-tutorial.net/two-way-data-binding>
 
-## Blazor - gRPC
+### Blazor - gRPC
 
 - <https://blog.stevensanderson.com/2020/01/15/2020-01-15-grpc-web-in-blazor-webassembly/>
 - <https://www.theguild.nl/sending-data-to-the-other-side-of-the-world-json-protocol-buffers-rest-grpc/>
@@ -26,3 +26,7 @@
 ## Json Serializer
 
 - <https://michaelscodingspot.com/the-battle-of-c-to-json-serializers-in-net-core-3/>
+
+### Linq to SQL
+
+- <https://weblog.west-wind.com/posts/2007/Aug/28/Dynamic-Expressions-in-Linq-to-Sql>

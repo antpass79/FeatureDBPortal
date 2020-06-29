@@ -1,0 +1,29 @@
+﻿[
+  {
+    "Title": "Model/Country/Probe/User",
+    "FirstGroup": "Application",
+    "SecondGroup": "Probe",
+    "Model": {
+      "Id": 50,
+      "Name": "APSARAS"
+    },
+    "Country": {
+      "Id": 3,
+      "Name": "AFGHANISTAN"
+    },
+    "User": "Standard",
+    "Result": {
+      "ExpectedHeaderCount": 94,
+      "ExpectedRowCount": 47,
+      "ExpectedCells": [
+        {
+          "ForRowName": "Abdominal bovine",
+          "ForColumnName": "Allow",
+          "ExpectedAllowMode": "No",
+          "ExpectedVisibility": "false",
+          "ExpectedAvailability": "false"
+        }
+      ]
+    }
+  }
+]

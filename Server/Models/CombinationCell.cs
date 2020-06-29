@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using FeatureDBPortal.Server.Utils;
+using System.Collections.Generic;
 
 namespace FeatureDBPortal.Server.Models
 {
@@ -9,11 +10,13 @@ namespace FeatureDBPortal.Server.Models
             RowId = -1;
             ColumnId = -1;
             Name = string.Empty;
-            Allow = null;
+            Available = null;
         }
 
         public string Name { get; set; }
-        public bool? Allow { get; set; }
+        public bool? Available { get; set; }
+        public bool? Visible { get; set; }
+        public AllowMode? AllowMode { get; set; }
         public IEnumerable<CombinationItem> Items { get; set; }
 
         public int? RowId { get; set; }

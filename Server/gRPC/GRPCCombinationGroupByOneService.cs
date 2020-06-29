@@ -53,7 +53,7 @@ namespace FeatureDBPortal.Server.gRPC
                     {
                         RowId = group.Key,
                         ColumnId = group.Key,
-                        Allow = nullGroup == null ? group.All(normalRule => normalRule.Allow != 0) : group.Union(nullGroup).All(normalRule => normalRule.Allow != 0)
+                        Available = nullGroup == null ? group.All(normalRule => normalRule.Allow != 0) : group.Union(nullGroup).All(normalRule => normalRule.Allow != 0)
                     };
                 });
 
@@ -75,7 +75,7 @@ namespace FeatureDBPortal.Server.gRPC
             orderedSelectedRowField
                 .ForEach(rowItem =>
                 {
-                    var row = new RowDictionary(1) { Name = rowItem.Name };
+                    var row = new RowDictionary(1) { RowId = rowItem.Id, Name = rowItem.Name };
                     matrix[rowItem.Id] = row;
                 });
 

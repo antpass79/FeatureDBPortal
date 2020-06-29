@@ -26,23 +26,16 @@ namespace FeatureDBPortal.Server.Services
                 .ElementAt(0)
                 .ToString();
 
-            var selectedRowField = Context.GetPropertyValue<IQueryable<IQueryableCombination>>(firstLayoutGroup);
+            var orderedSelectedRowField = Context.GetPropertyValue<IQueryable<IQueryableCombination>>(firstLayoutGroup)
+                .Select(item => new QueryableCombination { Id = item.Id, Name = item.Name })
+                .OrderBy(item => item.Name)
+                .ToList();
 
-            IEnumerable<NormalRule> normalRules = FilterNormalRules(search);
-
-            //var groups = normalRules
-            //    .GroupBy(normalRule => normalRule.GetPropertyValue<int?>(firstLayoutGroup + "Id"));
+            IQueryable<NormalRule> normalRules = FilterNormalRules(search);
 
             // Maybe add firstLayoutGroup + "Id" == null
             var groups = normalRules
                 .GroupBy(PropertyExpressionBuilder.Build<NormalRule, int?>(firstLayoutGroup + "Id").Compile());
-
-            var nullGroup = groups.SingleOrDefault(group => group.Key == null);
-
-            var orderedSelectedRowField = selectedRowField
-                .ToList()
-                .OrderBy(item => item.Name)
-                .ToList();
 
             CombinationDictionary matrix = PrepareMatrix(orderedSelectedRowField);
 
@@ -50,13 +43,16 @@ namespace FeatureDBPortal.Server.Services
                 .ToList()
                 .ForEach(group =>
                 {
-                    var key = group.Key.HasValue ? group.Key.Value : -1;
+                    var key = group.Key;
                     matrix[key][key] = new CombinationCell
                     {
                         RowId = group.Key,
                         ColumnId = group.Key,
-                        Allow = nullGroup == null ? group.All(normalRule => normalRule.Allow != 0) : group.Union(nullGroup).All(normalRule => normalRule.Allow != 0)
+                        Available = group.All(normalRule => (AllowMode)normalRule.Allow != AllowMode.No),
+                        Visible = group.All(normalRule => (AllowMode)normalRule.Allow == AllowMode.A),
+                        Name = "Allow"
                     };
+                    matrix[key][key].AllowMode = Allower.GetMode(matrix[key][key].Visible.Value, matrix[key][key].Available.Value);
                 });
 
             var combination = new CombinationDTO
@@ -72,14 +68,14 @@ namespace FeatureDBPortal.Server.Services
             return await Task.FromResult(combination);
         }
 
-        private static CombinationDictionary PrepareMatrix(List<IQueryableCombination> orderedSelectedRowField)
+        private static CombinationDictionary PrepareMatrix(List<QueryableCombination> orderedSelectedRowField)
         {
             var matrix = new CombinationDictionary(orderedSelectedRowField.Count);
 
             orderedSelectedRowField
                 .ForEach(rowItem =>
                 {
-                    var row = new RowDictionary(1) { Name = rowItem.Name };
+                    var row = new RowDictionary(1) { RowId = rowItem.Id, Name = rowItem.Name };
                     matrix[rowItem.Id] = row;
                 });
 

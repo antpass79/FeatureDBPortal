@@ -1,6 +1,7 @@
 ﻿using FeatureDBPortal.Client.Models;
 using FeatureDBPortal.Shared;
 using GrpcCombination;
+using System;
 using System.Linq;
 
 namespace FeatureDBPortal.Client.Extensions
@@ -13,11 +14,14 @@ namespace FeatureDBPortal.Client.Extensions
             {
                 Rows = dto.Rows.Select(row => new Row
                 {
+                    RowId = row.RowId,
                     Cells = row.Cells.Select(cell => new CombinationCell
                     {
                         RowId = cell.RowId,
                         ColumnId = cell.ColumnId,
-                        Allow = cell.Allow,
+                        Available = cell.Available,
+                        Visible = cell.Visible,
+                        AllowMode = cell.AllowMode.HasValue ? (AllowMode)cell.AllowMode : new Nullable<AllowMode>(),
                         Name = cell.Name,
                         AggregateItems = cell.Items == null ? string.Empty : string.Join(System.Environment.NewLine, cell.Items.Select(item => item.Name)),
                         //Items = cell.Items?.Select(item => new CombinationItem
@@ -32,7 +36,7 @@ namespace FeatureDBPortal.Client.Extensions
                     {
                         RowId = row.TitleCell.RowId,
                         ColumnId = row.TitleCell.ColumnId,
-                        Allow = row.TitleCell.Allow,
+                        Available = row.TitleCell.Available,
                         Name = row.TitleCell.Name
                     }
                 }).ToList(),
@@ -40,7 +44,7 @@ namespace FeatureDBPortal.Client.Extensions
                 {
                     Id = header.Id,
                     Name = header.Name
-                })
+                }).ToList()
             };
         }
 
@@ -54,7 +58,7 @@ namespace FeatureDBPortal.Client.Extensions
                     {
                         RowId = cell.RowId,
                         ColumnId = cell.ColumnId,
-                        Allow = cell.Allow,
+                        Available = cell.Allow,
                         Name = cell.Name,
                         AggregateItems = cell.Items == null ? string.Empty : string.Join(System.Environment.NewLine, cell.Items.Select(item => item.Name)),
                         //Items = cell.Items?.Select(item => new CombinationItem
@@ -69,7 +73,7 @@ namespace FeatureDBPortal.Client.Extensions
                     {
                         RowId = row.TitleCell.RowId,
                         ColumnId = row.TitleCell.ColumnId,
-                        Allow = row.TitleCell.Allow,
+                        Available = row.TitleCell.Allow,
                         Name = row.TitleCell.Name
                     }
                 }).ToList(),
@@ -77,7 +81,7 @@ namespace FeatureDBPortal.Client.Extensions
                 {
                     Id = header.Id,
                     Name = header.Name
-                })
+                }).ToList()
             };
         }
     }

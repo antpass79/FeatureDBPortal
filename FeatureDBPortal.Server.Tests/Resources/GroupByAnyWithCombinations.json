@@ -1,0 +1,29 @@
+﻿[
+  {
+    "Title": "Model/Country/Probe/User",
+    "Model": {
+      "Id": 50,
+      "Name": "APSARAS"
+    },
+    "Country": {
+      "Id": 3,
+      "Name": "AFGHANISTAN"
+    },
+    "Probe": {
+      "Id": 46,
+      "Name": "C 1-8"
+    },
+    "User": "RS",
+    "Result": {
+      "ExpectedHeaderCount": 1,
+      "ExpectedRowCount": 1,
+      "ExpectedCells": [
+        {
+          "ExpectedVisibility": "false",
+          "ExpectedAvailability": "false",
+          "ExpectedAllowMode": "No"
+        }
+      ]
+    }
+  }
+]

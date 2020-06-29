@@ -41,7 +41,7 @@ namespace FeatureDBPortal.Server.gRPC
                     Combinations = group.Select(groupItem => new
                     {
                         RowId = group.Key,
-                        Allow = group.All(item => item.Allow != 0),
+                        Availability = group.All(item => item.Allow != 0),
                         ColumnId = groupItem.GetPropertyValue<int?>(secondLayoutGroup + "Id")
                     }).ToList()
                 }).ToList();
@@ -77,7 +77,7 @@ namespace FeatureDBPortal.Server.gRPC
                             {
                                 RowId = rowKey,
                                 ColumnId = columnKey,
-                                Allow = columnA.Allow
+                                Available = columnA.Availability
                             };
                         }
                         else
@@ -86,7 +86,7 @@ namespace FeatureDBPortal.Server.gRPC
                             {
                                 RowId = rowKey,
                                 ColumnId = columnKey,
-                                Allow = columnA.Allow
+                                Available = columnA.Availability
                             });
                         }
                     }
@@ -97,7 +97,7 @@ namespace FeatureDBPortal.Server.gRPC
                         {
                             RowId = rowKey,
                             ColumnId = columnKey,
-                            Allow = columnA.Allow
+                            Available = columnA.Availability
                         };
                         matrix[rowKey] = newRow;
                     }
@@ -124,6 +124,7 @@ namespace FeatureDBPortal.Server.gRPC
                 .ForEach(rowItem =>
                 {
                     var row = new RowDictionary(orderedSelectedColumnField.Count);
+                    row.RowId = rowItem.Id;
                     row.Name = rowItem.Name;
                     orderedSelectedColumnField
                     .ForEach(columnItem =>

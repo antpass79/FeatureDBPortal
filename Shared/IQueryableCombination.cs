@@ -2,7 +2,7 @@
 {
     public interface IQueryableCombination
     {
-        public int Id { get; }
-        public string Name { get; }
+        int Id { get; }
+        string Name { get; }
     }
 }

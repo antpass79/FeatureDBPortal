@@ -1,0 +1,24 @@
+﻿[
+  {
+    "Title": "Model/Country/Probe/User",
+    "FirstGroup": "Application",
+    "Model": {
+      "Id": 50,
+      "Name": "APSARAS"
+    },
+    "Country": {
+      "Id": 3,
+      "Name": "AFGHANISTAN"
+    },
+    "User": "Standard",
+    "Result": {
+      "ExpectedHeaderCount": 2,
+      "ExpectedRowCount": 47,
+      "ExpectedCells": [
+        {
+          "ExpectedAllowMode": "No"
+        }
+      ]
+    }
+  }
+]
