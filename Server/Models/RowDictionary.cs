@@ -10,5 +10,6 @@ namespace FeatureDBPortal.Server.Models
         }
 
         public string Name { get; set; }
+        public int? RowId { get; set; }
     }
 }

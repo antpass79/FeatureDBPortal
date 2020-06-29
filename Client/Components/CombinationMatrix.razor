@@ -16,11 +16,37 @@
         background-color: lightgray;
     }
 
+    tr:nth-child(odd) {
+        background-color: white;
+    }
+
     .table {
         height: 100%;
     }
     .table td, .table th {
         padding: .35rem;
+    }
+
+    .table-fixed-header {
+        overflow-y: auto;
+    }
+
+        .table-fixed-header thead th {
+            position: sticky;
+            top: 0;
+        }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th, td {
+        padding: 8px 16px;
+    }
+
+    th {
+        background: #eee;
     }
 
     th.rotate {
@@ -41,12 +67,38 @@
     td.row-title {
         font-weight: bold;
         vertical-align: middle;
+        position: sticky;
+        position: -webkit-sticky;
+        min-width: 100px;
+        left: 0px;
+        background-color: inherit;
+    }
+
+    .available-background {
+        background-color: cadetblue;
+    }
+
+    .no-background {
+        background-color: burlywood;
+    }
+
+    th.fixed-column {
+        position: sticky;
+        position: -webkit-sticky;
+        min-width: 100px;
+        left: 0px;
+        z-index: 1;
     }
 
     .combination-matrix {
         overflow: auto;
         height: 100%;
     }
+
+    .highlight {
+        opacity: 0.7;
+    }
+
 </style>
 
 <div class="combination-matrix">
@@ -56,13 +108,16 @@
     }
     else
     {
-        <table class="table">
+        <table class="table table-fixed-header">
             <thead>
                 <tr>
-                    @foreach (var header in Combination.Headers)
+                    <th class="rotate fixed-column">
+                        <div><span>@Combination.Headers[0].Name</span></div>
+                    </th>
+                    @for (var i = 1; i < Combination.Headers.Count; i++)
                     {
                         <th class="rotate">
-                            <div><span>@header.Name</span></div>
+                            <div><span>@Combination.Headers[i].Name</span></div>
                         </th>
                     }
                 </tr>
@@ -79,7 +134,7 @@
                         //if (cell.Items == null)
                         if (string.IsNullOrWhiteSpace(cell.AggregateItems))
                         {
-                            <td>@cell.Allow</td>
+                            <td @onmouseover="@(async e => OnCellMouseEnter(cell))" @onmouseout="@(async e => OnCellMouseLeave(cell))" class="@cell.ClassValue">@cell.AllowMode</td>
                         }
                         else
                         {
