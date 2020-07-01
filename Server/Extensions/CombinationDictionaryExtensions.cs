@@ -15,9 +15,13 @@ namespace FeatureDBPortal.Server.Extensions
                 .Where(item => item.RowId.HasValue)
                 .Select(row => new RowDTO
             {
-                RowId = row.RowId,                
-                TitleCell = new CombinationCellDTO { Name = row.Name },
-                Cells = row.Values.Select(cell => new CombinationCellDTO
+                RowId = row.RowId,
+                Title = new RowTitleDTO
+                {
+                    Id = row.RowId,
+                    Name = row.Name
+                },
+                Cells = row.Values.Select(cell => new CellDTO
                 {
                     Name = cell.Name,
                     RowId = cell.RowId,
@@ -25,7 +29,7 @@ namespace FeatureDBPortal.Server.Extensions
                     Available = cell.Available,
                     Visible = cell.Visible,
                     AllowMode = cell.AllowMode.HasValue ? (AllowModeDTO)cell.AllowMode : new Nullable<AllowModeDTO>(),
-                    Items = cell.Items?.Select(itemCell => new CombinationItemDTO
+                    Items = cell.Items?.Select(itemCell => new CellItemDTO
                     {
                         RowId = itemCell.RowId,
                         ColumnId = itemCell.ColumnId,

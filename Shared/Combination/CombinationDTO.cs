@@ -5,7 +5,9 @@ namespace FeatureDBPortal.Shared
 {
     public class CombinationDTO
     {
-        public IEnumerable<ColumnTitleDTO> Headers { get; set; }
+        public string IntersectionTitle { get; set; }
+
+        public IEnumerable<ColumnDTO> Columns { get; set; }
 
         public IEnumerable<RowDTO> Rows { get; set; }
     }

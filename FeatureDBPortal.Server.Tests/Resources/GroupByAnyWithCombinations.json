@@ -7,7 +7,7 @@
     },
     "Country": {
       "Id": 3,
-      "Name": "AFGHANISTAN"
+      "Name": "AFGHANISTAN (AF)"
     },
     "Probe": {
       "Id": 46,
@@ -22,6 +22,72 @@
           "ExpectedVisibility": "false",
           "ExpectedAvailability": "false",
           "ExpectedAllowMode": "No"
+        }
+      ]
+    }
+  },
+  {
+    "Title": "Model/Country/Probe/Option/Application/User",
+    "Model": {
+      "Id": 1,
+      "Name": "MyLab 9"
+    },
+    "Country": {
+      "Id": 106,
+      "Name": "ITALY (IT)"
+    },
+    "Probe": {
+      "Id": 32,
+      "Name": "SB2C41"
+    },
+    "Option": {
+      "Id": 11,
+      "Name": "4D"
+    },
+    "Application": {
+      "Id": 1,
+      "Name": "Abdominal"
+    },
+    "User": "Standard",
+    "Result": {
+      "ExpectedHeaderCount": 1,
+      "ExpectedRowCount": 1,
+      "ExpectedCells": [
+        {
+          "ExpectedVisibility": "false",
+          "ExpectedAvailability": "true",
+          "ExpectedAllowMode": "Def"
+        }
+      ]
+    }
+  },
+  {
+    "Title": "Model/Country/Probe/Application/User",
+    "Model": {
+      "Id": 5,
+      "Name": "MyLabAlpha eHD"
+    },
+    "Country": {
+      "Id": 30,
+      "Name": "Brazil"
+    },
+    "Probe": {
+      "Id": 3,
+      "Name": "AL2442"
+    },
+    "Application": {
+      "Id": 13,
+      "Name": "Cardiac"
+    },
+    "User": "Standard",
+    "Result": {
+      "ExpectedHeaderCount": 1,
+      "ExpectedRowCount": 1,
+      "ExpectedCells": [
+        {
+          "ExpectedVisibility": "false",
+          "ExpectedAvailability": "true",
+          "ExpectedAllowMode": "Def"
         }
       ]
     }

@@ -1,0 +1,33 @@
+﻿@inherits ColumnComponentDataModel
+
+<style>
+    th.rotate {
+        height: 140px;
+        min-width: 50px;
+        white-space: nowrap;
+    }
+
+        th.rotate > div {
+            transform: translate(0px, 0px) rotate(315deg);
+            width: 0px;
+        }
+
+            th.rotate > div > span {
+                padding: 5px 10px;
+            }
+
+    .highlight {
+        opacity: 0.5;
+    }
+</style>
+
+@if (Column == null)
+{
+    <td>Empty</td>
+}
+else
+{
+    <th class="rotate">
+        <div class="@Column.ClassValue"><span>@Column.Name</span></div>
+    </th>
+}

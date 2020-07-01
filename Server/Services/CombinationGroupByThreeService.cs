@@ -28,9 +28,21 @@ namespace FeatureDBPortal.Server.Services
             var secondPropertyNameId = secondLayoutGroup + "Id";
             var thirdPropertyNameId = thirdLayoutGroup + "Id";
 
-            var selectedRowField = Context.GetPropertyValue<IQueryable<IQueryableCombination>>(firstLayoutGroup.ToString());
-            var selectedColumnField = Context.GetPropertyValue<IQueryable<IQueryableCombination>>(secondLayoutGroup.ToString());
-            var selectedCellField = Context.GetPropertyValue<IQueryable<IQueryableCombination>>(thirdLayoutGroup.ToString());
+            var orderedSelectedRowField = Context.GetPropertyValue<IQueryable<IQueryableCombination>>(firstLayoutGroup.ToString())
+                .AsEnumerable()
+                .Select(item => new QueryableCombination { Id = item.Id, Name = item.Name })
+                .OrderBy(item => item.Name)
+                .ToList();
+            var orderedSelectedColumnField = Context.GetPropertyValue<IQueryable<IQueryableCombination>>(secondLayoutGroup.ToString())
+                .AsEnumerable()
+                .Select(item => new QueryableCombination { Id = item.Id, Name = item.Name })
+                .OrderBy(item => item.Name)
+                .ToList();
+            var orderedSelectedCellField = Context.GetPropertyValue<IQueryable<IQueryableCombination>>(thirdLayoutGroup.ToString())
+                .AsEnumerable()
+                .Select(item => new QueryableCombination { Id = item.Id, Name = item.Name })
+                .OrderBy(item => item.Name)
+                .ToList();
 
             IQueryable<NormalRule> normalRules = FilterNormalRules(search);
 
@@ -55,31 +67,22 @@ namespace FeatureDBPortal.Server.Services
                 .Select(group => new
                 {
                     RowId = group.Key,
-                    RowName = selectedRowField.SingleOrDefault(item => item.Id == group.Key)?.Name,
+                    RowName = orderedSelectedRowField.SingleOrDefault(item => item.Id == group.Key)?.Name,
                     Cells = group.Select(groupItem => new
                     {
                         RowId = group.Key,
                         ColumnId = getPropertyValue(groupItem, secondPropertyNameId),
-                        //ColumnId = groupItem.GetPropertyValue<int?>(secondPropertyNameId),
+                        Name = orderedSelectedColumnField.SingleOrDefault(item => item.Id == getPropertyValue(groupItem, secondPropertyNameId))?.Name,
                         Available = group.All(item => (AllowMode)item.Allow != AllowMode.No),
                         Visible = group.All(item => (AllowMode)item.Allow == AllowMode.A),
                         AllowMode = Allower.GetMode(group.All(item => (AllowMode)item.Allow == AllowMode.A), group.All(item => (AllowMode)item.Allow != AllowMode.No)),
                         Items = group.GroupBy(thirdGroupExpression).Select(thirdGroup => new
                         {
-                            ItemName = selectedCellField.SingleOrDefault(cellItem => cellItem.Id == thirdGroup.Key)?.Name,
+                            ItemName = orderedSelectedCellField.SingleOrDefault(cellItem => cellItem.Id == thirdGroup.Key)?.Name,
                             Allow = thirdGroup.All(i => i.Allow != 0)
                         })
                     }).ToList()
                 }).ToList();
-
-            var orderedSelectedRowField = selectedRowField
-                .ToList()
-                .OrderBy(item => item.Name)
-                .ToList();
-            var orderedSelectedColumnField = selectedColumnField
-                .ToList()
-                .OrderBy(item => item.Name)
-                .ToList();
 
             CombinationDictionary matrix = PrepareMatrix(orderedSelectedRowField, orderedSelectedColumnField);
 
@@ -160,36 +163,36 @@ namespace FeatureDBPortal.Server.Services
                 }
             }
             
-            var firstHeaderItem = new List<ColumnTitleDTO> { new ColumnTitleDTO
-            {
-                Name = $"{firstLayoutGroup} - {secondLayoutGroup} - {thirdLayoutGroup}"
-            } };
-
             var combination = new CombinationDTO
             {
-                Headers = firstHeaderItem.Union(orderedSelectedColumnField.Select(item => new ColumnTitleDTO { Id = item.Id, Name = item.Name })),
+                IntersectionTitle = $"{firstLayoutGroup} - {secondLayoutGroup} - {thirdLayoutGroup}",
+                Columns = orderedSelectedColumnField.Select(item => new ColumnDTO { Id = item.Id, Name = item.Name }),
                 Rows = matrix.ToRows()
             };
 
             return await Task.FromResult(combination);
         }
 
-        private static CombinationDictionary PrepareMatrix(List<IQueryableCombination> orderedSelectedRowField, List<IQueryableCombination> orderedSelectedColumnField)
+        private static CombinationDictionary PrepareMatrix(List<QueryableCombination> orderedSelectedRowField, List<QueryableCombination> orderedSelectedColumnField)
         {
             var matrix = new CombinationDictionary(orderedSelectedRowField.Count);
 
             orderedSelectedRowField
                 .ForEach(rowItem =>
                 {
-                    var row = new RowDictionary(orderedSelectedColumnField.Count);
-                    row.Name = rowItem.Name;
+                    var row = new RowDictionary(orderedSelectedColumnField.Count)
+                    {
+                        RowId = rowItem.Id,
+                        Name = rowItem.Name
+                    };
                     orderedSelectedColumnField
                     .ForEach(columnItem =>
                     {
                         row[columnItem.Id] = new CombinationCell
                         {
                             RowId = rowItem.Id,
-                            ColumnId = columnItem.Id
+                            ColumnId = columnItem.Id,
+                            Name = columnItem.Name
                         };
                     });
                     matrix[rowItem.Id] = row;

@@ -118,14 +118,10 @@ namespace FeatureDBPortal.Server.Services
                     }
                 }
 
-                var firstHeaderItem = new List<ColumnTitleDTO> { new ColumnTitleDTO
-                {
-                    Name = $"{firstLayoutGroup} / {secondLayoutGroup}"
-                }};
-
                 var combination = new CombinationDTO
                 {
-                    Headers = firstHeaderItem.Union(orderedSelectedColumnField.Select(item => new ColumnTitleDTO { Id = item.Id, Name = item.Name })),
+                    IntersectionTitle = $"{firstLayoutGroup} / {secondLayoutGroup}",
+                    Columns = orderedSelectedColumnField.Select(item => new ColumnDTO { Id = item.Id, Name = item.Name }),
                     Rows = matrix.ToRows()
                 };
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace FeatureDBPortal.Shared
 {
-    public class CombinationCellDTO
+    public class CellDTO
     {
         public string Name { get; set; }
         public bool? Available { get; set; }
@@ -13,6 +13,6 @@ namespace FeatureDBPortal.Shared
         public int? RowId { get; set; }
         public int? ColumnId { get; set; }
 
-        public IEnumerable<CombinationItemDTO> Items { get; set; }
+        public IEnumerable<CellItemDTO> Items { get; set; }
     }
 }

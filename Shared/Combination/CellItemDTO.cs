@@ -1,8 +1,10 @@
-﻿namespace FeatureDBPortal.Client.Models
+﻿using System;
+
+namespace FeatureDBPortal.Shared
 {
-    public class CombinationItem
+    public class CellItemDTO
     {
-        public CombinationItem()
+        public CellItemDTO()
         {
             RowId = -1;
             ColumnId = -1;

@@ -27,9 +27,11 @@ namespace FeatureDBPortal.Server.Services
             var allowMode = Allower.GetMode(visible, available);
 
             var matrix = new CombinationDictionary(1);
-            matrix[-1] = new RowDictionary(1);
+            matrix[-1] = new RowDictionary(1) { RowId = -1 };
             matrix[-1][-1] = new CombinationCell()
             {
+                RowId = -1,
+                ColumnId = -1,
                 Available = available,
                 Visible = visible,
                 AllowMode = allowMode,
@@ -37,15 +39,22 @@ namespace FeatureDBPortal.Server.Services
 
             var combination = new CombinationDTO
             {
-                Headers = new List<ColumnTitleDTO>
+                IntersectionTitle = string.Empty,
+                Columns = new List<ColumnDTO>
                 {
-                    new ColumnTitleDTO { Id = -1, Name = "Allow" },
+                    new ColumnDTO { Id = -1, Name = "Allow" },
                 },
                 Rows = matrix.Values.Select(item => new RowDTO
                 {
-                    TitleCell = new CombinationCellDTO(),
-                    Cells = item.Values.Select(innerItem => new CombinationCellDTO
+                    RowId = -1,
+                    Title = new RowTitleDTO
                     {
+                        Id = -1
+                    },
+                    Cells = item.Values.Select(innerItem => new CellDTO
+                    {
+                        RowId = -1,
+                        ColumnId = -1,
                         Available = innerItem.Available,
                         Visible = innerItem.Visible,
                         AllowMode = (AllowModeDTO)innerItem.AllowMode,

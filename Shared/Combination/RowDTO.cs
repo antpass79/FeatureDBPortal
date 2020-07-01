@@ -5,8 +5,8 @@ namespace FeatureDBPortal.Shared
 {
     public class RowDTO
     {
-        public CombinationCellDTO TitleCell { get; set; }
-        public IEnumerable<CombinationCellDTO> Cells { get; set; }
+        public RowTitleDTO Title { get; set; }
+        public IEnumerable<CellDTO> Cells { get; set; }
         public int? RowId { get; set; }
     }
 }

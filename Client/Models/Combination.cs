@@ -4,8 +4,10 @@ namespace FeatureDBPortal.Client.Models
 {
     public class Combination
     {
-        public IList<ColumnTitle> Headers { get; set; }
+        public string IntersectionTitle { get; set; }
 
-        public IEnumerable<Row> Rows { get; set; }
+        public IDictionary<int, Column> Columns { get; set; }
+
+        public IDictionary<int, Row> Rows { get; set; }
     }
 }

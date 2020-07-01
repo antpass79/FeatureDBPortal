@@ -15,13 +15,13 @@ namespace FeatureDBPortal.Server.Controllers
         }
 
         [HttpGet]
-        async public Task<Tuple<int?, IEnumerable<CombinationCellDTO>>> Get()
+        async public Task<Tuple<int?, IEnumerable<CellDTO>>> Get()
         {
-            var tuple = new Tuple<int?, IEnumerable<CombinationCellDTO>>(5, new List<CombinationCellDTO>
+            var tuple = new Tuple<int?, IEnumerable<CellDTO>>(5, new List<CellDTO>
             {
-                new CombinationCellDTO() { Name = "Test 1" },
-                new CombinationCellDTO() { Name = "Test 2" },
-                new CombinationCellDTO() { Name = "Test 3" }
+                new CellDTO() { Name = "Test 1" },
+                new CellDTO() { Name = "Test 2" },
+                new CellDTO() { Name = "Test 3" }
             });
 
             return await Task.FromResult(tuple);

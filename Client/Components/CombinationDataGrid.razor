@@ -50,16 +50,16 @@
     {
         <MatTable Items="@Combination.Rows" class="table mat-elevation-z5" ShowPaging="true" PageSize="10">
             <MatTableHeader>
-                @foreach (var header in Combination.Headers)
+                @foreach (var column in Combination.Columns.Values)
                 {
                     <th class="rotate">
-                        <div><span>@header.Name</span></div>
+                        <div><span>@column.Name</span></div>
                     </th>
                 }
             </MatTableHeader>
             <MatTableRow>
-                <td>@context.TitleCell.Name</td>
-                @foreach (var cell in @context.Cells)
+                <td>@context.Value.Title.Name</td>
+                @foreach (var cell in @context.Value.Cells)
                     {
                         if (cell.Items == null)
                         {
