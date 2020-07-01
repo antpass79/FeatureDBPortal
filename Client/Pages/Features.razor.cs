@@ -62,8 +62,49 @@ namespace FeatureDBPortal.Client.Pages
 
         protected IEnumerable<LayoutTypeDTO> LayoutViews { get; set; }
         protected LayoutTypeDTO SelectedRowLayout { get; set; }
+        string _selectedRowLayoutText;
+        public string SelectedRowLayoutText
+        {
+            get => _selectedRowLayoutText;
+            set
+            {
+                _selectedRowLayoutText = value;
+                if (Enum.TryParse<LayoutTypeDTO>(_selectedRowLayoutText, out var layoutType))
+                {
+                    SelectedRowLayout = layoutType;
+                }
+            }
+        }
+
         protected LayoutTypeDTO SelectedColumnLayout { get; set; }
+        string _selectedColumnLayoutText;
+        public string SelectedColumnLayoutText
+        {
+            get => _selectedColumnLayoutText;
+            set
+            {
+                _selectedColumnLayoutText = value;
+                if (Enum.TryParse<LayoutTypeDTO>(_selectedColumnLayoutText, out var layoutType))
+                {
+                    SelectedColumnLayout = layoutType;
+                }
+            }
+        }
+
         protected LayoutTypeDTO SelectedCellLayout { get; set; }
+        string _selectedCellLayoutText;
+        public string SelectedCellLayoutText
+        {
+            get => _selectedCellLayoutText;
+            set
+            {
+                _selectedCellLayoutText = value;
+                if (Enum.TryParse<LayoutTypeDTO>(_selectedCellLayoutText, out var layoutType))
+                {
+                    SelectedCellLayout = layoutType;
+                }
+            }
+        }
 
         protected Combination Combination { get; private set; }
 
@@ -132,7 +173,7 @@ namespace FeatureDBPortal.Client.Pages
             CombinationsBusy = false;
 
             Trace.WriteLine(string.Empty);
-            Trace.WriteLine($"FEATURE: Process starts at {start} and stops at {DateTime.Now} with duration of {stopwatch.Elapsed}");
+            Trace.WriteLine($"CLIENT-SERVER ROUNDTRIP: Process starts at {start} and stops at {DateTime.Now} with duration of {stopwatch.Elapsed}");
         }
     }
 }

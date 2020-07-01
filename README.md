@@ -20,6 +20,8 @@
 ### Blazor - Performances
 
 - <https://docs.microsoft.com/en-us/aspnet/core/blazor/webassembly-performance-best-practices?view=aspnetcore-3.1>
+- <https://github.com/aspnet/samples/tree/master/samples/aspnetcore/blazor>
+- <https://github.com/julienGrd/BlazorTest>
 
 ### Blazor - gRPC
 

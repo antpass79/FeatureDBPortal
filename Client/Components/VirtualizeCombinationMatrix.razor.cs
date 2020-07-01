@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace FeatureDBPortal.Client.Components
 {
-    public class CombinationMatrixDataModel : ComponentBase
+    public class VirtualizeCombinationMatrixDataModel : ComponentBase
     {
         [Parameter]
         public Combination Combination { get; set; }
@@ -31,16 +31,6 @@ namespace FeatureDBPortal.Client.Components
             column.IsHighlight = selected;
         }
 
-        RenderFragment CreateHeader() => builder =>
-        {
-            builder.OpenComponent<HeaderComponent>(0);
-            builder.CloseComponent();
-        };
-
-        RenderFragment CreateBody() => builder =>
-        {
-            builder.OpenComponent<BodyComponent>(0);
-            builder.CloseComponent();
-        };
+        protected override bool ShouldRender() => false;
     }
 }
