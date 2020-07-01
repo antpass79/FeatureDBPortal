@@ -35,7 +35,7 @@ namespace FeatureDBPortal.Client.Pages
         protected VersionDTO SelectedVersion { get; private set; } = new VersionDTO();
 
         protected IEnumerable<ModelDTO> Models { get; set; }
-        protected ModelDTO SelectedModel { get; private set; } = new ModelDTO();
+        protected ModelDTO SelectedModel { get; set; } = new ModelDTO();
 
         protected IEnumerable<OptionDTO> Options { get; set; }
         protected OptionDTO SelectedOption { get; private set; } = new OptionDTO();
@@ -43,10 +43,24 @@ namespace FeatureDBPortal.Client.Pages
         protected IEnumerable<KitDTO> Kits { get; set; }
         protected KitDTO SelectedKit { get; private set; } = new KitDTO();
 
-        protected IEnumerable UserLevels { get; set; }
+        protected IEnumerable<UserLevelDTO> UserLevels { get; set; }
         protected UserLevelDTO SelectedUserLevel { get; set; }
 
-        protected IEnumerable LayoutViews { get; set; }
+        string _selectedUserLevelText;
+        public string SelectedUserLevelText
+        {
+            get => _selectedUserLevelText;
+            set
+            {
+                _selectedUserLevelText = value;
+                if (Enum.TryParse<UserLevelDTO>(_selectedUserLevelText, out var userLevel))
+                {
+                    SelectedUserLevel = userLevel;
+                }
+            }
+        }
+
+        protected IEnumerable<LayoutTypeDTO> LayoutViews { get; set; }
         protected LayoutTypeDTO SelectedRowLayout { get; set; }
         protected LayoutTypeDTO SelectedColumnLayout { get; set; }
         protected LayoutTypeDTO SelectedCellLayout { get; set; }
@@ -78,12 +92,13 @@ namespace FeatureDBPortal.Client.Pages
             Models = await FilterService.GetModels();
             Options = await FilterService.GetOptions();
             Kits = await FilterService.GetKits();
-            UserLevels = Enum.GetValues(typeof(UserLevelDTO));
-            LayoutViews = Enum.GetValues(typeof(LayoutTypeDTO));
+            UserLevels = Enum.GetValues(typeof(UserLevelDTO)).Cast<UserLevelDTO>().OrderBy(item => item.ToString());
+            LayoutViews = Enum.GetValues(typeof(LayoutTypeDTO)).Cast<LayoutTypeDTO>();
 
             SelectedModel = Models.FirstOrDefault();
             SelectedCountry = Countries.FirstOrDefault();
-            SelectedUserLevel = UserLevels.Cast<UserLevelDTO>().FirstOrDefault();
+            SelectedUserLevel = UserLevels.FirstOrDefault();
+            SelectedUserLevelText = SelectedUserLevel.ToString();
 
             FiltersBusy = false;
         }

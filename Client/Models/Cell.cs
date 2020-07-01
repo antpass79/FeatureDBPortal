@@ -2,9 +2,9 @@
 
 namespace FeatureDBPortal.Client.Models
 {
-    public class CombinationCell
+    public class Cell : BaseCell
     {
-        public CombinationCell()
+        public Cell()
         {
             RowId = -1;
             ColumnId = -1;
@@ -26,27 +26,17 @@ namespace FeatureDBPortal.Client.Models
             }
         }
         public string AggregateItems { get; set; }
-        public IEnumerable<CombinationItem> Items { get; set; }
+        public IEnumerable<CellItem> Items { get; set; }
 
         public int? RowId { get; set; }
         public int? ColumnId { get; set; }
 
-        private bool _isHighlight;
-        public bool IsHighlight
+        override protected string OnUpdateClassValue()
         {
-            get { return _isHighlight; }
-            set
-            {
-                _isHighlight = value;
-                UpdateClassValue();
-            }
-        }
-        public string ClassValue { get; private set; }
+            var classValue = this.AllowMode == Models.AllowMode.A ? "available-background" : "no-background";
+            classValue += this.IsHighlight ? " highlight" : string.Empty;
 
-        private void UpdateClassValue()
-        {
-            this.ClassValue = this.AllowMode == Models.AllowMode.A ? "available-background" : "no-background";
-            this.ClassValue += this.IsHighlight ? " highlight" : string.Empty;
+            return classValue;
         }
     }
 }

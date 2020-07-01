@@ -47,7 +47,7 @@ namespace FeatureDBPortal.Server.Services
                     matrix[key][key] = new CombinationCell
                     {
                         RowId = group.Key,
-                        ColumnId = group.Key,
+                        ColumnId = -1,
                         Available = group.All(normalRule => (AllowMode)normalRule.Allow != AllowMode.No),
                         Visible = group.All(normalRule => (AllowMode)normalRule.Allow == AllowMode.A),
                         Name = "Allow"
@@ -57,10 +57,10 @@ namespace FeatureDBPortal.Server.Services
 
             var combination = new CombinationDTO
             {
-                Headers = new List<ColumnTitleDTO>
+                IntersectionTitle = firstLayoutGroup,
+                Columns = new List<ColumnDTO>
                 {
-                    new ColumnTitleDTO { Id = -1, Name = firstLayoutGroup },
-                    new ColumnTitleDTO { Id = -1, Name = "Allow" }
+                    new ColumnDTO { Id = -1, Name = "Allow" }
                 },
                 Rows = matrix.ToRows()
             };

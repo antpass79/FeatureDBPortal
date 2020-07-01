@@ -1,0 +1,37 @@
+﻿@inherits CellComponentDataModel
+
+<style>
+    .available-background {
+        background-color: cadetblue;
+    }
+
+    .no-background {
+        background-color: burlywood;
+    }
+
+    .highlight {
+        opacity: 0.5;
+    }
+</style>
+
+@if (Cell == null)
+{
+    <td>Empty</td>
+}
+else
+{
+    @if (string.IsNullOrWhiteSpace(Cell.AggregateItems))
+    {
+        <td @onmouseover="@(async e => OnCellMouseEnter(Cell))" @onmouseout="@(async e => OnCellMouseLeave(Cell))" @onclick="@(async e => OnCellClick(Cell))" class="@Cell.ClassValue">@Cell.AllowMode</td>
+    }
+    else
+    {
+        <td>@Cell.AggregateItems</td>
+        @*<td>
+                @foreach (var item in cell.Items)
+                {
+                    <span>@item.Name</span>
+                }
+            </td>*@
+    }
+}

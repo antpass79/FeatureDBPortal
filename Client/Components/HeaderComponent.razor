@@ -1,0 +1,51 @@
+﻿@inherits HeaderComponentDataModel
+
+<style>
+    th.rotate {
+        height: 140px;
+        min-width: 50px;
+        white-space: nowrap;
+    }
+
+        th.rotate > div {
+            transform: translate(0px, 0px) rotate(315deg);
+            width: 0px;
+        }
+
+            th.rotate > div > span {
+                padding: 5px 10px;
+            }
+
+    th, td {
+        padding: 8px 16px;
+    }
+
+    th {
+        background: #eee;
+    }
+
+        th.fixed-column {
+            position: sticky;
+            position: -webkit-sticky;
+            min-width: 100px;
+            left: 0px;
+            z-index: 1;
+        }
+</style>
+
+@if (Columns == null)
+{
+    <td>Empty</td>
+}
+else
+{
+    <tr>
+        <th class="rotate fixed-column">
+            <div><span>@IntersectionTitle</span></div>
+        </th>
+        @foreach (var column in Columns)
+        {
+            <ColumnComponent Column="@column"></ColumnComponent>
+        }
+    </tr>
+}

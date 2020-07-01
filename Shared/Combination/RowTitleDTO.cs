@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace FeatureDBPortal.Shared
+﻿namespace FeatureDBPortal.Shared
 {
-    public class ColumnTitleDTO
+    public class RowTitleDTO
     {
         public int? Id { get; set; }
         public string Name { get; set; }
