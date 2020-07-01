@@ -1,0 +1,42 @@
+﻿@inherits RowComponentDataModel
+
+<style>
+    tr:nth-child(even) {
+        background-color: lightgray;
+    }
+
+    tr:nth-child(odd) {
+        background-color: white;
+    }
+
+   td.row-title {
+        font-weight: bold;
+        vertical-align: middle;
+        position: sticky;
+        position: -webkit-sticky;
+        min-width: 100px;
+        left: 0px;
+        background-color: inherit;
+    }
+
+    .highlight {
+        opacity: 0.5;
+    }
+</style>
+
+@if (Row == null)
+{
+    <td>Empty</td>
+}
+else
+{
+    <tr>
+        <td class="row-title @Row.Title.ClassValue">
+            @Row.Title.Name
+        </td>
+        @foreach (var cell in Row.Cells)
+        {
+            <CellComponent CellMouseEnter="@(async currentCell => OnCellMouseEnter(currentCell))" CellMouseLeave="@(async currentCell => OnCellMouseLeave(currentCell))" CellClick="@(async currentCell => OnCellClick(currentCell))" Cell="@cell"></CellComponent>
+        }
+    </tr>
+}

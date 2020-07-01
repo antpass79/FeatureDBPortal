@@ -1,7 +1,5 @@
 ﻿using FeatureDBPortal.Client.Models;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
-using System.Linq;
 
 namespace FeatureDBPortal.Client.Components
 {
@@ -10,26 +8,27 @@ namespace FeatureDBPortal.Client.Components
         [Parameter]
         public Combination Combination { get; set; }
 
-        protected void OnCellMouseEnter(CombinationCell cell)
+        protected void OnCellClick(Cell cell)
         {
-            cell.IsHighlight = true;
-            
-            var row = Combination.Rows.Single(row => row.RowId == cell.RowId);
-            row.TitleCell.IsHighlight = true;
-
-            var header = row.Cells.Single(header => header.ColumnId == cell.ColumnId);
-            header.IsHighlight = true;
         }
 
-        protected void OnCellMouseLeave(CombinationCell cell)
+        protected void OnCellMouseEnter(Cell cell)
         {
-            cell.IsHighlight = false;
+            UpdateSelection(cell, cell.IsHighlight);
+        }
 
-            var row = Combination.Rows.Single(row => row.RowId == cell.RowId);
-            row.TitleCell.IsHighlight = false;
+        protected void OnCellMouseLeave(Cell cell)
+        {
+            UpdateSelection(cell, cell.IsHighlight);
+        }
 
-            var header = row.Cells.Single(header => header.ColumnId == cell.ColumnId);
-            header.IsHighlight = true;
+        private void UpdateSelection(Cell cell, bool selected)
+        {
+            var row = Combination.Rows[cell.RowId.Value];
+            row.Title.IsHighlight = selected;
+
+            var column = Combination.Columns[cell.ColumnId.Value];
+            column.IsHighlight = selected;
         }
     }
 }

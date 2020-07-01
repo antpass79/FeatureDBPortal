@@ -1,6 +1,8 @@
-﻿namespace FeatureDBPortal.Client.Models
+﻿using System;
+
+namespace FeatureDBPortal.Shared
 {
-    public class ColumnTitle
+    public class ColumnDTO
     {
         public int? Id { get; set; }
         public string Name { get; set; }

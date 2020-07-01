@@ -3,7 +3,7 @@
 
 <style>
     .combination-container {
-        height: calc(100% - 200px);
+        height: calc(100% - 220px);
     }
 
     .features-options {
@@ -59,6 +59,16 @@
         align-self: center;
         margin: 15px;
     }
+
+    .select-field {
+        display: flex;
+        flex: 1;
+        margin: 3px;
+    }
+
+    .select-field > .mdc-select__anchor {
+        flex: 1;
+    }
 </style>
 
 <p>Check feature availability for a specific combination</p>
@@ -77,145 +87,137 @@ else
             <h5>Filters</h5>
             <div class="filter-row">
                 <div class="filter-item">
-                    <a>Models</a>
                     @if (Models == null)
                     {
-                        <p><em>Loading...</em></p>
+                        <p><em>Models Loading...</em></p>
                     }
                     else
                     {
-                        <select @bind="SelectedModel.Id" disabled="@DisableModel">
+                        <MatSelect Class="select-field" Label="Select a Model" Outlined="true" @bind-Value="SelectedModel.Id" TValue="int?" Disabled="@DisableModel">
                             @foreach (var model in Models)
                             {
-                                <option value="@model.Id">@model.Name</option>
+                                <MatOption TValue="int?" Value="@model.Id">@model.Name</MatOption>
                             }
-                        </select>
+                        </MatSelect>
                     }
                 </div>
 
                 <div class="filter-item">
-                    <a>Countries</a>
                     @if (Countries == null)
                     {
-                        <p><em>Loading...</em></p>
+                        <p><em>Countries Loading...</em></p>
                     }
                     else
                     {
-                        <select @bind="SelectedCountry.Id" disabled="@DisableCountry">
+                        <MatSelect Class="select-field" Label="Select a Country" Outlined="true" @bind-Value="SelectedCountry.Id" TValue="int?" Disabled="@DisableCountry">
                             @foreach (var country in Countries)
                             {
-                                <option value="@country.Id">@country.Name</option>
+                                <MatOption TValue="int?" Value="@country.Id">@country.Name</MatOption>
                             }
-                        </select>
+                        </MatSelect>
                     }
                 </div>
 
                 <div class="filter-item">
-                    <a>Users</a>
                     @if (UserLevels == null)
                     {
-                        <p><em>Loading...</em></p>
+                        <p><em>User Levels Loading...</em></p>
                     }
                     else
                     {
-                        <select @bind="SelectedUserLevel" disabled="@DisableUserLevel">
+                        <MatSelect Class="select-field" Label="Select an User Level" Outlined="true" @bind-Value="SelectedUserLevelText" TValue="string" Disabled="@DisableUserLevel">
                             @foreach (var userLevel in UserLevels)
                             {
-                                <option value="@userLevel">@userLevel</option>
+                                <MatOption TValue="string" Value="@userLevel.ToString()">@userLevel</MatOption>
                             }
-                        </select>
+                        </MatSelect>
                     }
                 </div>
 
                 <div class="filter-item">
-                    <a>Applications</a>
                     @if (Applications == null)
                     {
-                        <p><em>Loading...</em></p>
+                        <p><em>Applications Loading...</em></p>
                     }
                     else
                     {
-                        <select @bind="SelectedApplication.Id" disabled="@DisableApplication">
-                            <option></option>
+                        <MatSelect Class="select-field" Label="Select an Application" Outlined="true" @bind-Value="SelectedApplication.Id" TValue="int?" Disabled="@DisableApplication">
+                            <MatOption TValue="int?"></MatOption>
                             @foreach (var application in Applications)
                             {
-                                <option value="@application.Id">@application.Name</option>
+                                <MatOption TValue="int?" value="@application.Id">@application.Name</MatOption>
                             }
-                        </select>
+                        </MatSelect>
                     }
                 </div>
             </div>
 
             <div class="filter-row">
                 <div class="filter-item">
-                    <a>Probes</a>
                     @if (Probes == null)
                     {
-                        <p><em>Loading...</em></p>
+                        <p><em>Probes Loading...</em></p>
                     }
                     else
                     {
-                        <select @bind="SelectedProbe.Id" disabled="@DisableProbe">
-                            <option></option>
+                        <MatSelect Class="select-field" Label="Select a Probe" Outlined="true" @bind-Value="SelectedProbe.Id" TValue="int?" Disabled="@DisableProbe">
+                            <MatOption TValue="int?"></MatOption>
                             @foreach (var probe in Probes)
                             {
-                                <option value="@probe.Id">@probe.Name</option>
+                                <MatOption TValue="int?" value="@probe.Id">@probe.Name</MatOption>
                             }
-                        </select>
+                        </MatSelect>
                     }
                 </div>
 
                 <div class="filter-item">
-                    <a>Kits</a>
                     @if (Kits == null)
                     {
-                        <p><em>Loading...</em></p>
+                        <p><em>Kits Loading...</em></p>
                     }
                     else
                     {
-                        <select @bind="SelectedKit.Id" disabled="@DisableKit">
-                            <option></option>
+                        <MatSelect Class="select-field" Label="Select a Kit" Outlined="true" @bind-Value="SelectedKit.Id" TValue="int?" Disabled="@DisableKit">
+                            <MatOption TValue="int?"></MatOption>
                             @foreach (var kit in Kits)
                             {
-                                <option value="@kit.Id">@kit.Name</option>
+                                <MatOption TValue="int?" value="@kit.Id">@kit.Name</MatOption>
                             }
-                        </select>
+                        </MatSelect>
                     }
                 </div>
 
                 <div class="filter-item">
-                    <a>Options</a>
                     @if (Options == null)
                     {
-                        <p><em>Loading...</em></p>
+                        <p><em>Options Loading...</em></p>
                     }
                     else
                     {
-                        <select @bind="SelectedOption.Id" disabled="@DisableOption">
-                            <option></option>
+                        <MatSelect Class="select-field" Label="Select an Option" Outlined="true" @bind-Value="SelectedOption.Id" TValue="int?" Disabled="@DisableOption">
+                            <MatOption TValue="int?"></MatOption>
                             @foreach (var option in Options)
                             {
-                                <option value="@option.Id">@option.Name</option>
+                                <MatOption TValue="int?" value="@option.Id">@option.Name</MatOption>
                             }
-                        </select>
+                        </MatSelect>
                     }
                 </div>
 
                 <div class="filter-item">
-                    <a>Versions</a>
                     @if (Versions == null)
                     {
-                        <p><em>Loading...</em></p>
+                        <p><em>Versions Loading...</em></p>
                     }
                     else
                     {
-                        <select @bind="SelectedVersion.Id" disabled="@DisableVersion">
-                            <option></option>
+                        <MatSelect Class="select-field" Label="Select a Version" Outlined="true" @bind-Value="SelectedVersion.Id" TValue="int?" Disabled="@DisableVersion">
+                            <MatOption TValue="int?"></MatOption>
                             @foreach (var version in Versions)
                             {
-                                <option value="@version.Id">@version.BuildVersion</option>
+                                <MatOption TValue="int?" value="@version.Id">@version.BuildVersion</MatOption>
                             }
-                        </select>
+                        </MatSelect>
                     }
                 </div>
             </div>
@@ -287,17 +289,17 @@ else
 
 <div class="combination-container">
 
-        @if (CombinationsBusy)
-        {
-            <div class="logo">
-                <SpinKitCircle />
-                <p class="logo-text"><em>Loading Data...</em></p>
-            </div>
-        }
-        else
-        {
-            @*<CombinationDataGrid Combination="@Combination"></CombinationDataGrid>*@
-            <CombinationMatrix Combination="@Combination"></CombinationMatrix>
-        }
+    @if (CombinationsBusy)
+    {
+        <div class="logo">
+            <SpinKitCircle />
+            <p class="logo-text"><em>Loading Data...</em></p>
+        </div>
+    }
+    else
+    {
+        @*<CombinationDataGrid Combination="@Combination"></CombinationDataGrid>*@
+        <CombinationMatrix Combination="@Combination"></CombinationMatrix>
+    }
 
 </div>

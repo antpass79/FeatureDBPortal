@@ -12,10 +12,14 @@
 
 - <http://janholinka.net/Blog/Article/9>
 
-### Blazor
+### Blazor - Binding
 
 - <https://chrissainty.com/a-detailed-look-at-data-binding-in-blazor/>
 - <https://blazor-tutorial.net/two-way-data-binding>
+
+### Blazor - Performances
+
+- <https://docs.microsoft.com/en-us/aspnet/core/blazor/webassembly-performance-best-practices?view=aspnetcore-3.1>
 
 ### Blazor - gRPC
 
@@ -23,7 +27,7 @@
 - <https://www.theguild.nl/sending-data-to-the-other-side-of-the-world-json-protocol-buffers-rest-grpc/>
 - <https://docs.microsoft.com/it-it/dotnet/architecture/grpc-for-wcf-developers/protobuf-enums>
 
-## Json Serializer
+### Json Serializer
 
 - <https://michaelscodingspot.com/the-battle-of-c-to-json-serializers-in-net-core-3/>
 

@@ -10,12 +10,12 @@ namespace FeatureDBPortal.Server.Tests.Utils
     {
         public static void Null(CombinationDTO result)
         {
-            Assert.Null(result.Headers);
+            Assert.Null(result.Columns);
             Assert.Null(result.Rows);
         }
         public static void Empty(CombinationDTO result)
         {
-            Assert.Empty(result.Headers);
+            Assert.Empty(result.Columns);
             Assert.Empty(result.Rows);
         }
 
@@ -29,14 +29,13 @@ namespace FeatureDBPortal.Server.Tests.Utils
 
         public static void HeaderEqual(ExpectedResult expectedResult, CombinationDTO result)
         {
-            Assert.Equal(expectedResult.ExpectedHeaderCount, result.Headers.Count());
+            Assert.Equal(expectedResult.ExpectedHeaderCount, result.Columns.Count());
 
             if (expectedResult.ExpectedHeaders != null)
             {
-                // Skip the first column that is the intersaction between rows and columns
-                expectedResult.ExpectedHeaders.Skip(1).ToList().ForEach(expectedHeader =>
+                expectedResult.ExpectedHeaders.ToList().ForEach(expectedHeader =>
                 {
-                    var header = result.Headers.Single(item => expectedResult.FilterBy == FindBy.Id ? item.Id == expectedHeader.ForId : item.Name == expectedHeader.ExpectedName);
+                    var header = result.Columns.Single(item => expectedResult.FilterBy == FindBy.Id ? item.Id == expectedHeader.ForId : item.Name == expectedHeader.ExpectedName);
                     Assert.Equal(expectedHeader.ExpectedName, header.Name);
                 });
             }
@@ -50,8 +49,8 @@ namespace FeatureDBPortal.Server.Tests.Utils
             {
                 expectedResult.ExpectedRows.ToList().ForEach(expectedRow =>
                 {
-                    var row = result.Rows.Single(item => expectedResult.FilterBy == FindBy.Id ? item.RowId == expectedRow.ForRowId : item.TitleCell.Name == expectedRow.ExpectedName);
-                    Assert.Equal(expectedRow.ExpectedName, row.TitleCell.Name);
+                    var row = result.Rows.Single(item => expectedResult.FilterBy == FindBy.Id ? item.RowId == expectedRow.ForRowId : item.Title.Name == expectedRow.ExpectedName);
+                    Assert.Equal(expectedRow.ExpectedName, row.Title.Name);
                 });
             }
         }
@@ -62,7 +61,7 @@ namespace FeatureDBPortal.Server.Tests.Utils
             {
                 expectedResult.ExpectedCells.ToList().ForEach(expectedCell =>
                 {
-                    var row = result.Rows.Single(item => expectedResult.FilterBy == FindBy.Id ? item.RowId == expectedCell.ForRowId : item.TitleCell.Name == expectedCell.ForRowName);
+                    var row = result.Rows.Single(item => expectedResult.FilterBy == FindBy.Id ? item.RowId == expectedCell.ForRowId : item.Title.Name == expectedCell.ForRowName);
                     var cell = row.Cells.Single(item => expectedResult.FilterBy == FindBy.Id ? item.ColumnId == expectedCell.ForColumnId : item.Name == expectedCell.ForColumnName);
                     Assert.Equal(expectedCell.ExpectedAllowMode, cell.AllowMode);
                     Assert.Equal(expectedCell.ExpectedVisibility, cell.Visible);
@@ -77,7 +76,7 @@ namespace FeatureDBPortal.Server.Tests.Utils
             {
                 expectedResult.ExpectedItems.ToList().ForEach(expectedItem =>
                 {
-                    var row = result.Rows.Single(item => expectedResult.FilterBy == FindBy.Id ? item.RowId == expectedItem.ForRowId : item.TitleCell.Name == expectedItem.ForRowName);
+                    var row = result.Rows.Single(item => expectedResult.FilterBy == FindBy.Id ? item.RowId == expectedItem.ForRowId : item.Title.Name == expectedItem.ForRowName);
                     var cell = row.Cells.Single(item => expectedResult.FilterBy == FindBy.Id ? item.ColumnId == expectedItem.ForColumnId : item.Name == expectedItem.ForColumnName);
                     var item = cell.Items.Single(item => item.ItemId == expectedItem.ForItemId);
 

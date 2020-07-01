@@ -1,0 +1,16 @@
+﻿@inherits BodyComponentDataModel
+
+<style>
+</style>
+
+@if (Rows == null)
+{
+    <td>Empty</td>
+}
+else
+{
+    @foreach (var row in Rows)
+    {
+        <RowComponent CellMouseEnter="@(async currentCell => OnCellMouseEnter(currentCell))" CellMouseLeave="@(async currentCell => OnCellMouseLeave(currentCell))" CellClick="@(async currentCell => OnCellClick(currentCell))" Row="@row"></RowComponent>
+    }
+}

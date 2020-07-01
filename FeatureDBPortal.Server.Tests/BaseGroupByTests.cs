@@ -22,7 +22,7 @@ namespace FeatureDBPortal.Server.Tests
         {
             var result = await CombinationGroupService.Combine(new Shared.CombinationSearchDTO
             {
-                Model = IsGroupListContains(LayoutType.Application, groups) ? null : new ModelDTO { Id = combinationTest.Model.Id },
+                Model = IsGroupListContains(LayoutType.LogicalModel, groups) ? null : new ModelDTO { Id = combinationTest.Model.Id },
                 Country = IsGroupListContains(LayoutType.Country, groups) ? null : new CountryDTO { Id = combinationTest.Country.Id },
                 Probe = IsGroupListContains(LayoutType.Probe, groups) ? null : new ProbeDTO { Id = combinationTest.Probe.Id },
                 Option = IsGroupListContains(LayoutType.Option, groups) ? null : new OptionDTO { Id = combinationTest.Option.Id },

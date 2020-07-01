@@ -12,39 +12,43 @@ namespace FeatureDBPortal.Client.Extensions
         {
             return new Combination
             {
-                Rows = dto.Rows.Select(row => new Row
+                IntersectionTitle = dto.IntersectionTitle,
+                Rows = dto.Rows.Select(row =>
                 {
-                    RowId = row.RowId,
-                    Cells = row.Cells.Select(cell => new CombinationCell
+                    var newRow = new Row
                     {
-                        RowId = cell.RowId,
-                        ColumnId = cell.ColumnId,
-                        Available = cell.Available,
-                        Visible = cell.Visible,
-                        AllowMode = cell.AllowMode.HasValue ? (AllowMode)cell.AllowMode : new Nullable<AllowMode>(),
-                        Name = cell.Name,
-                        AggregateItems = cell.Items == null ? string.Empty : string.Join(System.Environment.NewLine, cell.Items.Select(item => item.Name)),
-                        //Items = cell.Items?.Select(item => new CombinationItem
-                        //{
-                        //    RowId = item.RowId,
-                        //    ColumnId = item.ColumnId,
-                        //    ItemId = item.ItemId,
-                        //    Name = item.Name
-                        //})
-                    }).ToList(),
-                    TitleCell = new CombinationCell()
-                    {
-                        RowId = row.TitleCell.RowId,
-                        ColumnId = row.TitleCell.ColumnId,
-                        Available = row.TitleCell.Available,
-                        Name = row.TitleCell.Name
-                    }
-                }).ToList(),
-                Headers = dto.Headers.Select(header => new ColumnTitle
+                        Id = row.Title.Id,
+                        Title = new RowTitle
+                        {
+                            Id = row.Title.Id,
+                            Name = row.Title.Name
+                        },
+                        Cells = row.Cells.Select(cell => new Cell
+                        {
+                            RowId = cell.RowId,
+                            ColumnId = cell.ColumnId,
+                            Available = cell.Available,
+                            Visible = cell.Visible,
+                            AllowMode = cell.AllowMode.HasValue ? (AllowMode)cell.AllowMode : new Nullable<AllowMode>(),
+                            Name = cell.Name,
+                            AggregateItems = cell.Items == null ? string.Empty : string.Join(System.Environment.NewLine, cell.Items.Select(item => item.Name)),
+                            //Items = cell.Items?.Select(item => new CombinationItem
+                            //{
+                            //    RowId = item.RowId,
+                            //    ColumnId = item.ColumnId,
+                            //    ItemId = item.ItemId,
+                            //    Name = item.Name
+                            //})
+                        }).ToList()
+                    };
+
+                    return newRow;
+                }).ToDictionary(item => item.Id.Value),
+                Columns = dto.Columns.Select(header => new Column
                 {
                     Id = header.Id,
                     Name = header.Name
-                }).ToList()
+                }).ToDictionary(item => item.Id.Value)
             };
         }
 
@@ -54,7 +58,13 @@ namespace FeatureDBPortal.Client.Extensions
             {
                 Rows = dto.Rows.Select(row => new Row
                 {
-                    Cells = row.Cells.Select(cell => new CombinationCell
+                    Id = row.TitleCell.RowId,
+                    Title = new RowTitle
+                    {
+                        Id = row.TitleCell.RowId,
+                        Name = row.TitleCell.Name
+                    },
+                    Cells = row.Cells.Select(cell => new Cell
                     {
                         RowId = cell.RowId,
                         ColumnId = cell.ColumnId,
@@ -68,20 +78,13 @@ namespace FeatureDBPortal.Client.Extensions
                         //    ItemId = item.ItemId,
                         //    Name = item.Name
                         //})
-                    }).ToList(),
-                    TitleCell = new CombinationCell()
-                    {
-                        RowId = row.TitleCell.RowId,
-                        ColumnId = row.TitleCell.ColumnId,
-                        Available = row.TitleCell.Allow,
-                        Name = row.TitleCell.Name
-                    }
-                }).ToList(),
-                Headers = dto.Headers.Select(header => new ColumnTitle
+                    }).ToList()
+                }).ToDictionary(item => item.Id.Value),
+                Columns = dto.Headers.Select(header => new Column
                 {
                     Id = header.Id,
                     Name = header.Name
-                }).ToList()
+                }).ToDictionary(item => item.Id.Value)
             };
         }
     }
