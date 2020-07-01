@@ -68,6 +68,7 @@
 
     .select-field > .mdc-select__anchor {
         flex: 1;
+        height: 36px;
     }
 </style>
 
@@ -226,54 +227,51 @@ else
         <div class="options-layout">
             <h5>Layout</h5>
             <div class="filter-item">
-                <a>Rows</a>
                 @if (LayoutViews == null)
                 {
                     <p><em>Loading...</em></p>
                 }
                 else
                 {
-                    <select @bind="SelectedRowLayout">
-                        <option></option>
+                    <MatSelect Class="select-field" Label="Select Row Output" Outlined="true" @bind-Value="SelectedRowLayoutText" TValue="string">
+                        <MatOption TValue="string"></MatOption>
                         @foreach (var layoutView in LayoutViews)
                         {
-                            <option value="@layoutView">@layoutView</option>
+                            <MatOption TValue="string" value="@layoutView.ToString()">@layoutView</MatOption>
                         }
-                    </select>
+                    </MatSelect>
                 }
             </div>
             <div class="filter-item">
-                <a>Columns</a>
                 @if (LayoutViews == null)
                 {
                     <p><em>Loading...</em></p>
                 }
                 else
                 {
-                    <select @bind="SelectedColumnLayout">
-                        <option></option>
+                    <MatSelect Class="select-field" Label="Select Column Output" Outlined="true" @bind-Value="SelectedColumnLayoutText" TValue="string">
+                        <MatOption TValue="string"></MatOption>
                         @foreach (var layoutView in LayoutViews)
                         {
-                            <option value="@layoutView">@layoutView</option>
+                            <MatOption TValue="string" value="@layoutView.ToString()">@layoutView</MatOption>
                         }
-                    </select>
+                    </MatSelect>
                 }
             </div>
             <div class="filter-item">
-                <a>Cells</a>
                 @if (LayoutViews == null)
                 {
                     <p><em>Loading...</em></p>
                 }
                 else
                 {
-                    <select @bind="SelectedCellLayout">
-                        <option></option>
+                    <MatSelect Class="select-field" Label="Select Cell Output" Outlined="true" @bind-Value="SelectedCellLayoutText" TValue="string">
+                        <MatOption TValue="string"></MatOption>
                         @foreach (var layoutView in LayoutViews)
                         {
-                            <option value="@layoutView">@layoutView</option>
+                            <MatOption TValue="string" value="@layoutView.ToString()">@layoutView</MatOption>
                         }
-                    </select>
+                    </MatSelect>
                 }
             </div>
         </div>
@@ -299,7 +297,8 @@ else
     else
     {
         @*<CombinationDataGrid Combination="@Combination"></CombinationDataGrid>*@
-        <CombinationMatrix Combination="@Combination"></CombinationMatrix>
+        @*<CombinationMatrix Combination="@Combination"></CombinationMatrix>*@
+        <VirtualizeCombinationMatrix Combination="@Combination"></VirtualizeCombinationMatrix>
     }
 
 </div>

@@ -61,7 +61,7 @@ namespace FeatureDBPortal.Server.Services
             finally
             {
                 Trace.WriteLine(string.Empty);
-                Trace.WriteLine($"Process starts at {start} and stops at {DateTime.Now} with duration of {stopwatch.Elapsed}");
+                Trace.WriteLine($"ON SERVER: Process starts at {start} and stops at {DateTime.Now} with duration of {stopwatch.Elapsed}");
             }
         }
 

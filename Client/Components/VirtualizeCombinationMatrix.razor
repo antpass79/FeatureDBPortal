@@ -1,0 +1,114 @@
+﻿@inherits VirtualizeCombinationMatrixDataModel
+
+<style>
+    tr:nth-child(even) {
+        background-color: lightgray;
+    }
+
+    tr:nth-child(odd) {
+        background-color: white;
+    }
+
+    th, td {
+        padding: 8px 16px;
+    }
+
+    th {
+        background: #eee;
+    }
+
+    td.fixed-row-title {
+        font-weight: bold;
+        vertical-align: middle;
+        position: sticky;
+        position: -webkit-sticky;
+        width: 150px;
+        left: 0px;
+        background-color: inherit;
+    }
+
+    .table-fixed-header thead th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+
+    th.header-rotate {
+        height: 140px;
+        min-width: 100px;
+        white-space: nowrap;
+    }
+
+        th.header-rotate > div {
+            transform: translate(0px, 0px) rotate(315deg);
+            width: 0px;
+        }
+
+            th.header-rotate > div > span {
+                padding: 5px 10px;
+            }
+
+
+    th.fixed-column {
+        position: sticky;
+        position: -webkit-sticky;
+        min-width: 100px;
+        left: 0px;
+        z-index: 2 !important;
+    }
+
+    .available-background {
+        background-color: cadetblue;
+    }
+
+    .no-background {
+        background-color: burlywood;
+    }
+
+    .highlight {
+        opacity: 0.5;
+    }
+</style>
+
+<div style="height: calc(100% - 20px); overflow-y: auto; position: relative;">
+    @if (Combination == null)
+    {
+        <p><em>No Available Combinations</em></p>
+    }
+    else
+    {
+        <table class="table table-fixed-header">
+            <thead>
+                <tr>
+                    <th class="header-rotate fixed-column">
+                        <div><span>@Combination.IntersectionTitle</span></div>
+                    </th>
+                    @foreach (var column in Combination.Columns.Values)
+                    {
+                        <th class="header-rotate">
+                            <div><span>@column.Name</span></div>
+                        </th>
+                    }
+                </tr>
+            </thead>
+            <Virtualize TagName="tbody" ItemHeight="25" Items="@Combination.Rows.Values">
+                <tr @key="@context.GetHashCode()">
+                    <td class="fixed-row-title @context.Title.ClassValue">
+                        @context.Title.Name
+                    </td>
+                    @foreach (var cell in context.Cells)
+                    {
+                        @if (string.IsNullOrWhiteSpace(@cell.AggregateItems))
+                        {
+                            <td @onmouseover="@(async e => OnCellMouseEnter(@cell))" @onmouseout="@(async e => OnCellMouseLeave(@cell))" @onclick="@(async e => OnCellClick(@cell))" class="@cell.ClassValue">@cell.AllowMode</td>
+                        }
+                        else
+                        {
+                            <td>@cell.AggregateItems</td>
+                        }
+                    }
+                </tr>
+            </Virtualize>
+        </table>
+    }
+</div>
