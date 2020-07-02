@@ -1,5 +1,15 @@
 # FeatureDBPortal
 
+## How to access to Oracle 
+
+ Scaffold-DbContext "User Id=<userid>;Password=<password>;Data Source=<host>:<port>/<servicename>" Oracle.EntityFrameworkCore -OutputDir <outputdir>
+ 
+Console application based on 2.2 .NET core Framework. 
+Install Oracle.EntityFrameworkCore and all related dependeces: version 2.6
+Set for the application project 3.1 .NET version
+Run the Scaffold-DbContext command
+
+
 ## References
 
 ### Azure DevOps - Blazor

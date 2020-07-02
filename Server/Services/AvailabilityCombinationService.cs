@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using FeatureDBPortal.Server.Data.Models;
+using FeatureDBPortal.Server.Data.Models.RD;
 using FeatureDBPortal.Server.Extensions;
 using FeatureDBPortal.Server.Models;
 using FeatureDBPortal.Shared;
