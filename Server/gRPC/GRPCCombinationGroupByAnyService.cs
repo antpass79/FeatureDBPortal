@@ -1,4 +1,4 @@
-﻿using FeatureDBPortal.Server.Data.Models;
+﻿using FeatureDBPortal.Server.Data.Models.RD;
 using FeatureDBPortal.Server.Models;
 using FeatureDBPortal.Shared;
 using GrpcCombination;

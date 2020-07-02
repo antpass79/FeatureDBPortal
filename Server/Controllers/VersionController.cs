@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using FeatureDBPortal.Server.Data.Models;
+using FeatureDBPortal.Server.Data.Models.RD;
 using FeatureDBPortal.Server.Repositories;
 using FeatureDBPortal.Shared;
 using Microsoft.AspNetCore.Mvc;
