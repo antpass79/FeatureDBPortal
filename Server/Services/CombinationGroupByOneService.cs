@@ -26,7 +26,16 @@ namespace FeatureDBPortal.Server.Services
                 .ElementAt(0)
                 .ToString();
 
+            var fakeIds = Context.GetPropertyValue<IQueryable<IQueryableCombination>>(firstLayoutGroup)
+                .ToList()
+                .Where(item => item.IsFake)
+                .Select(item => item.Id)
+                .ToList();
+
+
             var orderedSelectedRowField = Context.GetPropertyValue<IQueryable<IQueryableCombination>>(firstLayoutGroup)
+                .ToList()
+                .Where(item => !item.IsFake)
                 .Select(item => new QueryableCombination { Id = item.Id, Name = item.Name })
                 .OrderBy(item => item.Name)
                 .ToList();
@@ -40,6 +49,8 @@ namespace FeatureDBPortal.Server.Services
             CombinationDictionary matrix = PrepareMatrix(orderedSelectedRowField);
 
             groups
+                .ToList()
+                .Where(item => item.Key.HasValue && !fakeIds.Contains(item.Key.Value))
                 .ToList()
                 .ForEach(group =>
                 {

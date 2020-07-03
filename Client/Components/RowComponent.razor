@@ -20,7 +20,8 @@
     }
 
     .highlight {
-        opacity: 0.5;
+        background-color: firebrick !important;
+        color: whitesmoke;
     }
 </style>
 
@@ -34,7 +35,7 @@ else
         <td class="row-title @Row.Title.ClassValue">
             @Row.Title.Name
         </td>
-        @foreach (var cell in Row.Cells)
+        @foreach (var cell in Row.Cells.Values)
         {
             <CellComponent CellMouseEnter="@(async currentCell => OnCellMouseEnter(currentCell))" CellMouseLeave="@(async currentCell => OnCellMouseLeave(currentCell))" CellClick="@(async currentCell => OnCellClick(currentCell))" Cell="@cell"></CellComponent>
         }

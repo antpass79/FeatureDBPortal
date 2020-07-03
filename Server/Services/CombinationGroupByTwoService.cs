@@ -69,6 +69,10 @@ namespace FeatureDBPortal.Server.Services
                     {
                         var columnA = rowA.Cells[y];
 
+                        // ANTO why id can be null?
+                        if (!columnA.RowId.HasValue || !columnA.ColumnId.HasValue)
+                            continue;
+
                         var rowKey = columnA.RowId.HasValue ? columnA.RowId : -1;
                         var columnKey = columnA.ColumnId.HasValue ? columnA.ColumnId : -1;
 

@@ -3,6 +3,7 @@ using FeatureDBPortal.Server.Repositories;
 using FeatureDBPortal.Shared;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 namespace FeatureDBPortal.Server.Controllers
 {
     public abstract class BaseInputFilterController<TEntity, TDTO, TController> : ControllerBase
-        where TEntity: class
+        where TEntity: IQueryableCombination
         where TDTO: IOrderablePropertyName
         where TController: BaseInputFilterController<TEntity, TDTO, TController>
     {
