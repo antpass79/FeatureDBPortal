@@ -13,10 +13,7 @@
     "User": "RS",
     "Result": {
       "ExpectedHeaderCount": 2,
-      "ExpectedRowCount": 47,
-      "ExpectedTitleCell": {
-        "ExpectedName": "Abdominal"
-      },
+      "ExpectedRowCount": 33,
       "ExpectedHeaders": [
         {
           "ForId": -1,
@@ -25,13 +22,32 @@
       ],
       "ExpectedCells": [
         {
-          "ForRowName": "Abdominal bovine",
+          "ForRowId": "1",
           "ForColumnName": "Allow",
-          "ExpectedAllowMode": "No",
-          "ExpectedVisibility": "false",
-          "ExpectedAvailability": "false"
+          "ExpectedAllowMode": "A",
+          "ExpectedVisibility": "true",
+          "ExpectedAvailability": "true"
         }
       ]
+    }
+  },
+  {
+    "Title": "FILTERS: Model/Country/Probe/User - GROUPS: Application",
+    "FirstGroup": "Application",
+    "Model": {
+      "Id": 1,
+      "Name": "MyLab 9"
+    },
+    "Country": {
+      "Id": 106,
+      "Name": "ITALY (IT)"
+    },
+    "Probe": {
+      "Id": 46,
+      "Name": "C 1-8"
+    },
+    "User": "Standard",
+    "Result": {
     }
   }
 ]
