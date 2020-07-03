@@ -39,26 +39,41 @@
             top: 0;
         }
 
+    .combination-component {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        height: 100%;
+    }
+
     .combination-matrix {
         overflow: auto;
         height: 100%;
     }
 </style>
 
-<div class="combination-matrix">
-    @if (Combination == null)
-    {
-        <p class="logo-text"><em>No Available Combinations</em></p>
-    }
-    else
-    {
-        <table class="table table-fixed-header">
-            <thead>
-                <HeaderComponent IntersectionTitle="@Combination.IntersectionTitle" Columns="@Combination.Columns.Values"></HeaderComponent>
-            </thead>
-            <tbody>
-                <BodyComponent CellMouseEnter="@(async currentCell => OnCellMouseEnter(currentCell))" CellMouseLeave="@(async currentCell => OnCellMouseLeave(currentCell))" CellClick="@(async currentCell => OnCellClick(currentCell))" Rows="@Combination.Rows.Values"></BodyComponent>
-            </tbody>
-        </table>
-    }
+<div class="combination-component">
+    <div class="combination-filters">
+        <MatCheckbox Label="Hide empty rows/columns" TValue="bool" Value="@Filters.KeepIfIdNotNull"></MatCheckbox>
+        <MatCheckbox Label="Hide empty allow mode cells" TValue="bool" Value="@Filters.KeepIfCellAllowModeNotNull"></MatCheckbox>
+        <MatButton @onclick="@(async () => OnApplyFilters())"></MatButton>
+    </div>
+
+    <div class="combination-matrix">
+        @if (Combination == null)
+        {
+            <p class="logo-text"><em>No Available Combinations</em></p>
+        }
+        else
+        {
+            <table class="table table-fixed-header">
+                <thead>
+                    <HeaderComponent IntersectionTitle="@Combination.IntersectionTitle" Columns="@Combination.ProjectedColumns.Values"></HeaderComponent>
+                </thead>
+                <tbody>
+                    <BodyComponent CellMouseEnter="@(async currentCell => OnCellMouseEnter(currentCell))" CellMouseLeave="@(async currentCell => OnCellMouseLeave(currentCell))" CellClick="@(async currentCell => OnCellClick(currentCell))" Rows="@Combination.ProjectedRows.Values"></BodyComponent>
+                </tbody>
+            </table>
+        }
+    </div>
 </div>

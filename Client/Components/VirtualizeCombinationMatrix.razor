@@ -83,7 +83,7 @@
                     <th class="header-rotate fixed-column">
                         <div><span>@Combination.IntersectionTitle</span></div>
                     </th>
-                    @foreach (var column in Combination.Columns.Values)
+                    @foreach (var column in Combination.ProjectedColumns.Values)
                     {
                         <th class="header-rotate">
                             <div><span>@column.Name</span></div>
@@ -91,12 +91,12 @@
                     }
                 </tr>
             </thead>
-            <Virtualize TagName="tbody" ItemHeight="25" Items="@Combination.Rows.Values">
+            <Virtualize TagName="tbody" ItemHeight="25" Items="@Combination.ProjectedRows.Values">
                 <tr @key="@context.GetHashCode()">
                     <td class="fixed-row-title @context.Title.ClassValue">
                         @context.Title.Name
                     </td>
-                    @foreach (var cell in context.Cells)
+                    @foreach (var cell in context.Cells.Values)
                     {
                         @if (string.IsNullOrWhiteSpace(@cell.AggregateItems))
                         {

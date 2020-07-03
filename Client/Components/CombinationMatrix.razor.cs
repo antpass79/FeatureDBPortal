@@ -1,5 +1,7 @@
-﻿using FeatureDBPortal.Client.Models;
+﻿using FeatureDBPortal.Client.Extensions;
+using FeatureDBPortal.Client.Models;
 using Microsoft.AspNetCore.Components;
+using System.Threading.Tasks;
 
 namespace FeatureDBPortal.Client.Components
 {
@@ -7,6 +9,14 @@ namespace FeatureDBPortal.Client.Components
     {
         [Parameter]
         public Combination Combination { get; set; }
+
+        protected CombinationFilter Filters = new CombinationFilter() { KeepIfIdNotNull = true, KeepIfCellAllowModeNotNull = true };
+
+        protected override Task OnParametersSetAsync()
+        {
+            Combination?.ApplyFilters(Filters);
+            return base.OnParametersSetAsync();
+        }
 
         protected void OnCellClick(Cell cell)
         {
@@ -31,16 +41,9 @@ namespace FeatureDBPortal.Client.Components
             column.IsHighlight = selected;
         }
 
-        RenderFragment CreateHeader() => builder =>
+        protected void OnApplyFilters()
         {
-            builder.OpenComponent<HeaderComponent>(0);
-            builder.CloseComponent();
-        };
-
-        RenderFragment CreateBody() => builder =>
-        {
-            builder.OpenComponent<BodyComponent>(0);
-            builder.CloseComponent();
-        };
+            Combination.ApplyFilters(Filters);
+        }
     }
 }

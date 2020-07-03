@@ -6,6 +6,6 @@ namespace FeatureDBPortal.Client.Models
     {
         public int? Id { get; set; }
         public RowTitle Title { get; set; }
-        public IEnumerable<Cell> Cells { get; set; }
+        public IDictionary<int, Cell> Cells { get; set; }
     }
 }
