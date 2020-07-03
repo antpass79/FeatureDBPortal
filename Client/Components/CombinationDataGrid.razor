@@ -59,7 +59,7 @@
             </MatTableHeader>
             <MatTableRow>
                 <td>@context.Value.Title.Name</td>
-                @foreach (var cell in @context.Value.Cells)
+                @foreach (var cell in @context.Value.Cells.Values)
                     {
                         if (cell.Items == null)
                         {

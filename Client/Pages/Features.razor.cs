@@ -4,7 +4,6 @@ using FeatureDBPortal.Client.Services;
 using FeatureDBPortal.Shared;
 using Microsoft.AspNetCore.Components;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
