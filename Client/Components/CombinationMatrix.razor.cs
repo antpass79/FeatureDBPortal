@@ -7,16 +7,22 @@ namespace FeatureDBPortal.Client.Components
 {
     public class CombinationMatrixDataModel : ComponentBase
     {
+        private const string DATA_MESSAGE_LOADING_DATA = "Loading Data...";
+        private const string DATA_MESSAGE_RENDERING_DATA = "Rendering Data...";
+
+        [Parameter]
+        public bool Busy { get; set; }
+
+        [Parameter]
+        public bool ShouldRefresh { get; set; }
+
         [Parameter]
         public Combination Combination { get; set; }
 
-        protected CombinationFilter Filters = new CombinationFilter() { KeepIfIdNotNull = true, KeepIfCellAllowModeNotNull = true };
+        [Parameter]
+        public CombinationFilter Filters { get; set; }
 
-        protected override Task OnParametersSetAsync()
-        {
-            Combination?.ApplyFilters(Filters);
-            return base.OnParametersSetAsync();
-        }
+        protected string DataMessage { get; set; } = DATA_MESSAGE_LOADING_DATA;
 
         protected void OnCellClick(Cell cell)
         {
@@ -41,9 +47,23 @@ namespace FeatureDBPortal.Client.Components
             column.IsHighlight = selected;
         }
 
-        protected void OnApplyFilters()
+        async protected Task OnApplyFilters()
         {
-            Combination.ApplyFilters(Filters);
+            ShouldRefresh = true;
+            DataMessage = DATA_MESSAGE_RENDERING_DATA;
+            Busy = true;
+
+            await Task.Run(() =>
+            {
+                Combination?.ApplyFilters(Filters);
+                StateHasChanged();
+            });
+
+            Busy = false;
+            DataMessage = DATA_MESSAGE_LOADING_DATA;
+            ShouldRefresh = false;
+
+            await Task.CompletedTask;
         }
     }
 }

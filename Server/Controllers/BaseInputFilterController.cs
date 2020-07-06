@@ -17,7 +17,8 @@ namespace FeatureDBPortal.Server.Controllers
     {
         private readonly ILogger<TController> _logger;
         private readonly IMapper _mapper;
-        private readonly IGenericRepository<TEntity> _repository;
+
+        protected IGenericRepository<TEntity> Repository { get; }
 
         protected BaseInputFilterController(
             ILogger<TController> logger,
@@ -26,17 +27,22 @@ namespace FeatureDBPortal.Server.Controllers
         {
             _logger = logger;
             _mapper = mapper;
-            _repository = repository;
+            Repository = repository;
         }
 
         [HttpGet]
         async public Task<IEnumerable<TDTO>> Get()
         {
-            var items = _repository.Get();
+            var items = GetItems();
             return await Task.FromResult(
                 _mapper
                     .Map<IEnumerable<TDTO>>(items)
                     .OrderBy(item => item.OrderableProperty));
+        }
+
+        virtual protected IEnumerable<TEntity> GetItems()
+        {
+            return Repository.Get();
         }
     }
 }

@@ -44,10 +44,10 @@ namespace FeatureDBPortal.Server.Services
                 IEnumerable<LayoutType> groupBy = GetGroups(search);
                 CombinationDTO combination = groupBy.Count() switch
                 {
-                    0 => await _combinationGroupByAnyService.Combine(search, groupBy),
-                    1 => await _combinationGroupByOneService.Combine(search, groupBy),
-                    2 => await _combinationGroupByTwoService.Combine(search, groupBy),
-                    3 => await _combinationGroupByThreeService.Combine(search, groupBy),
+                    0 => await _combinationGroupByAnyService.GetCombination(search, groupBy),
+                    1 => await _combinationGroupByOneService.GetCombination(search, groupBy),
+                    2 => await _combinationGroupByTwoService.GetCombination(search, groupBy),
+                    3 => await _combinationGroupByThreeService.GetCombination(search, groupBy),
                     _ => throw new NotImplementedException()
                 };
 

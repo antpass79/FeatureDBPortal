@@ -20,7 +20,7 @@ namespace FeatureDBPortal.Server.Services
         {
         }
 
-        async override public Task<CombinationDTO> Combine(CombinationSearchDTO search, IEnumerable<LayoutType> groupBy)
+        async override protected Task<CombinationDTO> GroupNormalRules(IQueryable<NormalRule> normalRules, IEnumerable<LayoutType> groupBy)
         {
             var firstLayoutGroup = groupBy
                 .ElementAt(0)
@@ -39,8 +39,6 @@ namespace FeatureDBPortal.Server.Services
                 .Select(item => new QueryableCombination { Id = item.Id, Name = item.Name })
                 .OrderBy(item => item.Name)
                 .ToList();
-
-            IQueryable<NormalRule> normalRules = FilterNormalRules(search);
 
             // Maybe add firstLayoutGroup + "Id" == null
             var groups = normalRules

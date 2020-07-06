@@ -36,8 +36,11 @@ namespace FeatureDBPortal.Client.Components
             CellMouseLeave.InvokeAsync(cell);
         }
 
+        [Parameter]
+        public bool ShouldRefresh { get; set; }
+
         private bool _shouldRender;
-        protected override bool ShouldRender() => _shouldRender;
+        protected override bool ShouldRender() => _shouldRender || ShouldRefresh;
 
         protected override void OnAfterRender(bool firstRender)
         {

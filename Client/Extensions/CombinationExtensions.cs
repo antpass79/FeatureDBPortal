@@ -91,26 +91,31 @@ namespace FeatureDBPortal.Client.Extensions
 
         public static void ApplyFilters(this Combination combination, CombinationFilter filters)
         {
+            var copiedCombination = combination.Copy();
+
+            Console.WriteLine(string.Empty);
+            Console.WriteLine($"Column filter: {filters.KeepIfRowTitleContains}, Row filter: {filters.KeepIfColumnTitleContains}");
+
             // Filter Rows
-            combination.ProjectedRows = combination.Rows
+            combination.ProjectedRows = copiedCombination.Rows
                 .Select(row => row.Value)
                 .Where(row => OnKeepRow(row, filters))
                 .ToDictionary(row => row.Id.Value);
 
             // Filter Columns
-            var filteredColumns = combination.Columns
+            var filteredColumns = copiedCombination.Columns
                 .Select(column => column.Value)
                 .Where(column => OnKeepColumn(column, filters))
                 .ToDictionary(column => column.Id.Value);
 
             List<int> projectedColumnIds = new List<int>();
 
-            foreach (var column in combination.Columns)
+            foreach (var column in copiedCombination.Columns)
             {
                 // Filter Cells
                 var show = combination.ProjectedRows
                     .Select(row => row.Value.Cells[column.Key])
-                    .Any(cell => OnKeepCell(cell, filters));
+                    .Any(cell => filteredColumns.ContainsKey(column.Key) && OnKeepCell(cell, filters));
 
                 if (show)
                 {
@@ -137,14 +142,14 @@ namespace FeatureDBPortal.Client.Extensions
         {
             return
                 (filters.KeepIfIdNotNull ? row.Id.HasValue && row.Cells.Any(cell => OnKeepCell(cell.Value, filters)) : true) &&
-                (!string.IsNullOrWhiteSpace(filters.KeepIfRowTitleContains) ? row.Title.Name.Contains(filters.KeepIfRowTitleContains) : true);
+                (!string.IsNullOrWhiteSpace(filters.KeepIfRowTitleContains) ? row.Title.Name.Contains(filters.KeepIfRowTitleContains, StringComparison.InvariantCultureIgnoreCase) : true);
         }
 
         static bool OnKeepColumn(Column column, CombinationFilter filters)
         {
             return
                 (filters.KeepIfIdNotNull ? column.Id.HasValue : true) &&
-                (!string.IsNullOrWhiteSpace(filters.KeepIfColumnTitleContains) ? column.Name.Contains(filters.KeepIfColumnTitleContains) : true);
+                (!string.IsNullOrWhiteSpace(filters.KeepIfColumnTitleContains) ? column.Name.Contains(filters.KeepIfColumnTitleContains, StringComparison.InvariantCultureIgnoreCase) : true);
         }
 
         static bool OnKeepCell(Cell cell, CombinationFilter filters)
@@ -152,6 +157,28 @@ namespace FeatureDBPortal.Client.Extensions
             return
                 (filters.KeepIfIdNotNull ? cell.ColumnId.HasValue : true) &&
                 filters.KeepIfCellAllowModeNotNull ? cell.AllowMode.HasValue : true;
+        }
+
+        static Combination Copy(this Combination combination)
+        {
+            return new Combination
+            {
+                IntersectionTitle = combination.IntersectionTitle,
+                Columns = combination.Columns
+                .Select(column => column.Value)
+                .ToDictionary(column => column.Id.Value),
+                Rows = combination.Rows
+                .Select(row => row.Value)
+                .Select(row => new Row
+                {
+                    Id = row.Id,
+                    Title = row.Title,
+                    Cells = row.Cells
+                    .Select(cell => cell.Value)
+                    .ToDictionary(Cell => Cell.ColumnId.Value)
+                })
+                .ToDictionary(row => row.Id.Value)
+            };
         }
     }
 }

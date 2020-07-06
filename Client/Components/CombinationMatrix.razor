@@ -12,6 +12,17 @@
         align-items: center;
     }
 
+    .logo {
+        display: flex;
+        align-self: center;
+    }
+
+    .logo-text {
+        flex: 1;
+        align-self: center;
+        margin: 15px;
+    }
+
     .table {
         border-collapse: collapse;
         width: 100%;
@@ -39,11 +50,22 @@
             top: 0;
         }
 
+    .mat-component {
+        margin: 5px;
+        align-self: center;
+        align-content: center;
+        align-items: center;
+    }
+
     .combination-component {
         display: flex;
         flex-direction: column;
         flex: 1;
         height: 100%;
+    }
+
+    .combination-filters {
+        display: flex;
     }
 
     .combination-matrix {
@@ -54,26 +76,38 @@
 
 <div class="combination-component">
     <div class="combination-filters">
-        <MatCheckbox Label="Hide empty rows/columns" TValue="bool" Value="@Filters.KeepIfIdNotNull"></MatCheckbox>
-        <MatCheckbox Label="Hide empty allow mode cells" TValue="bool" Value="@Filters.KeepIfCellAllowModeNotNull"></MatCheckbox>
-        <MatButton @onclick="@(async () => OnApplyFilters())"></MatButton>
+        <MatTextField Class="mat-component" PlaceHolder="Filter Rows" TValue="string" @bind-Value="@Filters.KeepIfRowTitleContains"></MatTextField>
+        <MatTextField Class="mat-component" PlaceHolder="Filter Columns" TValue="string" @bind-Value="@Filters.KeepIfColumnTitleContains"></MatTextField>
+        <MatCheckbox Class="mat-component" Label="Hide empty rows/columns" TValue="bool" @bind-Value="@Filters.KeepIfIdNotNull"></MatCheckbox>
+        <MatCheckbox Class="mat-component" Label="Hide empty allow mode cells" TValue="bool" @bind-Value="@Filters.KeepIfCellAllowModeNotNull"></MatCheckbox>
+        <MatButton Class="mat-component" @onclick="@(async () => await OnApplyFilters())">Apply</MatButton>
     </div>
 
-    <div class="combination-matrix">
-        @if (Combination == null)
-        {
-            <p class="logo-text"><em>No Available Combinations</em></p>
-        }
-        else
-        {
-            <table class="table table-fixed-header">
-                <thead>
-                    <HeaderComponent IntersectionTitle="@Combination.IntersectionTitle" Columns="@Combination.ProjectedColumns.Values"></HeaderComponent>
-                </thead>
-                <tbody>
-                    <BodyComponent CellMouseEnter="@(async currentCell => OnCellMouseEnter(currentCell))" CellMouseLeave="@(async currentCell => OnCellMouseLeave(currentCell))" CellClick="@(async currentCell => OnCellClick(currentCell))" Rows="@Combination.ProjectedRows.Values"></BodyComponent>
-                </tbody>
-            </table>
-        }
-    </div>
+    @if (Busy)
+    {
+        <div class="logo">
+            <SpinKitCircle />
+            <p class="logo-text"><em>@DataMessage</em></p>
+        </div>
+    }
+    else
+    {
+        <div class="combination-matrix">
+            @if (Combination == null)
+            {
+                <p class="logo-text"><em>No Available Combinations</em></p>
+            }
+            else
+            {
+                <table class="table table-fixed-header">
+                    <thead>
+                        <HeaderComponent IntersectionTitle="@Combination.IntersectionTitle" Columns="@Combination.ProjectedColumns.Values"></HeaderComponent>
+                    </thead>
+                    <tbody>
+                        <BodyComponent ShouldRefresh="@ShouldRefresh" CellMouseEnter="@(async currentCell => OnCellMouseEnter(currentCell))" CellMouseLeave="@(async currentCell => OnCellMouseLeave(currentCell))" CellClick="@(async currentCell => OnCellClick(currentCell))" Rows="@Combination.ProjectedRows.Values"></BodyComponent>
+                    </tbody>
+                </table>
+            }
+        </div>
+    }
 </div>
