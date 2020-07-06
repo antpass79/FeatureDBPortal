@@ -18,49 +18,30 @@ namespace FeatureDBPortal.Server.Services
         {
         }
 
-        async override public Task<CombinationDTO> Combine(CombinationSearchDTO search, IEnumerable<LayoutType> groupBy)
+        async override protected Task<CombinationDTO> GroupNormalRules(IQueryable<NormalRule> normalRules, IEnumerable<LayoutType> groupBy)
         {
-            var firstLayoutGroup = groupBy.ElementAt(0);
-            var secondLayoutGroup = groupBy.ElementAt(1);
-            var thirdLayoutGroup = groupBy.ElementAt(2);
+            var firstLayoutGroup = groupBy.ElementAt(0).ToString();
+            var secondLayoutGroup = groupBy.ElementAt(1).ToString();
+            var thirdLayoutGroup = groupBy.ElementAt(2).ToString();
 
-            var firstPropertyNameId = firstLayoutGroup + "Id";
-            var secondPropertyNameId = secondLayoutGroup + "Id";
-            var thirdPropertyNameId = thirdLayoutGroup + "Id";
-
-            var orderedSelectedRowField = Context.GetPropertyValue<IQueryable<IQueryableCombination>>(firstLayoutGroup.ToString())
+            var orderedSelectedRowField = Context.GetPropertyValue<IQueryable<IQueryableCombination>>(firstLayoutGroup)
                 .AsEnumerable()
                 .Select(item => new QueryableCombination { Id = item.Id, Name = item.Name })
                 .OrderBy(item => item.Name)
                 .ToList();
-            var orderedSelectedColumnField = Context.GetPropertyValue<IQueryable<IQueryableCombination>>(secondLayoutGroup.ToString())
+            var orderedSelectedColumnField = Context.GetPropertyValue<IQueryable<IQueryableCombination>>(secondLayoutGroup)
                 .AsEnumerable()
                 .Select(item => new QueryableCombination { Id = item.Id, Name = item.Name })
                 .OrderBy(item => item.Name)
                 .ToList();
-            var orderedSelectedCellField = Context.GetPropertyValue<IQueryable<IQueryableCombination>>(thirdLayoutGroup.ToString())
+            var orderedSelectedCellField = Context.GetPropertyValue<IQueryable<IQueryableCombination>>(thirdLayoutGroup)
                 .AsEnumerable()
                 .Select(item => new QueryableCombination { Id = item.Id, Name = item.Name })
                 .OrderBy(item => item.Name)
                 .ToList();
 
-            IQueryable<NormalRule> normalRules = FilterNormalRules(search);
-
-            var firstGroupExpression = PropertyExpressionBuilder.Build<NormalRule, int?>(firstPropertyNameId).Compile();
-            var thirdGroupExpression = PropertyExpressionBuilder.Build<NormalRule, int?>(thirdPropertyNameId).Compile();
-
-            Func<NormalRule, string, int?> getPropertyValue = (NormalRule nr, string propertyName) =>
-            {
-                var result = propertyName switch
-                {
-                    "ApplicationId" => nr.ApplicationId,
-                    "ProbeId" => nr.ProbeId,
-                    "OptionId" => nr.OptionId,
-                    _ => throw new NotSupportedException()
-                };
-
-                return result;
-            };
+            var firstGroupExpression = PropertyExpressionBuilder.Build<NormalRule, int?>($"{firstLayoutGroup}Id").Compile();
+            var thirdGroupExpression = PropertyExpressionBuilder.Build<NormalRule, int?>($"{thirdLayoutGroup}Id").Compile();
 
             var groups = normalRules
                 .GroupBy(firstGroupExpression)
@@ -71,8 +52,8 @@ namespace FeatureDBPortal.Server.Services
                     Cells = group.Select(groupItem => new
                     {
                         RowId = group.Key,
-                        ColumnId = getPropertyValue(groupItem, secondPropertyNameId),
-                        Name = orderedSelectedColumnField.SingleOrDefault(item => item.Id == getPropertyValue(groupItem, secondPropertyNameId))?.Name,
+                        ColumnId = groupItem.GetPropertyIdByGroupName(secondLayoutGroup),
+                        Name = orderedSelectedColumnField.SingleOrDefault(item => item.Id == groupItem.GetPropertyIdByGroupName(secondLayoutGroup))?.Name,
                         Available = group.All(item => (AllowMode)item.Allow != AllowMode.No),
                         Visible = group.All(item => (AllowMode)item.Allow == AllowMode.A),
                         AllowMode = Allower.GetMode(group.All(item => (AllowMode)item.Allow == AllowMode.A), group.All(item => (AllowMode)item.Allow != AllowMode.No)),

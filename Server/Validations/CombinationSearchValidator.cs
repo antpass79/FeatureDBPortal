@@ -7,10 +7,10 @@ namespace FeatureDBPortal.Server.Validations
     {
         public CombinationSearchValidator()
         {
-            RuleFor(model => model.Model.Id)
-                .NotNull();
-            RuleFor(model => model.Country.Id)
-                .NotNull();
+            //RuleFor(model => model.Model.Id)
+            //    .NotNull();
+            //RuleFor(model => model.Country.Id)
+            //    .NotNull();
         }
     }
 }

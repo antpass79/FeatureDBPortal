@@ -107,6 +107,8 @@ namespace FeatureDBPortal.Client.Pages
 
         protected Combination Combination { get; private set; }
 
+        public CombinationFilter Filters = new CombinationFilter() { KeepIfIdNotNull = true, KeepIfCellAllowModeNotNull = true };
+
         protected LayoutTypeDTO CurrentHeader { get; set; }
 
         protected bool DisableApplication => SelectedRowLayout == LayoutTypeDTO.Application || SelectedColumnLayout == LayoutTypeDTO.Application || SelectedCellLayout == LayoutTypeDTO.Application;
@@ -155,7 +157,7 @@ namespace FeatureDBPortal.Client.Pages
             {
                 Application = IsOutputLayoutTypeSelected(LayoutTypeDTO.Application) ? null : SelectedApplication,
                 Probe = IsOutputLayoutTypeSelected(LayoutTypeDTO.Probe) ? null : SelectedProbe,
-                Country = IsOutputLayoutTypeSelected(LayoutTypeDTO.Country) || SelectedCellLayout == LayoutTypeDTO.Country ? null : SelectedCountry,
+                Country = IsOutputLayoutTypeSelected(LayoutTypeDTO.Country)  ? null : SelectedCountry,
                 Version = IsOutputLayoutTypeSelected(LayoutTypeDTO.Version) ? null : SelectedVersion,
                 Model = IsOutputLayoutTypeSelected(LayoutTypeDTO.Model) ? null : SelectedModel,
                 Option = IsOutputLayoutTypeSelected(LayoutTypeDTO.Option) ? null : SelectedOption,
@@ -167,12 +169,22 @@ namespace FeatureDBPortal.Client.Pages
             });
 
             Combination = combinationDTO.ToModel();
+
+            _shouldRenderer = true;
+
+            Combination.ApplyFilters(Filters);
             CurrentHeader = SelectedRowLayout;
 
             CombinationsBusy = false;
 
+            StateHasChanged();
+            _shouldRenderer = false;
+
             Trace.WriteLine(string.Empty);
             Trace.WriteLine($"CLIENT-SERVER ROUNDTRIP: Process starts at {start} and stops at {DateTime.Now} with duration of {stopwatch.Elapsed}");
         }
+
+        bool _shouldRenderer = false;
+        //protected override bool ShouldRender() => _shouldRenderer;
     }
 }

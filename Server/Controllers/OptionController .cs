@@ -4,6 +4,7 @@ using FeatureDBPortal.Server.Repositories;
 using FeatureDBPortal.Shared;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 
 namespace FeatureDBPortal.Server.Controllers
 {
@@ -17,6 +18,12 @@ namespace FeatureDBPortal.Server.Controllers
             IGenericRepository<Option> repository)
             : base(logger, mapper, repository)
         {
+        }
+
+        protected override IEnumerable<Option> GetItems()
+        {
+            return Repository
+                .Get(item => !item.IsFake);
         }
     }
 }

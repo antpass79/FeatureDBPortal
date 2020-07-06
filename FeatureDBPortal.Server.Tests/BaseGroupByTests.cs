@@ -20,7 +20,7 @@ namespace FeatureDBPortal.Server.Tests
 
         async protected Task<CombinationDTO> GroupBy(CombinationTest combinationTest, List<LayoutType> groups)
         {
-            var result = await CombinationGroupService.Combine(new Shared.CombinationSearchDTO
+            var result = await CombinationGroupService.GetCombination(new Shared.CombinationSearchDTO
             {
                 Model = IsGroupListContains(LayoutType.LogicalModel, groups) ? null : new ModelDTO { Id = combinationTest.Model.Id },
                 Country = IsGroupListContains(LayoutType.Country, groups) ? null : new CountryDTO { Id = combinationTest.Country.Id },
