@@ -16,9 +16,8 @@ namespace FeatureDBPortal.Server.Services
         {
         }
 
-        async override public Task<CombinationDTO> Combine(CombinationSearchDTO search, IEnumerable<LayoutType> groupBy)
+        async override protected Task<CombinationDTO> GroupNormalRules(IQueryable<NormalRule> normalRules, IEnumerable<LayoutType> groupBy)
         {
-            IQueryable<NormalRule> normalRules = FilterNormalRules(search);
             if (normalRules.Count() == 0)
                 return await Task.FromResult(new CombinationDTO());
 

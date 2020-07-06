@@ -66,10 +66,10 @@
         margin: 3px;
     }
 
-    .select-field > .mdc-select__anchor {
-        flex: 1;
-        height: 36px;
-    }
+        .select-field > .mdc-select__anchor {
+            flex: 1;
+            height: 36px;
+        }
 </style>
 
 <p>Check feature availability for a specific combination</p>
@@ -287,18 +287,8 @@ else
 
 <div class="combination-container">
 
-    @if (CombinationsBusy)
-    {
-        <div class="logo">
-            <SpinKitCircle />
-            <p class="logo-text"><em>Loading Data...</em></p>
-        </div>
-    }
-    else
-    {
-        @*<CombinationDataGrid Combination="@Combination"></CombinationDataGrid>*@
-        <CombinationMatrix Combination="@Combination"></CombinationMatrix>
-        @*<VirtualizeCombinationMatrix Combination="@Combination"></VirtualizeCombinationMatrix>*@
-    }
+    @*<CombinationDataGrid Combination="@Combination"></CombinationDataGrid>*@
+    <CombinationMatrix Busy="@CombinationsBusy" Combination="@Combination" Filters="@Filters"></CombinationMatrix>
+    @*<VirtualizeCombinationMatrix Combination="@Combination"></VirtualizeCombinationMatrix>*@
 
 </div>
