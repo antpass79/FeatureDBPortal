@@ -33,8 +33,17 @@ namespace FeatureDBPortal.Client.Models
 
         override protected string OnUpdateClassValue()
         {
-            var classValue = this.AllowMode == Models.AllowMode.A ? "available-background" : "no-background";
-            classValue += this.IsHighlight ? " highlight" : string.Empty;
+            var classValue = AllowMode switch
+            {
+                Models.AllowMode.A => BACKGROUND_MODE_AVAILABLE,
+                Models.AllowMode.Def => BACKGROUND_MODE_DEFAULT,
+                Models.AllowMode.No => BACKGROUND_MODE_NO,
+                _ => BACKGROUND_MODE_NULL
+            };
+
+            classValue = IsSelected ? SELECTED : classValue;
+
+            classValue += this.IsActive ? $" {ACTIVE}" : string.Empty;
 
             return classValue;
         }

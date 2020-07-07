@@ -89,12 +89,9 @@ namespace FeatureDBPortal.Client.Extensions
             };
         }
 
-        public static void ApplyFilters(this Combination combination, CombinationFilter filters)
+        public static void ApplyFilters(this Combination combination, CombinationFilters filters)
         {
             var copiedCombination = combination.Copy();
-
-            Console.WriteLine(string.Empty);
-            Console.WriteLine($"Column filter: {filters.KeepIfRowTitleContains}, Row filter: {filters.KeepIfColumnTitleContains}");
 
             // Filter Rows
             combination.ProjectedRows = copiedCombination.Rows
@@ -138,25 +135,28 @@ namespace FeatureDBPortal.Client.Extensions
                 .ToDictionary(column => column.Id.Value);
         }
 
-        static bool OnKeepRow(Row row, CombinationFilter filters)
+        static bool OnKeepRow(Row row, CombinationFilters filters)
         {
             return
                 (filters.KeepIfIdNotNull ? row.Id.HasValue && row.Cells.Any(cell => OnKeepCell(cell.Value, filters)) : true) &&
                 (!string.IsNullOrWhiteSpace(filters.KeepIfRowTitleContains) ? row.Title.Name.Contains(filters.KeepIfRowTitleContains, StringComparison.InvariantCultureIgnoreCase) : true);
         }
 
-        static bool OnKeepColumn(Column column, CombinationFilter filters)
+        static bool OnKeepColumn(Column column, CombinationFilters filters)
         {
             return
                 (filters.KeepIfIdNotNull ? column.Id.HasValue : true) &&
                 (!string.IsNullOrWhiteSpace(filters.KeepIfColumnTitleContains) ? column.Name.Contains(filters.KeepIfColumnTitleContains, StringComparison.InvariantCultureIgnoreCase) : true);
         }
 
-        static bool OnKeepCell(Cell cell, CombinationFilter filters)
+        static bool OnKeepCell(Cell cell, CombinationFilters filters)
         {
             return
                 (filters.KeepIfIdNotNull ? cell.ColumnId.HasValue : true) &&
-                filters.KeepIfCellAllowModeNotNull ? cell.AllowMode.HasValue : true;
+                (filters.KeepIfCellModeNotNull ?
+                    (filters.KeepIfCellModeA && cell.AllowMode == AllowMode.A ||
+                    filters.KeepIfCellModeDef && cell.AllowMode == AllowMode.Def ||
+                    filters.KeepIfCellModeNo && cell.AllowMode == AllowMode.No) : true);
         }
 
         static Combination Copy(this Combination combination)

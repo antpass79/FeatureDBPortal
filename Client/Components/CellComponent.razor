@@ -1,17 +1,36 @@
 ﻿@inherits CellComponentDataModel
 
 <style>
-    .available-background {
+    .background-mode-available {
         background-color: cadetblue;
     }
 
-    .no-background {
+    .background-mode-default {
+        background-color: lightgray;
+    }
+    .background-mode-no {
+        background-color: burlywood;
+    }
+    .background-mode-null {
         background-color: burlywood;
     }
 
-    .highlight {
+    .cell-content {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        height: 100%;
+    }
+
+    .cell-selected {
+        background-color: lightcoral !important;
+        font-weight: bold;
+    }
+
+    .cell-active {
         background-color: firebrick !important;
         color: whitesmoke;
+        font-weight: bold;
     }
 </style>
 

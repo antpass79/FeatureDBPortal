@@ -1,8 +1,7 @@
 ﻿using AutoMapper;
 using FeatureDBPortal.Server.Data.Models.RD;
-using FeatureDBPortal.Server.Extensions;
-using FeatureDBPortal.Server.Models;
 using FeatureDBPortal.Shared;
+using FeatureDBPortal.Shared.Utilities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -35,9 +34,7 @@ namespace FeatureDBPortal.Server.Services
 
         async public Task<CombinationDTO> Get(CombinationSearchDTO search)
         {
-            var start = DateTime.Now;
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
+            using var watcher = new Watcher("ON SERVER");
 
             try
             {
@@ -57,11 +54,6 @@ namespace FeatureDBPortal.Server.Services
             {
                 Trace.WriteLine(e.Message);
                 return await Task.FromResult<CombinationDTO>(null);
-            }
-            finally
-            {
-                Trace.WriteLine(string.Empty);
-                Trace.WriteLine($"ON SERVER: Process starts at {start} and stops at {DateTime.Now} with duration of {stopwatch.Elapsed}");
             }
         }
 

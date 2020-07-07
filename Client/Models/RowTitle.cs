@@ -7,7 +7,8 @@
 
         protected override string OnUpdateClassValue()
         {
-            return this.IsHighlight ? "highlight" : string.Empty;
+            var classValue = IsSelected ? SELECTED : string.Empty;
+            return this.IsActive ? ACTIVE : classValue;
         }
     }
 }

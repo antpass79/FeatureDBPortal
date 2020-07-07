@@ -13,8 +13,66 @@
 </style>
 
 <p>Welcome to the new Feature Database Portal!</p>
+
+<div class="mat-layout-grid">
+    <div class="mat-layout-grid-inner">
+        <div class="mat-layout-grid-cell mat-layout-grid-cell-span-9">
+            <div class="mat-layout-grid-inner">
+                <div class="mat-layout-grid-cell mat-layout-grid-cell-span-3">
+                    Model
+                </div>
+                <div class="mat-layout-grid-cell mat-layout-grid-cell-span-3">
+                    Country
+                </div>
+                <div class="mat-layout-grid-cell mat-layout-grid-cell-span-3">
+                    User
+                </div>
+                <div class="mat-layout-grid-cell mat-layout-grid-cell-span-3">
+                    Application
+                </div>
+            </div>
+            <div class="mat-layout-grid-inner">
+                <div class="mat-layout-grid-cell mat-layout-grid-cell-span-3">
+                    Option
+                </div>
+                <div class="mat-layout-grid-cell mat-layout-grid-cell-span-3">
+                    Feature
+                </div>
+                <div class="mat-layout-grid-cell mat-layout-grid-cell-span-3">
+                    Kit
+                </div>
+                <div class="mat-layout-grid-cell mat-layout-grid-cell-span-3">
+                    Version
+                </div>
+            </div>
+        </div>
+        <div class="mat-layout-grid-cell mat-layout-grid-cell-span-3">
+            <div class="mat-layout-grid-inner">
+                <div class="mat-layout-grid-cell">
+                    By Row
+                </div>
+            </div>
+            <div class="mat-layout-grid-inner">
+                <div class="mat-layout-grid-cell">
+                    By Column
+                </div>
+            </div>
+            <div class="mat-layout-grid-inner">
+                <div class="mat-layout-grid-cell">
+                    By Cell
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="test-scroller">
     <div class="scroll-content">
         CONTAINER
     </div>
 </div>
+
+@code
+        {
+    bool panelOpenState;
+}

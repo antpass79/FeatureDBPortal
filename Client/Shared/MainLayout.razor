@@ -8,16 +8,26 @@
     }
 </style>
 
+<MatThemeProvider Theme="@theme">
     <div class="sidebar">
         <NavMenu />
     </div>
 
     <div class="main">
         @*<div class="top-row px-4">
-            <a href="http://blazor.net" target="_blank" class="ml-md-auto">About</a>
-        </div>*@
+                <a href="http://blazor.net" target="_blank" class="ml-md-auto">About</a>
+            </div>*@
 
         <div class="content px-4 background-container">
             @Body
         </div>
     </div>
+</MatThemeProvider>
+
+@code
+{
+    MatTheme theme = new MatTheme()
+    {
+        Primary = "#5d2f91"
+    };
+}

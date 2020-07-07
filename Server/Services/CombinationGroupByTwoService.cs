@@ -27,8 +27,15 @@ namespace FeatureDBPortal.Server.Services
                 .ElementAt(1)
                 .ToString();
 
+            var fakeIds = Context.GetPropertyValue<IQueryable<IQueryableCombination>>(firstLayoutGroup)
+                .ToList()
+                .Where(item => item.IsFake)
+                .Select(item => item.Id)
+                .ToList();
+
             var orderedSelectedRowField = Context.GetPropertyValue<IQueryable<IQueryableCombination>>(firstLayoutGroup)
                 .AsEnumerable()
+                .Where(item => !item.IsFake)
                 .Select(item => new QueryableCombination { Id = item.Id, Name = item.Name })
                 .OrderBy(item => item.Name)
                 .ToList();
@@ -41,18 +48,25 @@ namespace FeatureDBPortal.Server.Services
 
             var groups = normalRules
                 .GroupBy(PropertyExpressionBuilder.Build<NormalRule, int?>($"{firstLayoutGroup}Id").Compile())
+                .ToList()
+                .Where(item => item.Key.HasValue && !fakeIds.Contains(item.Key.Value))
                 .Select(group => new
                 {
                     RowId = group.Key,
                     RowName = orderedSelectedRowField.SingleOrDefault(item => item.Id == group.Key)?.Name,
-                    Cells = group.Select(groupItem => new
+                    Cells = group.Select(groupItem =>
                     {
-                        RowId = group.Key,
-                        ColumnId = groupItem.GetPropertyIdByGroupName(secondLayoutGroup),
-                        Name = orderedSelectedColumnField.SingleOrDefault(item => item.Id == groupItem.GetPropertyIdByGroupName(secondLayoutGroup))?.Name,
-                        Available = group.All(item => (AllowMode)item.Allow != AllowMode.No),
-                        Visible = group.All(item => (AllowMode)item.Allow == AllowMode.A),
-                        AllowMode = Allower.GetMode(group.All(item => (AllowMode)item.Allow == AllowMode.A), group.All(item => (AllowMode)item.Allow != AllowMode.No)),
+                        var newCell = new CombinationCell
+                        {
+                            RowId = group.Key,
+                            ColumnId = groupItem.GetPropertyIdByGroupName(secondLayoutGroup),
+                            Name = orderedSelectedColumnField.SingleOrDefault(item => item.Id == groupItem.GetPropertyIdByGroupName(secondLayoutGroup))?.Name,
+                            Available = group.All(item => (AllowMode)item.Allow != AllowMode.No),
+                            Visible = group.All(item => (AllowMode)item.Allow == AllowMode.A)
+                        };
+                        newCell.AllowMode = Allower.GetMode(newCell.Visible.Value, newCell.Available.Value);
+
+                        return newCell;
                     }).ToList()
                 }).ToList();
 

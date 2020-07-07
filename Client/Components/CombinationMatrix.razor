@@ -57,6 +57,10 @@
         align-items: center;
     }
 
+    .mat-checkbox > .mdc-form-field > label {
+        padding-top: 5px !important;
+    }
+
     .combination-component {
         display: flex;
         flex-direction: column;
@@ -66,6 +70,7 @@
 
     .combination-filters {
         display: flex;
+        background-color: rgb(238,238,238);
     }
 
     .combination-matrix {
@@ -76,12 +81,17 @@
 
 <div class="combination-component">
     <div class="combination-filters">
-        <MatTextField Class="mat-component" PlaceHolder="Filter Rows" TValue="string" @bind-Value="@Filters.KeepIfRowTitleContains"></MatTextField>
-        <MatTextField Class="mat-component" PlaceHolder="Filter Columns" TValue="string" @bind-Value="@Filters.KeepIfColumnTitleContains"></MatTextField>
-        <MatCheckbox Class="mat-component" Label="Hide empty rows/columns" TValue="bool" @bind-Value="@Filters.KeepIfIdNotNull"></MatCheckbox>
-        <MatCheckbox Class="mat-component" Label="Hide empty allow mode cells" TValue="bool" @bind-Value="@Filters.KeepIfCellAllowModeNotNull"></MatCheckbox>
-        <MatButton Class="mat-component" @onclick="@(async () => await OnApplyFilters())">Apply</MatButton>
+        <MatStringField Class="mat-component" Icon="search" Label="Filter Rows" @bind-Value="@Filters.KeepIfRowTitleContains"></MatStringField>
+        <MatStringField Class="mat-component" Icon="search" Label="Filter Columns" @bind-Value="@Filters.KeepIfColumnTitleContains"></MatStringField>
+        <MatCheckbox Class="mat-component" Label="Hide empty id" TValue="bool" @bind-Value="@Filters.KeepIfIdNotNull"></MatCheckbox>
+        <MatCaption Class="mat-component" >Show mode: </MatCaption>
+        <MatCheckbox Class="mat-component mat-checkbox" Label="Not Empty" TValue="bool" @bind-Value="@Filters.KeepIfCellModeNotNull"></MatCheckbox>
+        <MatCheckbox Class="mat-component mat-checkbox" Label="A" TValue="bool" @bind-Value="@Filters.KeepIfCellModeA"></MatCheckbox>
+        <MatCheckbox Class="mat-component mat-checkbox" Label="Def" TValue="bool" @bind-Value="@Filters.KeepIfCellModeDef"></MatCheckbox>
+        <MatCheckbox Class="mat-component mat-checkbox" Label="No" TValue="bool" @bind-Value="@Filters.KeepIfCellModeNo"></MatCheckbox>
+        <MatButton Class="mat-component" Icon="filter_list" Raised="true" @onclick="@(async () => await OnApplyFilters())">Apply</MatButton>
     </div>
+    <MatDivider></MatDivider>
 
     @if (Busy)
     {
