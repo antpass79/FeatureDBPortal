@@ -14,21 +14,21 @@ namespace FeatureDBPortal.Client.Components
 
         protected void OnCellMouseEnter(Cell cell)
         {
-            UpdateSelection(cell, cell.IsHighlight);
+            UpdateSelection(cell, cell.IsActive);
         }
 
         protected void OnCellMouseLeave(Cell cell)
         {
-            UpdateSelection(cell, cell.IsHighlight);
+            UpdateSelection(cell, cell.IsActive);
         }
 
         private void UpdateSelection(Cell cell, bool selected)
         {
             var row = Combination.Rows[cell.RowId.Value];
-            row.Title.IsHighlight = selected;
+            row.Title.IsActive = selected;
 
             var column = Combination.Columns[cell.ColumnId.Value];
-            column.IsHighlight = selected;
+            column.IsActive = selected;
         }
 
         protected override bool ShouldRender() => false;

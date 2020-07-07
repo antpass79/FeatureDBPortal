@@ -20,31 +20,41 @@ namespace FeatureDBPortal.Client.Components
         public Combination Combination { get; set; }
 
         [Parameter]
-        public CombinationFilter Filters { get; set; }
+        public CombinationFilters Filters { get; set; }
 
         protected string DataMessage { get; set; } = DATA_MESSAGE_LOADING_DATA;
 
         protected void OnCellClick(Cell cell)
         {
+            UpdateSelection(cell, cell.IsSelected);
         }
 
         protected void OnCellMouseEnter(Cell cell)
         {
-            UpdateSelection(cell, cell.IsHighlight);
+            UpdateActivation(cell, cell.IsActive);
         }
 
         protected void OnCellMouseLeave(Cell cell)
         {
-            UpdateSelection(cell, cell.IsHighlight);
+            UpdateActivation(cell, cell.IsActive);
+        }
+
+        private void UpdateActivation(Cell cell, bool active)
+        {
+            var row = Combination.Rows[cell.RowId.Value];
+            row.Title.IsActive = active;
+
+            var column = Combination.Columns[cell.ColumnId.Value];
+            column.IsActive = active;
         }
 
         private void UpdateSelection(Cell cell, bool selected)
         {
             var row = Combination.Rows[cell.RowId.Value];
-            row.Title.IsHighlight = selected;
+            row.Title.IsSelected = selected;
 
             var column = Combination.Columns[cell.ColumnId.Value];
-            column.IsHighlight = selected;
+            column.IsSelected = selected;
         }
 
         async protected Task OnApplyFilters()

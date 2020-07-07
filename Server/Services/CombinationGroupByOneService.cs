@@ -32,9 +32,8 @@ namespace FeatureDBPortal.Server.Services
                 .Select(item => item.Id)
                 .ToList();
 
-
             var orderedSelectedRowField = Context.GetPropertyValue<IQueryable<IQueryableCombination>>(firstLayoutGroup)
-                .ToList()
+                .AsEnumerable()
                 .Where(item => !item.IsFake)
                 .Select(item => new QueryableCombination { Id = item.Id, Name = item.Name })
                 .OrderBy(item => item.Name)

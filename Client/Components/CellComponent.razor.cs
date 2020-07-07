@@ -19,19 +19,20 @@ namespace FeatureDBPortal.Client.Components
 
         protected void OnCellClick(Cell cell)
         {
+            cell.IsSelected = !cell.IsSelected;
             CellClick.InvokeAsync(cell);
         }
 
         protected void OnCellMouseEnter(Cell cell)
         {
-            cell.IsHighlight = true;
+            cell.IsActive = true;
             _shouldRender = true;
             CellMouseEnter.InvokeAsync(cell);
         }
 
         protected void OnCellMouseLeave(Cell cell)
         {
-            cell.IsHighlight = false;
+            cell.IsActive = false;
             _shouldRender = true;
             CellMouseLeave.InvokeAsync(cell);
         }
