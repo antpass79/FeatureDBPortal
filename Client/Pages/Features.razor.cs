@@ -2,6 +2,7 @@
 using FeatureDBPortal.Client.Models;
 using FeatureDBPortal.Client.Services;
 using FeatureDBPortal.Shared;
+using FeatureDBPortal.Shared.Utilities;
 using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
@@ -20,6 +21,19 @@ namespace FeatureDBPortal.Client.Pages
 
         protected bool FiltersBusy { get; set; }
         protected bool CombinationsBusy { get; set; }
+
+        bool _filtersOpened = true;
+        protected bool FiltersOpened
+        {
+            get => _filtersOpened;
+            set
+            {
+                _filtersOpened = value;
+                CombinationContainerClass = FiltersOpened ? "feature-combination-filters-opened" : "feature-combination-filters-closed";
+            }
+        }
+        protected bool KeepOpen { get; set; }
+        protected string CombinationContainerClass { get; set; } = "feature-combination-filters-opened";
 
         protected IEnumerable<ApplicationDTO> Applications { get; set; }
         protected ApplicationDTO SelectedApplication { get; private set; } = new ApplicationDTO();
@@ -107,7 +121,13 @@ namespace FeatureDBPortal.Client.Pages
 
         protected Combination Combination { get; private set; }
 
-        public CombinationFilter Filters = new CombinationFilter() { KeepIfIdNotNull = true, KeepIfCellAllowModeNotNull = true };
+        public CombinationFilters Filters = new CombinationFilters
+        {
+            KeepIfIdNotNull = true,
+            KeepIfCellModeNotNull = true,
+            KeepIfCellModeA = true,
+            KeepIfCellModeDef = true
+        };
 
         protected LayoutTypeDTO CurrentHeader { get; set; }
 
@@ -147,9 +167,7 @@ namespace FeatureDBPortal.Client.Pages
 
         async protected Task OnSearch()
         {
-            var start = DateTime.Now;
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
+            using var watcher = new Watcher("CLIENT-SERVER ROUNDTRIP");
 
             CombinationsBusy = true;
 
@@ -168,23 +186,28 @@ namespace FeatureDBPortal.Client.Pages
                 CellLayout = SelectedCellLayout
             });
 
-            Combination = combinationDTO.ToModel();
+            using (var innerWatcher = new Watcher("ToModel"))
+            {
+                Combination = combinationDTO.ToModel();
+            }
 
-            _shouldRenderer = true;
+            using (var innerWatcher = new Watcher("ApplyFilters"))
+            {
+                Combination.ApplyFilters(Filters);
+            }
 
-            Combination.ApplyFilters(Filters);
             CurrentHeader = SelectedRowLayout;
 
             CombinationsBusy = false;
 
-            StateHasChanged();
-            _shouldRenderer = false;
+            FiltersOpened = KeepOpen || false;
 
-            Trace.WriteLine(string.Empty);
-            Trace.WriteLine($"CLIENT-SERVER ROUNDTRIP: Process starts at {start} and stops at {DateTime.Now} with duration of {stopwatch.Elapsed}");
+            StateHasChanged();
         }
 
-        bool _shouldRenderer = false;
-        //protected override bool ShouldRender() => _shouldRenderer;
+        protected void OnToggleExpanded()
+        {
+
+        }
     }
 }
