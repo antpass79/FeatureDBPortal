@@ -195,3 +195,9 @@ body, app, .main {
 .main {
     width: calc(100% - 250px); /*250px is the sidebar*/
 }
+
+/*CUSTOM SELECTORS*/
+
+.feature-checkbox > label {
+    margin-bottom: 0px !important;
+}

@@ -50,15 +50,15 @@
             top: 0;
         }
 
+    .feature-elevation {
+        margin: 6px;
+    }
+
     .mat-component {
         margin: 5px;
         align-self: center;
         align-content: center;
         align-items: center;
-    }
-
-    .mat-checkbox > .mdc-form-field > label {
-        padding-top: 5px !important;
     }
 
     .combination-component {
@@ -83,12 +83,13 @@
     <div class="combination-filters">
         <MatStringField Class="mat-component" Icon="search" Label="Filter Rows" @bind-Value="@Filters.KeepIfRowTitleContains"></MatStringField>
         <MatStringField Class="mat-component" Icon="search" Label="Filter Columns" @bind-Value="@Filters.KeepIfColumnTitleContains"></MatStringField>
-        <MatCheckbox Class="mat-component" Label="Hide empty id" TValue="bool" @bind-Value="@Filters.KeepIfIdNotNull"></MatCheckbox>
-        <MatCaption Class="mat-component" >Show mode: </MatCaption>
-        <MatCheckbox Class="mat-component mat-checkbox" Label="Not Empty" TValue="bool" @bind-Value="@Filters.KeepIfCellModeNotNull"></MatCheckbox>
-        <MatCheckbox Class="mat-component mat-checkbox" Label="A" TValue="bool" @bind-Value="@Filters.KeepIfCellModeA"></MatCheckbox>
-        <MatCheckbox Class="mat-component mat-checkbox" Label="Def" TValue="bool" @bind-Value="@Filters.KeepIfCellModeDef"></MatCheckbox>
-        <MatCheckbox Class="mat-component mat-checkbox" Label="No" TValue="bool" @bind-Value="@Filters.KeepIfCellModeNo"></MatCheckbox>
+        <div class="mat-elevation-z3 feature-elevation">
+            <MatCheckbox Class="mat-component feature-checkbox" Label="Row/Columns ids not Empty" TValue="bool" @bind-Value="@Filters.KeepIfIdNotNull"></MatCheckbox>
+            <MatCheckbox Class="mat-component feature-checkbox" Label="Mode not Empty" TValue="bool" @bind-Value="@Filters.KeepIfCellModeNotNull"></MatCheckbox>
+            <MatCheckbox Class="mat-component feature-checkbox" Label="A" TValue="bool" @bind-Value="@Filters.KeepIfCellModeA"></MatCheckbox>
+            <MatCheckbox Class="mat-component feature-checkbox" Label="Def" TValue="bool" @bind-Value="@Filters.KeepIfCellModeDef"></MatCheckbox>
+            <MatCheckbox Class="mat-component feature-checkbox" Label="No" TValue="bool" @bind-Value="@Filters.KeepIfCellModeNo"></MatCheckbox>
+        </div>
         <MatButton Class="mat-component" Icon="filter_list" Raised="true" @onclick="@(async () => await OnApplyFilters())">Apply</MatButton>
     </div>
     <MatDivider></MatDivider>
