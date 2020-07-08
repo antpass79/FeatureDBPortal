@@ -186,15 +186,19 @@ namespace FeatureDBPortal.Client.Pages
                 CellLayout = SelectedCellLayout
             });
 
+            Combination combination;
+
             using (var innerWatcher = new Watcher("ToModel"))
             {
-                Combination = combinationDTO.ToModel();
+                combination = combinationDTO.ToModel();
             }
 
             using (var innerWatcher = new Watcher("ApplyFilters"))
             {
-                Combination.ApplyFilters(Filters);
+                combination.ApplyFilters(Filters);
             }
+
+            Combination = combination;
 
             CurrentHeader = SelectedRowLayout;
 

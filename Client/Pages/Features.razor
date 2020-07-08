@@ -3,12 +3,12 @@
 
 <style>
     .feature-combination-filters-opened {
-        padding-top: 15px;
-        height: calc(100% - 325px);
+        margin-top: 15px;
+        height: calc(100% - 320px);
     }
     .feature-combination-filters-closed {
-        padding-top: 15px;
-        height: calc(100% - 105px);
+        margin-top: 15px;
+        height: calc(100% - 100px);
     }
 
     .feature-layout-grid {
@@ -65,14 +65,14 @@ else
         <MatExpansionPanelSummary>
             <MatExpansionPanelHeader>Filters</MatExpansionPanelHeader>
             <MatExpansionPanelSubHeader Class="feature-accordion-header">
-                <MatCheckbox Class="feature-accordion-header-content" @bind-Value="@KeepOpen">Keep Open</MatCheckbox>
+                <MatCheckbox Class="feature-accordion-header-content feature-checkbox" @bind-Value="@KeepOpen">Keep Open</MatCheckbox>
             </MatExpansionPanelSubHeader>
         </MatExpansionPanelSummary>
         <MatExpansionPanelDetails>
 
             <div class="mat-layout-grid feature-layout-grid">
                 <div class="mat-layout-grid-inner">
-                    <div class="mat-layout-grid-cell mat-layout-grid-cell-span-9">
+                    <div class="mat-layout-grid-cell mat-layout-grid-cell-span-11">
                         <div class="mat-layout-grid-inner">
                             <div class="mat-layout-grid-cell mat-layout-grid-cell-span-3">
                                 @if (Models == null)
@@ -202,10 +202,9 @@ else
                                 }
                             </div>
                         </div>
-                    </div>
-                    <div class="mat-layout-grid-cell mat-layout-grid-cell-span-2">
+
                         <div class="mat-layout-grid-inner">
-                            <div class="mat-layout-grid-cell">
+                            <div class="mat-layout-grid-cell mat-layout-grid-cell-span-4">
                                 @if (LayoutViews == null)
                                 {
                                     <p><em>Loading...</em></p>
@@ -221,9 +220,7 @@ else
                                     </MatSelect>
                                 }
                             </div>
-                        </div>
-                        <div class="mat-layout-grid-inner">
-                            <div class="mat-layout-grid-cell">
+                            <div class="mat-layout-grid-cell mat-layout-grid-cell-span-4">
                                 @if (LayoutViews == null)
                                 {
                                     <p><em>Loading...</em></p>
@@ -239,9 +236,7 @@ else
                                     </MatSelect>
                                 }
                             </div>
-                        </div>
-                        <div class="mat-layout-grid-inner">
-                            <div class="mat-layout-grid-cell">
+                            <div class="mat-layout-grid-cell mat-layout-grid-cell-span-4">
                                 @if (LayoutViews == null)
                                 {
                                     <p><em>Loading...</em></p>
@@ -258,14 +253,13 @@ else
                                 }
                             </div>
                         </div>
-                    </div>
+
+                        </div>
                     <div class="mat-layout-grid-cell mat-layout-grid-cell-span-1">
-                        <button class="btn btn-info" @onclick="OnSearch">
-                            <i class="fa fa-search"></i>
-                        </button>
+                        <MatButton Class="mat-component" Icon="search" Raised="true" @onclick="@(async () => await OnSearch())">Search</MatButton>
                     </div>
 
-                </div>
+                    </div>
             </div>
         </MatExpansionPanelDetails>
     </MatExpansionPanel>

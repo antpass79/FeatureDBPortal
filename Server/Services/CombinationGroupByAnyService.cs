@@ -48,7 +48,8 @@ namespace FeatureDBPortal.Server.Services
                     RowId = -1,
                     Title = new RowTitleDTO
                     {
-                        Id = -1
+                        Id = -1,
+                        Name = "Value"
                     },
                     Cells = item.Values.Select(innerItem => new CellDTO
                     {
