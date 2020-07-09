@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
+using FeatureDBPortal.Server.Models;
 using FeatureDBPortal.Server.Repositories;
 using FeatureDBPortal.Shared;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -33,16 +33,24 @@ namespace FeatureDBPortal.Server.Controllers
         [HttpGet]
         async public Task<IEnumerable<TDTO>> Get()
         {
-            var items = GetItems();
-            return await Task.FromResult(
+            var items = PreFilter(Repository.Get());
+
+            var mappedItems = await Task.FromResult(
                 _mapper
                     .Map<IEnumerable<TDTO>>(items)
                     .OrderBy(item => item.OrderableProperty));
+
+            return PostFilter(mappedItems);
         }
 
-        virtual protected IEnumerable<TEntity> GetItems()
+        virtual protected IEnumerable<TEntity> PreFilter(IEnumerable<TEntity> entities)
         {
-            return Repository.Get();
+            return entities;
+        }
+
+        virtual protected IEnumerable<TDTO> PostFilter(IEnumerable<TDTO> items)
+        {
+            return items;
         }
     }
 }

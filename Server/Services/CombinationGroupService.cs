@@ -38,6 +38,8 @@ namespace FeatureDBPortal.Server.Services
             //.Where(normalRule => !normalRule.KitId.HasValue || (search.Kit != null && search.Kit.Id == normalRule.KitId))
             //.Where(normalRule => !normalRule.OptionId.HasValue || (search.Option != null && search.Option.Id == normalRule.OptionId))
             //.Where(normalRule => !normalRule.ApplicationId.HasValue || (search.Application != null && search.Application.Id == normalRule.ApplicationId));
+            //.WhereIf(normalRule => !normalRule.Version.HasValue || search.Version.Id < normalRule.Version, search.Version != null && search.Version.Id.HasValue);
+            //.WhereIf(normalRule => !normalRule.Version.HasValue || search.Version.Id < normalRule.Version, search.Version == null);
 
             .WhereIf(normalRule => normalRule.LogicalModelId == search.Model.Id || !normalRule.LogicalModelId.HasValue, search.Model != null)
             .WhereIf(normalRule => normalRule.CountryId == search.Country.Id || !normalRule.CountryId.HasValue, search.Country != null)
@@ -45,7 +47,9 @@ namespace FeatureDBPortal.Server.Services
             .WhereIf(normalRule => normalRule.ProbeId == search.Probe.Id || !normalRule.ProbeId.HasValue, search.Probe != null)
             .WhereIf(normalRule => normalRule.KitId == search.Kit.Id || !normalRule.KitId.HasValue, search.Kit != null)
             .WhereIf(normalRule => normalRule.OptionId == search.Option.Id || !normalRule.OptionId.HasValue, search.Option != null)
-            .WhereIf(normalRule => normalRule.ApplicationId == search.Application.Id || !normalRule.ApplicationId.HasValue, search.Application != null);
+            .WhereIf(normalRule => normalRule.ApplicationId == search.Application.Id || !normalRule.ApplicationId.HasValue, search.Application != null)
+            .WhereIf(normalRule => normalRule.Version < search.Version.Id || !normalRule.Version.HasValue, search.Version != null);
+            //.WhereIf(normalRule => !normalRule.Version.HasValue || search.Version.Id < normalRule.Version, search.Version == null);
         }
     }
 }

@@ -18,7 +18,7 @@ Run the Scaffold-DbContext command
 - <https://www.youtube.com/watch?v=jRgLSMlp28U&feature=youtu.be>
 - <https://developercommunity.visualstudio.com/content/problem/443433/publishbuildartifacts-task-is-looking-in-the-wrong.html>
 
-## Repositoy and UnitOfWork Patterns
+### Repositoy and UnitOfWork Patterns
 
 - <http://janholinka.net/Blog/Article/9>
 
@@ -46,3 +46,8 @@ Run the Scaffold-DbContext command
 ### Linq to SQL
 
 - <https://weblog.west-wind.com/posts/2007/Aug/28/Dynamic-Expressions-in-Linq-to-Sql>
+
+### Active Directory
+
+- <https://gist.github.com/JaimeStill/539af65518091f7b8e6b9e003a493baa>
+- <https://www.brechtbaekelandt.net/blog/post/authenticating-against-active-directory-with-aspnet-core-2-and-managing-users>

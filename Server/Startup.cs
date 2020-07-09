@@ -1,7 +1,9 @@
 using AutoMapper;
+using FeatureDBPortal.Server.ActiveDirectory;
 using FeatureDBPortal.Server.Data.Models.RD;
 using FeatureDBPortal.Server.gRPC;
 using FeatureDBPortal.Server.Options;
+using FeatureDBPortal.Server.Providers;
 using FeatureDBPortal.Server.Repositories;
 using FeatureDBPortal.Server.Services;
 using FluentValidation.AspNetCore;
@@ -11,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using System;
 using System.Reflection;
 
@@ -29,6 +32,18 @@ namespace FeatureDBPortal.Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            // Options
+            services
+                .AddOptions()
+                .Configure<JwtAuthenticationOptions>(options =>
+                {
+                    _configuration.GetSection(nameof(JwtAuthenticationOptions)).Bind(options);
+                })
+                .Configure<ActiveDirectoryOptions>(options =>
+                {
+                    _configuration.GetSection(nameof(ActiveDirectoryOptions)).Bind(options);
+                });
+
             // Configuration
             var databaseOptions = new DatabaseOptions();
             _configuration.GetSection(nameof(DatabaseOptions)).Bind(databaseOptions);
@@ -49,7 +64,7 @@ namespace FeatureDBPortal.Server
                 _ => throw new NotSupportedException("DbContext not supported")
             };
 
-            // Services
+            // Feature Services
             services
                 .AddScoped<IGenericRepository<Application>, GenericRepository<Application>>()
                 .AddScoped<IGenericRepository<Country>, GenericRepository<Country>>()
@@ -58,9 +73,18 @@ namespace FeatureDBPortal.Server
                 .AddScoped<IGenericRepository<BiopsyKits>, GenericRepository<BiopsyKits>>()
                 .AddScoped<IGenericRepository<Option>, GenericRepository<Option>>()
                 .AddScoped<IGenericRepository<Probe>, GenericRepository<Probe>>();
-
             services
+                .AddScoped<IVersionProvider, VersionProvider>()
                 .AddScoped<IAvailabilityCombinationService, AvailabilityCombinationService>();
+
+            // Active Directory
+            services
+                .AddScoped<IAsyncLoginService, ADLoginService>()
+                .AddScoped<IUserProvider, AdUserProvider>()
+                .AddSingleton<IJwtTokenEncoder<AdUser>, ADJwtTokenEncoder>()
+                .AddSingleton<ISigningCredentialsBuilder, SigningCredentialsBuilder>()
+                .AddSingleton<IConfigureOptions<JwtAuthenticationOptions>, ConfigureJwtAuthenticationOptions>()
+                .AddSingleton<IConfigureOptions<ActiveDirectoryOptions>, ConfigureActiveDirectoryOptions>();
 
             // Mapping
             services.AddAutoMapper(typeof(Startup));
@@ -89,6 +113,9 @@ namespace FeatureDBPortal.Server
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            // Active Directory
+            //app.UseAdMiddleware();
 
             app.UseHttpsRedirection();
             app.UseBlazorFrameworkFiles();

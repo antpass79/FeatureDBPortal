@@ -50,8 +50,25 @@
             top: 0;
         }
 
-    .feature-elevation {
+    .feature-elevation, .feature-elevation-information {
         margin: 6px;
+    }
+
+    .feature-elevation-information {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+    }
+
+    .feature-information {
+        font-size: smaller !important;
+        text-align: end !important;
+        flex: 1;
+    }
+
+    .feature-information-group {
+        display: flex;
+        flex: 1;
     }
 
     .mat-component {
@@ -91,6 +108,31 @@
             <MatCheckbox Class="mat-component feature-checkbox" Label="No" TValue="bool" @bind-Value="@Filters.KeepIfCellModeNo"></MatCheckbox>
         </div>
         <MatButton Class="mat-component" Icon="filter_list" Raised="true" @onclick="@(async () => await OnApplyFilters())">Apply</MatButton>
+        @if (@Combination != null)
+        {
+            <div class="mat-elevation-z3 feature-elevation-information">
+                <div class="feature-information-group">
+                    @if (@Combination.Rows != null)
+                    {
+                        <span class="feature-information">Total Rows: @Combination.Rows.Count</span>
+                    }
+                    @if (@Combination.Columns != null)
+                    {
+                        <span class="feature-information">Total Columns: @Combination.Columns.Count</span>
+                    }
+                </div>
+                <div class="feature-information-group">
+                    @if (@Combination.ProjectedRows != null)
+                    {
+                        <span class="feature-information">Projected Rows: @Combination.ProjectedRows.Count</span>
+                    }
+                    @if (Combination.ProjectedColumns != null)
+                    {
+                        <span class="feature-information">Projected Columns: @Combination.ProjectedColumns.Count</span>
+                    }
+                </div>
+            </div>
+        }
     </div>
     <MatDivider></MatDivider>
 

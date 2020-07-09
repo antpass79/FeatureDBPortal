@@ -1,4 +1,4 @@
-﻿using FeatureDBPortal.Shared;
+﻿using FeatureDBPortal.Server.Models;
 
 namespace FeatureDBPortal.Server.Data.Models.RD
 {
