@@ -1,4 +1,4 @@
-﻿namespace FeatureDBPortal.Shared
+﻿namespace FeatureDBPortal.Server.Models
 {
     public interface IQueryableCombination
     {

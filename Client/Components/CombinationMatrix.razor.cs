@@ -1,6 +1,7 @@
 ﻿using FeatureDBPortal.Client.Extensions;
 using FeatureDBPortal.Client.Models;
 using Microsoft.AspNetCore.Components;
+using System;
 using System.Threading.Tasks;
 
 namespace FeatureDBPortal.Client.Components
@@ -18,7 +19,7 @@ namespace FeatureDBPortal.Client.Components
 
         [Parameter]
         public Combination Combination { get; set; }
-
+        
         [Parameter]
         public CombinationFilters Filters { get; set; }
 

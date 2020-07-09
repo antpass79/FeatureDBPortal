@@ -5,6 +5,7 @@ using FeatureDBPortal.Shared;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FeatureDBPortal.Server.Controllers
 {
@@ -20,10 +21,10 @@ namespace FeatureDBPortal.Server.Controllers
         {
         }
 
-        protected override IEnumerable<Application> GetItems()
+        protected override IEnumerable<Application> PreFilter(IEnumerable<Application> entities)
         {
-            return Repository
-                .Get(item => !item.IsFake);
+            return entities
+                .Where(item => !item.IsFake);
         }
     }
 }

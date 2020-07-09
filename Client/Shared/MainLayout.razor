@@ -1,10 +1,10 @@
 ﻿@inherits LayoutComponentBase
 
 <style>
-    .background-container {
+    .feature-main-container {
         display: flex;
         flex-direction: column;
-        height: 100%;
+        height: calc(100% - 50px);
     }
 </style>
 
@@ -14,11 +14,12 @@
     </div>
 
     <div class="main">
-        @*<div class="top-row px-4">
-                <a href="http://blazor.net" target="_blank" class="ml-md-auto">About</a>
-            </div>*@
+        <div class="top-row px-4">
+            <LoginDisplay />
+            @*<a href="http://blazor.net" target="_blank" class="ml-md-auto">About</a>*@
+        </div>
 
-        <div class="content px-4 background-container">
+        <div class="content px-4 feature-main-container">
             @Body
         </div>
     </div>
@@ -28,6 +29,6 @@
 {
     MatTheme theme = new MatTheme()
     {
-        Primary = "#5d2f91"
+        Primary = "#0d47a1"
     };
 }
