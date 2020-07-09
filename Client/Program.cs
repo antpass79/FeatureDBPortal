@@ -1,9 +1,11 @@
+using Blazored.LocalStorage;
 using FeatureDBPortal.Client.Components;
 using FeatureDBPortal.Client.Services;
 using Grpc.Net.Client;
 using Grpc.Net.Client.Web;
 using GrpcCombination;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -18,6 +20,12 @@ namespace FeatureDBPortal.Client
         {
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("app");
+
+            builder.Services.AddBlazoredLocalStorage();
+            builder.Services.AddAuthorizationCore();
+            builder.Services.AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>();
+            builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<IGlobeDataStorage, GlobeLocalStorage>();
 
             builder.Services.AddSingleton(services =>
             {
