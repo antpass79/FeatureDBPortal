@@ -4,16 +4,21 @@
 <style>
     .feature-combination-filters-opened {
         margin-top: 15px;
-        height: calc(100% - 320px);
+        height: calc(100% - 300px);
     }
     .feature-combination-filters-closed {
         margin-top: 15px;
-        height: calc(100% - 100px);
+        height: calc(100% - 80px);
     }
 
     .feature-layout-grid {
         padding: 0px !important;
         width: 100%;
+    }
+
+    .feature-filter-divider {
+        margin-top: 10px !important;
+        margin-bottom: 10px !important;
     }
 
     .feature-accordion-header {
@@ -48,8 +53,6 @@
             height: 36px;
         }
 </style>
-
-<p>Check feature availability for a specific combination</p>
 
 @if (FiltersBusy)
 {
@@ -203,6 +206,8 @@ else
                             </div>
                         </div>
 
+                        <MatDivider Class="feature-filter-divider"></MatDivider>
+
                         <div class="mat-layout-grid-inner">
                             <div class="mat-layout-grid-cell mat-layout-grid-cell-span-4">
                                 @if (LayoutViews == null)
@@ -254,7 +259,7 @@ else
                             </div>
                         </div>
 
-                        </div>
+                    </div>
                     <div class="mat-layout-grid-cell mat-layout-grid-cell-span-1">
                         <MatButton Class="mat-component" Icon="search" Raised="true" @onclick="@(async () => await OnSearch())">Search</MatButton>
                     </div>

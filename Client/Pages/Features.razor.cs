@@ -4,7 +4,6 @@ using FeatureDBPortal.Client.Services;
 using FeatureDBPortal.Shared;
 using FeatureDBPortal.Shared.Utilities;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +14,7 @@ namespace FeatureDBPortal.Client.Pages
     public class FeaturesDataModel : ComponentBase, IDisposable
     {
         const string BUTTON_ACTION_EXPORT_TO_CSV = "BUTTON_ACTION_EXPORT_TO_CSV";
+        const string BUTTON_ACTION_SYNC_RA = "BUTTON_ACTION_SYNC_RA";
 
         [Inject]
         protected IFilterService FilterService { get; set; }
@@ -225,40 +225,24 @@ namespace FeatureDBPortal.Client.Pages
                 Label = "Export to CSV",
                 IconName = "import_export"
             });
+            ButtonsService.Actions.Add(new ButtonAction
+            {
+                Id = BUTTON_ACTION_SYNC_RA,
+                Label = "Sync RA",
+                IconName = "sync"
+            });
 
             ButtonsService.FireAction = async (action) =>
             {
                 switch (action.Id)
                 {
                     case BUTTON_ACTION_EXPORT_TO_CSV:
-                        DownloadFile();
-                        //await CsvExportService.DownloadCsv(new CombinationDTO());
+                        await CsvExportService.DownloadCsv(Combination.ToDTO(), "combination.csv");
+                        break;
+                    case BUTTON_ACTION_SYNC_RA:
                         break;
                 }
             };
-        }
-
-        [Inject]
-        protected IJSRuntime JSRuntime { get; set; }
-
-        //async public Task<byte[]> DownloadCsv(CombinationDTO combination)
-        //{
-        //    await JSRuntime.InvokeAsync<object>(
-        //           "SaveFileAs",
-        //           "combination.csv",
-        //           "prova di testo"
-        //       );
-
-        //    return await Task.FromResult<byte[]>(null);
-        //}
-
-        private void DownloadFile()
-        {
-            JSRuntime.InvokeAsync<object>(
-                   "SaveFileAs",
-                   "combination.csv",
-                   "prova di testo"
-               );
         }
 
         public void Dispose()
