@@ -13,5 +13,10 @@ namespace FeatureDBPortal.Client.Extensions
 
             return value;
         }
+
+        async public static Task<byte[]> GetByteArrayValue(this HttpResponseMessage httpResponseMessage)
+        {
+            return await httpResponseMessage.Content.ReadAsByteArrayAsync();
+        }
     }
 }
