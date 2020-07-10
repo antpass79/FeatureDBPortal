@@ -1,5 +1,6 @@
 ﻿using FeatureDBPortal.Server.Data.Models.RD;
 using FeatureDBPortal.Server.Models;
+using FeatureDBPortal.Server.Providers;
 using FeatureDBPortal.Server.Utils;
 using FeatureDBPortal.Shared;
 using Microsoft.EntityFrameworkCore;
@@ -11,19 +12,43 @@ namespace FeatureDBPortal.Server.Services
 {
     public class CombinationGroupByAnyService : CombinationGroupService
     {
-        public CombinationGroupByAnyService(DbContext context)
-            : base(context)
+        public CombinationGroupByAnyService(DbContext context, IVersionProvider versionProvider)
+            : base(context, versionProvider)
         {
         }
 
-        async override protected Task<CombinationDTO> GroupNormalRules(IQueryable<NormalRule> normalRules, IEnumerable<LayoutType> groupBy)
+        async override protected Task<CombinationDTO> GroupNormalRules(CombinationSearchDTO search, IQueryable<NormalRule> normalRules, IEnumerable<LayoutType> groupBy)
         {
             if (normalRules.Count() == 0)
                 return await Task.FromResult(new CombinationDTO());
 
-            var available = normalRules.All(normalRule => (AllowMode)normalRule.Allow != AllowMode.No);
-            var visible = normalRules.All(normalRule => (AllowMode)normalRule.Allow == AllowMode.A);
-            var allowMode = Allower.GetMode(visible, available);
+            bool available = false;
+            bool visible = false;
+            AllowMode allowMode = AllowMode.No;
+
+            if (search.Probe != null && search.Probe.Id.HasValue)
+            {
+                // Probe 50: TLC 3-13 => 2 transducers
+                var transducers = Context.ProbeTransducers
+                    .Where(item => item.ProbeId == search.Probe.Id.Value)
+                    .ToList();
+
+                foreach (var transducer in transducers)
+                {
+                    var transducerNormalRules = normalRules.
+                        Where(normalRule => !normalRule.TransducerType.HasValue || transducer.TransducerType == normalRule.TransducerType);
+
+                    available |= transducerNormalRules.All(normalRule => (AllowMode)normalRule.Allow != AllowMode.No);
+                    visible |= transducerNormalRules.All(normalRule => (AllowMode)normalRule.Allow == AllowMode.A);
+                }
+            }
+            else
+            {
+                available = normalRules.All(normalRule => (AllowMode)normalRule.Allow != AllowMode.No);                
+                visible = normalRules.All(normalRule => (AllowMode)normalRule.Allow == AllowMode.A);
+            }
+
+            allowMode = Allower.GetMode(visible, available);
 
             var matrix = new CombinationDictionary(1);
             matrix[-1] = new RowDictionary(1) { RowId = -1 };

@@ -10,5 +10,8 @@ namespace FeatureDBPortal.Server.Providers
 
         IEnumerable<int> VersioNumbers { get; }
         IEnumerable<IQueryableCombination> Versions { get; }
+        void Update();
+        int BuildDefaultVersion(int countryId, int modelId);
+        string BuildStringVersion(int version);
     }
 }

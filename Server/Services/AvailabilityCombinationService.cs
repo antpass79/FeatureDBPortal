@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using FeatureDBPortal.Server.Data.Models.RD;
+using FeatureDBPortal.Server.Providers;
 using FeatureDBPortal.Shared;
 using FeatureDBPortal.Shared.Utilities;
 using Microsoft.EntityFrameworkCore;
@@ -21,15 +22,15 @@ namespace FeatureDBPortal.Server.Services
         private readonly ICombinationGroupService _combinationGroupByTwoService;
         private readonly ICombinationGroupService _combinationGroupByThreeService;
 
-        public AvailabilityCombinationService(IMapper mapper, DbContext context)
+        public AvailabilityCombinationService(IMapper mapper, DbContext context, IVersionProvider versionProvider)
         {
             _mapper = mapper;
             _context = context as FeaturesContext;
 
-            _combinationGroupByAnyService = new CombinationGroupByAnyService(context);
-            _combinationGroupByOneService = new CombinationGroupByOneService(context);
-            _combinationGroupByTwoService = new CombinationGroupByTwoService(context);
-            _combinationGroupByThreeService = new CombinationGroupByThreeService(context);
+            _combinationGroupByAnyService = new CombinationGroupByAnyService(context, versionProvider);
+            _combinationGroupByOneService = new CombinationGroupByOneService(context, versionProvider);
+            _combinationGroupByTwoService = new CombinationGroupByTwoService(context, versionProvider);
+            _combinationGroupByThreeService = new CombinationGroupByThreeService(context, versionProvider);
         }
 
         async public Task<CombinationDTO> Get(CombinationSearchDTO search)

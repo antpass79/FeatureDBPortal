@@ -57,6 +57,5 @@ namespace FeatureDBPortal.Server.Controllers
         {
             await _loginService.LogoutAsync();
         }
-
     }
 }

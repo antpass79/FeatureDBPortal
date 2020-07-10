@@ -1,0 +1,17 @@
+﻿@inherits ToolbarButtonsDataModel
+
+<style>
+    .feature-toolbar {
+        flex: 1;
+    }
+</style>
+
+@if (@ButtonsService != null)
+{
+    <div class="feature-toolbar">
+        @foreach (var action in @ButtonsService.Actions)
+        {
+            <MatButton Icon="@action.IconName" Label="@action.Label" @onclick="@(async () => await OnActionClick(action))"></MatButton>
+        }
+    </div>
+}
