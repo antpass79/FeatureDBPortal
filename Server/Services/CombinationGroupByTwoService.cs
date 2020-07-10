@@ -1,6 +1,7 @@
 ﻿using FeatureDBPortal.Server.Data.Models.RD;
 using FeatureDBPortal.Server.Extensions;
 using FeatureDBPortal.Server.Models;
+using FeatureDBPortal.Server.Providers;
 using FeatureDBPortal.Server.Utils;
 using FeatureDBPortal.Shared;
 using Microsoft.EntityFrameworkCore;
@@ -13,12 +14,12 @@ namespace FeatureDBPortal.Server.Services
 {
     public class CombinationGroupByTwoService : CombinationGroupService
     {
-        public CombinationGroupByTwoService(DbContext context)
-            : base(context)
+        public CombinationGroupByTwoService(DbContext context, IVersionProvider versionProvider)
+            : base(context, versionProvider)
         {
         }
 
-        async override protected Task<CombinationDTO> GroupNormalRules(IQueryable<NormalRule> normalRules, IEnumerable<LayoutType> groupBy)
+        async override protected Task<CombinationDTO> GroupNormalRules(CombinationSearchDTO search, IQueryable<NormalRule> normalRules, IEnumerable<LayoutType> groupBy)
         {
             var firstLayoutGroup = groupBy
                 .ElementAt(0)
@@ -45,6 +46,12 @@ namespace FeatureDBPortal.Server.Services
                 .Select(item => new QueryableCombination { Id = item.Id, Name = item.Name })
                 .OrderBy(item => item.Name)
                 .ToList();
+
+            // If in output there are Model and Country:
+            // - Foreach groups take ids (in case of model the firstGroup id is ModelId, the secondGroup id is CountryId)
+            // - Build the default version with firstGroup.Id and secondGroup.Id
+            // - Filter rules with the default version (see FilterNormalRules function in the base class)
+            // NOTE: only if there isn't a version in the search
 
             var groups = normalRules
                 .GroupBy(PropertyExpressionBuilder.Build<NormalRule, int?>($"{firstLayoutGroup}Id").Compile())

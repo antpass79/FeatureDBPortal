@@ -1,6 +1,6 @@
 ﻿using FeatureDBPortal.Server.Data.Models.RD;
 using FeatureDBPortal.Server.Models;
-using FeatureDBPortal.Server.Repositories;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -8,12 +8,12 @@ namespace FeatureDBPortal.Server.Providers
 {
     public class VersionProvider : IVersionProvider
     {
-        private readonly IGenericRepository<MinorVersionAssociation> _repository;
+        private readonly FeaturesContext _context;
 
-        public VersionProvider(IGenericRepository<MinorVersionAssociation> repository)
+        public VersionProvider(DbContext context)
         {
-            _repository = repository;
-            Build();
+            _context = context as FeaturesContext;
+            Update();
         }
 
         int _min;
@@ -30,13 +30,11 @@ namespace FeatureDBPortal.Server.Providers
 
         #region Public Functions
 
-        public void Build()
+        public void Update()
         {
-            _min = _repository
-                .Get()
+            _min = _context.MinorVersionAssociation
                 .Min(item => item.Major);
-            _max = _repository
-                .Get()
+            _max = _context.MinorVersionAssociation
                 .Max(item => item.Major);
 
             _versioNumbers = Enumerable
@@ -46,22 +44,26 @@ namespace FeatureDBPortal.Server.Providers
             _versions = _versioNumbers.Select(item => new QueryableCombination
             {
                 Id = item,
-                Name = GetStringVersion(item)
+                Name = BuildStringVersion(item)
             });
         }
 
-        #endregion
+        public int BuildDefaultVersion(int countryId, int modelId)
+        {
+            var countryVersion = _context.CountryVersion
+                .Single(item => item.CountryId == countryId && item.LogicalModelId == modelId);
 
-        #region Private Functions
+            return GetNumericVersionFromMajor(countryVersion.MajorVersion);
+        }
 
-        string GetStringVersion(int IntVersion)
+        public string BuildStringVersion(int version)
         {
             // converts from format 60002 => 06.00.02
-            if (IntVersion >= 10000)
+            if (version >= 10000)
             {
-                var major = GetMajorFromNumericVersion(IntVersion);
-                var middle = (IntVersion - major * 10000) / 100;
-                var minor = IntVersion - middle * 100 - major * 10000;
+                var major = GetMajorFromNumericVersion(version);
+                var middle = (version - major * 10000) / 100;
+                var minor = version - middle * 100 - major * 10000;
                 return BuildStringVersion(major, middle, minor);
             }
             else
@@ -69,6 +71,11 @@ namespace FeatureDBPortal.Server.Providers
                 return null;
             }
         }
+
+        #endregion
+
+        #region Private Functions
+
         string BuildStringVersion(int? major, int? middle, int? minor)
         {
             return (major != null ? major.ToString().PadLeft(2, '0') : "") + "."

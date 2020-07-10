@@ -1,6 +1,7 @@
 ﻿using FeatureDBPortal.Server.Data.Models.RD;
 using FeatureDBPortal.Server.Extensions;
 using FeatureDBPortal.Server.Models;
+using FeatureDBPortal.Server.Providers;
 using FeatureDBPortal.Server.Utils;
 using FeatureDBPortal.Shared;
 using Microsoft.EntityFrameworkCore;
@@ -13,12 +14,12 @@ namespace FeatureDBPortal.Server.Services
 {
     public class CombinationGroupByThreeService : CombinationGroupService
     {
-        public CombinationGroupByThreeService(DbContext context)
-            : base(context)
+        public CombinationGroupByThreeService(DbContext context, IVersionProvider versionProvider)
+            : base(context, versionProvider)
         {
         }
 
-        async override protected Task<CombinationDTO> GroupNormalRules(IQueryable<NormalRule> normalRules, IEnumerable<LayoutType> groupBy)
+        async override protected Task<CombinationDTO> GroupNormalRules(CombinationSearchDTO search, IQueryable<NormalRule> normalRules, IEnumerable<LayoutType> groupBy)
         {
             var firstLayoutGroup = groupBy.ElementAt(0).ToString();
             var secondLayoutGroup = groupBy.ElementAt(1).ToString();
