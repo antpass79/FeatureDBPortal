@@ -26,6 +26,8 @@ namespace FeatureDBPortal.Client
             builder.Services.AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>();
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IGlobeDataStorage, GlobeLocalStorage>();
+            builder.Services.AddScoped<ICsvExportService, CsvExportService>();
+            builder.Services.AddSingleton<ToolbarButtonsService>();
 
             builder.Services.AddSingleton(services =>
             {

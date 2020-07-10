@@ -4,20 +4,26 @@ using FeatureDBPortal.Client.Services;
 using FeatureDBPortal.Shared;
 using FeatureDBPortal.Shared.Utilities;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace FeatureDBPortal.Client.Pages
 {
-    public class FeaturesDataModel : ComponentBase
+    public class FeaturesDataModel : ComponentBase, IDisposable
     {
+        const string BUTTON_ACTION_EXPORT_TO_CSV = "BUTTON_ACTION_EXPORT_TO_CSV";
+
         [Inject]
         protected IFilterService FilterService { get; set; }
         [Inject]
         protected IAvailabilityCombinationService AvailabilityCombinationService { get; set; }
+        [Inject]
+        protected ToolbarButtonsService ButtonsService { get; set; }
+        [Inject]
+        protected ICsvExportService CsvExportService { get; set; }
 
         protected bool FiltersBusy { get; set; }
         protected bool CombinationsBusy { get; set; }
@@ -147,6 +153,8 @@ namespace FeatureDBPortal.Client.Pages
         {
             FiltersBusy = true;
 
+            BuildToolbar();
+
             Applications = await FilterService.GetApplications();
             Probes = await FilterService.GetProbes();
             Countries = await FilterService.GetCountries();
@@ -209,9 +217,53 @@ namespace FeatureDBPortal.Client.Pages
             StateHasChanged();
         }
 
-        protected void OnToggleExpanded()
+        private void BuildToolbar()
         {
+            ButtonsService.Actions.Add(new ButtonAction
+            {
+                Id = BUTTON_ACTION_EXPORT_TO_CSV,
+                Label = "Export to CSV",
+                IconName = "import_export"
+            });
 
+            ButtonsService.FireAction = async (action) =>
+            {
+                switch (action.Id)
+                {
+                    case BUTTON_ACTION_EXPORT_TO_CSV:
+                        DownloadFile();
+                        //await CsvExportService.DownloadCsv(new CombinationDTO());
+                        break;
+                }
+            };
+        }
+
+        [Inject]
+        protected IJSRuntime JSRuntime { get; set; }
+
+        //async public Task<byte[]> DownloadCsv(CombinationDTO combination)
+        //{
+        //    await JSRuntime.InvokeAsync<object>(
+        //           "SaveFileAs",
+        //           "combination.csv",
+        //           "prova di testo"
+        //       );
+
+        //    return await Task.FromResult<byte[]>(null);
+        //}
+
+        private void DownloadFile()
+        {
+            JSRuntime.InvokeAsync<object>(
+                   "SaveFileAs",
+                   "combination.csv",
+                   "prova di testo"
+               );
+        }
+
+        public void Dispose()
+        {
+            ButtonsService.Actions.Clear();
         }
     }
 }

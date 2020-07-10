@@ -22,7 +22,7 @@ namespace FeatureDBPortal.Server.Tests
             optionsBuilder.UseSqlServer("Server=PC\\SQLExpress;Database=Features;Trusted_Connection=True;");
             var context = new FeaturesContext(optionsBuilder.Options);
 
-            return new CombinationGroupByTwoService(context);
+            return new CombinationGroupByTwoService(context, null);
         }
 
         [Theory]
