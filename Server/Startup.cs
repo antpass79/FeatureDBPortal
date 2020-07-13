@@ -75,6 +75,7 @@ namespace FeatureDBPortal.Server
                 .AddScoped<IGenericRepository<Probe>, GenericRepository<Probe>>();
             services
                 .AddScoped<IVersionProvider, VersionProvider>()
+                .AddScoped<IAsyncCsvService, CsvService>()
                 .AddScoped<IAvailabilityCombinationService, AvailabilityCombinationService>();
 
             // Active Directory

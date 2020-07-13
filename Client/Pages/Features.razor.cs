@@ -41,6 +41,9 @@ namespace FeatureDBPortal.Client.Pages
         protected bool KeepOpen { get; set; }
         protected string CombinationContainerClass { get; set; } = "feature-combination-filters-opened";
 
+        protected bool ShowCsvExportDialog { get; set; }
+        protected CsvExportSettingsDTO CsvExportSettings = new CsvExportSettingsDTO();
+
         protected IEnumerable<ApplicationDTO> Applications { get; set; }
         protected ApplicationDTO SelectedApplication { get; private set; } = new ApplicationDTO();
 
@@ -132,7 +135,8 @@ namespace FeatureDBPortal.Client.Pages
             KeepIfIdNotNull = true,
             KeepIfCellModeNotNull = true,
             KeepIfCellModeA = true,
-            KeepIfCellModeDef = true
+            KeepIfCellModeDef = true,
+            KeepIfCellModeNo = true
         };
 
         protected LayoutTypeDTO CurrentHeader { get; set; }
@@ -232,12 +236,13 @@ namespace FeatureDBPortal.Client.Pages
                 IconName = "sync"
             });
 
-            ButtonsService.FireAction = async (action) =>
+            ButtonsService.FireAction = (action) =>
             {
                 switch (action.Id)
                 {
                     case BUTTON_ACTION_EXPORT_TO_CSV:
-                        await CsvExportService.DownloadCsv(Combination.ToDTO(), "combination.csv");
+                        ShowCsvExportDialog = true;
+                        StateHasChanged();
                         break;
                     case BUTTON_ACTION_SYNC_RA:
                         break;
@@ -248,6 +253,16 @@ namespace FeatureDBPortal.Client.Pages
         public void Dispose()
         {
             ButtonsService.Actions.Clear();
+        }
+
+        async protected Task OnDownload()
+        {
+            ShowCsvExportDialog = false;
+            await CsvExportService.DownloadCsv(new CsvExportDTO
+            {
+                Combination = Combination.ToDTO(),
+                Settings = CsvExportSettings
+            });
         }
     }
 }

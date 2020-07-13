@@ -1,5 +1,6 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
+using FeatureDBPortal.Server.Services;
 using FeatureDBPortal.Shared;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
@@ -16,35 +17,18 @@ namespace FeatureDBPortal.Server.Controllers
     [Route("api/[controller]")]
     public class CsvExportController : ControllerBase
     {
-        public CsvExportController()
+        private readonly IAsyncCsvService _csvService;
+
+        public CsvExportController(IAsyncCsvService csvService)
         {
+            _csvService = csvService;
         }
 
         [HttpPost]
-        async public Task<FileStreamResult> Post([FromBody]CombinationDTO combination)
+        async public Task<FileStreamResult> Post([FromBody]CsvExportDTO csvExport)
         {
-            using var memoryStream = new MemoryStream();
-            using var streamWriter = new StreamWriter(memoryStream);
-            using (var csvWriter = new CsvWriter(streamWriter, new CsvConfiguration(CultureInfo.CurrentCulture)))
-            {
-                foreach (var row in combination.Rows)
-                {
-                    csvWriter.WriteRecord(row);
-                    csvWriter.WriteRecords(row.Cells);
-                }
-                await csvWriter.FlushAsync();
-            }
-
-            //byte[] buffer = Encoding.UTF8.GetBytes("Sample text");
-            byte[] buffer = memoryStream.ToArray();
-
-            //HttpResponseMessage result = new HttpResponseMessage(HttpStatusCode.OK);
-            //result.Content = new ByteArrayContent(buffer);
-            //result.Content.Headers.ContentType =
-            //    new MediaTypeHeaderValue("application/octet-stream");
-
-            return File(new MemoryStream(buffer), "application/octet-stream");
-            //return await Task.FromResult(result);
+            byte[] csv = await _csvService.BuildCsv(csvExport);
+            return File(new MemoryStream(csv), "application/octet-stream");
         }
     }
 }
