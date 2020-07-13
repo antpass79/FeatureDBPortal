@@ -11,13 +11,13 @@ namespace FeatureDBPortal.Server.Tests.Models
         public LayoutType? SecondGroup { get; set; }
         public LayoutType? ThirdGroup { get; set; }
 
-        public ModelDTO Model { get; set; } = new ModelDTO();
-        public CountryDTO Country { get; set; } = new CountryDTO();
-        public ProbeDTO Probe { get; set; } = new ProbeDTO();
-        public OptionDTO Option { get; set; } = new OptionDTO();
-        public ApplicationDTO Application { get; set; } = new ApplicationDTO();
-        public KitDTO Kit { get; set; } = new KitDTO();
-        public VersionDTO Version { get; set; } = new VersionDTO();
+        public int? ModelId { get; set; }
+        public int? CountryId { get; set; }
+        public int? ProbeId { get; set; }
+        public int? OptionId { get; set; }
+        public int? ApplicationId { get; set; }
+        public int? KitId { get; set; }
+        public int? VersionId { get; set; }
         public UserLevelDTO User { get; set; } = UserLevelDTO.None;
 
         public ExpectedResult Result { get; set; }

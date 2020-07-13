@@ -17,7 +17,7 @@ namespace FeatureDBPortal.Server.Services
         {
         }
 
-        async override protected Task<CombinationDTO> GroupNormalRules(CombinationSearchDTO search, IQueryable<NormalRule> normalRules, IEnumerable<LayoutType> groupBy)
+        async override protected Task<CombinationDTO> GroupNormalRules(CombinationSearchDTO search, IQueryable<NormalRule> normalRules)
         {
             if (normalRules.Count() == 0)
                 return await Task.FromResult(new CombinationDTO());
@@ -26,11 +26,11 @@ namespace FeatureDBPortal.Server.Services
             bool visible = false;
             AllowMode allowMode = AllowMode.No;
 
-            if (search.Probe != null && search.Probe.Id.HasValue)
+            if (search.ProbeId.HasValue)
             {
                 // Probe 50: TLC 3-13 => 2 transducers
                 var transducers = Context.ProbeTransducers
-                    .Where(item => item.ProbeId == search.Probe.Id.Value)
+                    .Where(item => item.ProbeId == search.ProbeId)
                     .ToList();
 
                 foreach (var transducer in transducers)

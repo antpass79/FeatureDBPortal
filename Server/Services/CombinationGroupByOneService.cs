@@ -21,19 +21,17 @@ namespace FeatureDBPortal.Server.Services
         {
         }
 
-        async override protected Task<CombinationDTO> GroupNormalRules(CombinationSearchDTO search, IQueryable<NormalRule> normalRules, IEnumerable<LayoutType> groupBy)
+        async override protected Task<CombinationDTO> GroupNormalRules(CombinationSearchDTO search, IQueryable<NormalRule> normalRules)
         {
-            var firstLayoutGroup = groupBy
-                .ElementAt(0)
-                .ToString();
+            var firstLayoutGroup = search.RowLayout.ToNormalRulePropertyName();
 
-            var fakeIds = Context.GetPropertyValue<IQueryable<IQueryableCombination>>(firstLayoutGroup)
+            var fakeIds = Context.GetPropertyValue<IQueryable<IQueryableCombination>>(search.RowLayout.ToTableName())
                 .ToList()
                 .Where(item => item.IsFake)
                 .Select(item => item.Id)
                 .ToList();
 
-            var orderedSelectedRowField = Context.GetPropertyValue<IQueryable<IQueryableCombination>>(firstLayoutGroup)
+            var orderedSelectedRowField = Context.GetPropertyValue<IQueryable<IQueryableCombination>>(search.RowLayout.ToTableName())
                 .AsEnumerable()
                 .Where(item => !item.IsFake)
                 .Select(item => new QueryableCombination { Id = item.Id, Name = item.Name })
@@ -48,7 +46,7 @@ namespace FeatureDBPortal.Server.Services
 
             // Maybe add firstLayoutGroup + "Id" == null
             var groups = normalRules
-                .GroupBy(PropertyExpressionBuilder.Build<NormalRule, int?>(firstLayoutGroup + "Id").Compile());
+                .GroupBy(PropertyExpressionBuilder.Build<NormalRule, int?>(search.RowLayout.ToNormalRulePropertyNameId()).Compile());
 
             CombinationDictionary matrix = PrepareMatrix(orderedSelectedRowField);
 

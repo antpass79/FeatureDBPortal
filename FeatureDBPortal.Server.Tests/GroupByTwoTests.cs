@@ -1,4 +1,5 @@
 using FeatureDBPortal.Server.Data.Models.RD;
+using FeatureDBPortal.Server.Providers;
 using FeatureDBPortal.Server.Services;
 using FeatureDBPortal.Server.Tests.Attributes;
 using FeatureDBPortal.Server.Tests.Models;
@@ -22,7 +23,7 @@ namespace FeatureDBPortal.Server.Tests
             optionsBuilder.UseSqlServer("Server=PC\\SQLExpress;Database=Features;Trusted_Connection=True;");
             var context = new FeaturesContext(optionsBuilder.Options);
 
-            return new CombinationGroupByTwoService(context, null);
+            return new CombinationGroupByTwoService(context, new VersionProvider(context));
         }
 
         [Theory]
