@@ -25,10 +25,10 @@ namespace FeatureDBPortal.Server.Services
             _versionProvider = versionProvider;
         }
 
-        public Task<CombinationDTO> GetCombination(CombinationSearchDTO search, IEnumerable<LayoutType> groupBy)
+        public Task<CombinationDTO> GetCombination(CombinationSearchDTO search)
         {
             var filteredNornalRules = FilterNormalRules(search);
-            return GroupNormalRules(search, filteredNornalRules, groupBy);
+            return GroupNormalRules(search, filteredNornalRules);
         }
 
         // Check for input parameters
@@ -54,32 +54,28 @@ namespace FeatureDBPortal.Server.Services
         // return search.InputId < rule.InputId;
         protected IQueryable<NormalRule> FilterNormalRules(CombinationSearchDTO search)
         {
-            if ((search.Version == null || !search.Version.Id.HasValue) &&
-                search.Model != null &&
-                search.Country != null)
+            if (!search.VersionId.HasValue && search.ModelId.HasValue && search.CountryId.HasValue)
             {
-                int version = _versionProvider.BuildDefaultVersion(search.Country.Id.Value, search.Model.Id.Value);
-                search.Version = new VersionDTO
-                {
-                    BuildVersion = _versionProvider.BuildStringVersion(version),
-                    Id = version
-                };
+                int version = _versionProvider.BuildDefaultVersion(search.CountryId.Value, search.ModelId.Value);
+                search.VersionId = version;
             }
 
             var result = Context
                 .NormalRule
-            .WhereIf(normalRule => !normalRule.LogicalModelId.HasValue || search.Model.Id == normalRule.LogicalModelId, search.Model != null)
-            .WhereIf(normalRule => !normalRule.CountryId.HasValue || search.Country.Id == normalRule.CountryId, search.Country != null)
+            .WhereIf(normalRule => !normalRule.LogicalModelId.HasValue || search.ModelId.HasValue && search.ModelId == normalRule.LogicalModelId, !IsOutputLayoutTypeSelected(search, LayoutTypeDTO.Model))
+            .WhereIf(normalRule => !normalRule.CountryId.HasValue || search.CountryId.HasValue && search.CountryId == normalRule.CountryId, !IsOutputLayoutTypeSelected(search, LayoutTypeDTO.Country))
             .WhereIf(normalRule => !normalRule.UserLevel.HasValue || search.UserLevel == (UserLevelDTO)normalRule.UserLevel, search.UserLevel != UserLevelDTO.None)
-            .WhereIf(normalRule => !normalRule.ProbeId.HasValue || search.Probe.Id == normalRule.ProbeId, search.Probe != null)
-            .WhereIf(normalRule => !normalRule.KitId.HasValue || search.Kit.Id == normalRule.KitId, search.Kit != null)
-            .WhereIf(normalRule => !normalRule.OptionId.HasValue || search.Option.Id == normalRule.OptionId, search.Option != null)
-            .WhereIf(normalRule => !normalRule.ApplicationId.HasValue || search.Application.Id == normalRule.ApplicationId, search.Application != null)
-            .WhereIf(normalRule => !normalRule.Version.HasValue || search.Version.Id.HasValue && search.Version.Id < normalRule.Version, search.Version != null);
+            .WhereIf(normalRule => !normalRule.ProbeId.HasValue || search.ProbeId.HasValue && search.ProbeId == normalRule.ProbeId, !IsOutputLayoutTypeSelected(search, LayoutTypeDTO.Probe))
+            .WhereIf(normalRule => !normalRule.KitId.HasValue || search.KitId.HasValue && search.KitId == normalRule.KitId, !IsOutputLayoutTypeSelected(search, LayoutTypeDTO.Kit))
+            .WhereIf(normalRule => !normalRule.OptionId.HasValue || search.OptionId.HasValue && search.OptionId == normalRule.OptionId,  !IsOutputLayoutTypeSelected(search, LayoutTypeDTO.Option))
+            .WhereIf(normalRule => !normalRule.ApplicationId.HasValue || search.ApplicationId.HasValue && search.ApplicationId == normalRule.ApplicationId, !IsOutputLayoutTypeSelected(search, LayoutTypeDTO.Application))
+            .WhereIf(normalRule => !normalRule.Version.HasValue || search.VersionId.HasValue && search.VersionId < normalRule.Version, !IsOutputLayoutTypeSelected(search, LayoutTypeDTO.Version));
 
             return result;
         }
 
-        protected abstract Task<CombinationDTO> GroupNormalRules(CombinationSearchDTO search, IQueryable<NormalRule> normalRules, IEnumerable<LayoutType> groupBy);
+        protected abstract Task<CombinationDTO> GroupNormalRules(CombinationSearchDTO search, IQueryable<NormalRule> normalRules);
+
+        private bool IsOutputLayoutTypeSelected(CombinationSearchDTO search, LayoutTypeDTO layoutType) => search.RowLayout == layoutType || search.ColumnLayout == layoutType || search.CellLayout == layoutType;
     }
 }

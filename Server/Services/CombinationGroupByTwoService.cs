@@ -19,14 +19,10 @@ namespace FeatureDBPortal.Server.Services
         {
         }
 
-        async override protected Task<CombinationDTO> GroupNormalRules(CombinationSearchDTO search, IQueryable<NormalRule> normalRules, IEnumerable<LayoutType> groupBy)
+        async override protected Task<CombinationDTO> GroupNormalRules(CombinationSearchDTO search, IQueryable<NormalRule> normalRules)
         {
-            var firstLayoutGroup = groupBy
-                .ElementAt(0)
-                .ToString();
-            var secondLayoutGroup = groupBy
-                .ElementAt(1)
-                .ToString();
+            var firstLayoutGroup = search.RowLayout.ToNormalRulePropertyName();
+            var secondLayoutGroup = search.ColumnLayout.ToNormalRulePropertyName();
 
             var fakeIds = Context.GetPropertyValue<IQueryable<IQueryableCombination>>(firstLayoutGroup)
                 .ToList()
@@ -54,7 +50,7 @@ namespace FeatureDBPortal.Server.Services
             // NOTE: only if there isn't a version in the search
 
             var groups = normalRules
-                .GroupBy(PropertyExpressionBuilder.Build<NormalRule, int?>($"{firstLayoutGroup}Id").Compile())
+                .GroupBy(PropertyExpressionBuilder.Build<NormalRule, int?>(search.RowLayout.ToNormalRulePropertyNameId()).Compile())
                 .ToList()
                 .Where(item => item.Key.HasValue && !fakeIds.Contains(item.Key.Value))
                 .Select(group => new

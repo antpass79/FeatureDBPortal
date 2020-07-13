@@ -39,13 +39,13 @@ namespace FeatureDBPortal.Server.Services
 
             try
             {
-                IEnumerable<LayoutType> groupBy = GetGroups(search);
-                CombinationDTO combination = groupBy.Count() switch
+                var groupCount = GetGroupCount(search);
+                CombinationDTO combination = groupCount switch
                 {
-                    0 => await _combinationGroupByAnyService.GetCombination(search, groupBy),
-                    1 => await _combinationGroupByOneService.GetCombination(search, groupBy),
-                    2 => await _combinationGroupByTwoService.GetCombination(search, groupBy),
-                    3 => await _combinationGroupByThreeService.GetCombination(search, groupBy),
+                    0 => await _combinationGroupByAnyService.GetCombination(search),
+                    1 => await _combinationGroupByOneService.GetCombination(search),
+                    2 => await _combinationGroupByTwoService.GetCombination(search),
+                    3 => await _combinationGroupByThreeService.GetCombination(search),
                     _ => throw new NotImplementedException()
                 };
 
@@ -60,23 +60,23 @@ namespace FeatureDBPortal.Server.Services
 
         #region Private Functions
 
-        private IEnumerable<LayoutType> GetGroups(CombinationSearchDTO search)
+        private int GetGroupCount(CombinationSearchDTO search)
         {
-            List<LayoutType> groupBy = new List<LayoutType>();
+            int count = 0;
             if (search.RowLayout != LayoutTypeDTO.None)
             {
-                groupBy.Add(_mapper.Map<LayoutType>(search.RowLayout));
+                count++;
             }
             if (search.ColumnLayout != LayoutTypeDTO.None)
             {
-                groupBy.Add(_mapper.Map<LayoutType>(search.ColumnLayout));
+                count++;
             }
             if (search.CellLayout != LayoutTypeDTO.None)
             {
-                groupBy.Add(_mapper.Map<LayoutType>(search.CellLayout));
+                count++;
             }
 
-            return groupBy;
+            return count;
         }
 
         #endregion

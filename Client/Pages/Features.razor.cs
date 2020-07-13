@@ -27,6 +27,7 @@ namespace FeatureDBPortal.Client.Pages
 
         protected bool FiltersBusy { get; set; }
         protected bool CombinationsBusy { get; set; }
+        protected string ErrorMessage { get; private set; }
 
         bool _filtersOpened = true;
         protected bool FiltersOpened
@@ -139,16 +140,14 @@ namespace FeatureDBPortal.Client.Pages
             KeepIfCellModeNo = true
         };
 
-        protected LayoutTypeDTO CurrentHeader { get; set; }
-
-        protected bool DisableApplication => SelectedRowLayout == LayoutTypeDTO.Application || SelectedColumnLayout == LayoutTypeDTO.Application || SelectedCellLayout == LayoutTypeDTO.Application;
-        protected bool DisableProbe => SelectedRowLayout == LayoutTypeDTO.Probe || SelectedColumnLayout == LayoutTypeDTO.Probe || SelectedCellLayout == LayoutTypeDTO.Probe;
-        protected bool DisableModel => SelectedRowLayout == LayoutTypeDTO.Model || SelectedColumnLayout == LayoutTypeDTO.Model || SelectedCellLayout == LayoutTypeDTO.Model;
-        protected bool DisableKit => SelectedRowLayout == LayoutTypeDTO.Kit || SelectedColumnLayout == LayoutTypeDTO.Kit || SelectedCellLayout == LayoutTypeDTO.Kit;
-        protected bool DisableOption => SelectedRowLayout == LayoutTypeDTO.Option || SelectedColumnLayout == LayoutTypeDTO.Option || SelectedCellLayout == LayoutTypeDTO.Option;
-        protected bool DisableVersion => SelectedRowLayout == LayoutTypeDTO.Version || SelectedColumnLayout == LayoutTypeDTO.Version || SelectedCellLayout == LayoutTypeDTO.Version;
-        protected bool DisableCountry => SelectedRowLayout == LayoutTypeDTO.Country || SelectedColumnLayout == LayoutTypeDTO.Country || SelectedCellLayout == LayoutTypeDTO.Country;
-        protected bool DisableUserLevel => SelectedRowLayout == LayoutTypeDTO.UserLevel || SelectedColumnLayout == LayoutTypeDTO.UserLevel || SelectedCellLayout == LayoutTypeDTO.UserLevel;
+        protected bool DisableApplication => IsOutputLayoutTypeSelected(LayoutTypeDTO.Application);
+        protected bool DisableProbe => IsOutputLayoutTypeSelected(LayoutTypeDTO.Probe);
+        protected bool DisableModel => IsOutputLayoutTypeSelected(LayoutTypeDTO.Model);
+        protected bool DisableKit => IsOutputLayoutTypeSelected(LayoutTypeDTO.Kit);
+        protected bool DisableOption => IsOutputLayoutTypeSelected(LayoutTypeDTO.Option);
+        protected bool DisableVersion => IsOutputLayoutTypeSelected(LayoutTypeDTO.Version);
+        protected bool DisableCountry => IsOutputLayoutTypeSelected(LayoutTypeDTO.Country);
+        protected bool DisableUserLevel => IsOutputLayoutTypeSelected(LayoutTypeDTO.UserLevel);
 
         private bool IsOutputLayoutTypeSelected(LayoutTypeDTO layoutType) => SelectedRowLayout == layoutType || SelectedColumnLayout == layoutType || SelectedCellLayout == layoutType;
 
@@ -179,46 +178,56 @@ namespace FeatureDBPortal.Client.Pages
 
         async protected Task OnSearch()
         {
+            ErrorMessage = string.Empty;
+
             using var watcher = new Watcher("CLIENT-SERVER ROUNDTRIP");
 
             CombinationsBusy = true;
 
-            var combinationDTO = await AvailabilityCombinationService.GetCombinations(new CombinationSearchDTO
+            try
             {
-                Application = IsOutputLayoutTypeSelected(LayoutTypeDTO.Application) ? null : SelectedApplication,
-                Probe = IsOutputLayoutTypeSelected(LayoutTypeDTO.Probe) ? null : SelectedProbe,
-                Country = IsOutputLayoutTypeSelected(LayoutTypeDTO.Country)  ? null : SelectedCountry,
-                Version = IsOutputLayoutTypeSelected(LayoutTypeDTO.Version) ? null : SelectedVersion,
-                Model = IsOutputLayoutTypeSelected(LayoutTypeDTO.Model) ? null : SelectedModel,
-                Option = IsOutputLayoutTypeSelected(LayoutTypeDTO.Option) ? null : SelectedOption,
-                Kit = IsOutputLayoutTypeSelected(LayoutTypeDTO.Kit) ? null : SelectedKit,
-                UserLevel = IsOutputLayoutTypeSelected(LayoutTypeDTO.UserLevel) ? UserLevelDTO.None : SelectedUserLevel,
-                RowLayout = SelectedRowLayout,
-                ColumnLayout = SelectedColumnLayout,
-                CellLayout = SelectedCellLayout
-            });
+                var combinationDTO = await AvailabilityCombinationService.GetCombinations(new CombinationSearchDTO
+                {
+                    ApplicationId = IsOutputLayoutTypeSelected(LayoutTypeDTO.Application) ? null : SelectedApplication.Id,
+                    ProbeId = IsOutputLayoutTypeSelected(LayoutTypeDTO.Probe) ? null : SelectedProbe.Id,
+                    CountryId = IsOutputLayoutTypeSelected(LayoutTypeDTO.Country) ? null : SelectedCountry.Id,
+                    VersionId = IsOutputLayoutTypeSelected(LayoutTypeDTO.Version) ? null : SelectedVersion.Id,
+                    ModelId = IsOutputLayoutTypeSelected(LayoutTypeDTO.Model) ? null : SelectedModel.Id,
+                    OptionId = IsOutputLayoutTypeSelected(LayoutTypeDTO.Option) ? null : SelectedOption.Id,
+                    KitId = IsOutputLayoutTypeSelected(LayoutTypeDTO.Kit) ? null : SelectedKit.Id,
+                    UserLevel = IsOutputLayoutTypeSelected(LayoutTypeDTO.UserLevel) ? UserLevelDTO.None : SelectedUserLevel,
+                    RowLayout = SelectedRowLayout,
+                    ColumnLayout = SelectedColumnLayout,
+                    CellLayout = SelectedCellLayout
+                });
 
-            Combination combination;
+                Combination combination;
 
-            using (var innerWatcher = new Watcher("ToModel"))
-            {
-                combination = combinationDTO.ToModel();
+                using (var innerWatcher = new Watcher("ToModel"))
+                {
+                    combination = combinationDTO.ToModel();
+                }
+
+                using (var innerWatcher = new Watcher("ApplyFilters"))
+                {
+                    combination.ApplyFilters(Filters);
+                }
+
+                Combination = combination;
             }
-
-            using (var innerWatcher = new Watcher("ApplyFilters"))
+            catch (Exception e)
             {
-                combination.ApplyFilters(Filters);
+                Console.WriteLine(e.Message);
+                ErrorMessage = "Unsupported Combination";
+                Combination = null;
             }
+            finally
+            {
+                CombinationsBusy = false;
+                FiltersOpened = KeepOpen || false;
 
-            Combination = combination;
-
-            CurrentHeader = SelectedRowLayout;
-
-            CombinationsBusy = false;
-
-            FiltersOpened = KeepOpen || false;
-
-            StateHasChanged();
+                StateHasChanged();
+            }
         }
 
         private void BuildToolbar()

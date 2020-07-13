@@ -45,6 +45,13 @@
         margin: 15px;
     }
 
+    .feature-error-message {
+        flex: 1;
+        align-self: center;
+        margin: 15px;
+        color: red;
+    }
+
     .select-field {
         display: flex;
     }
@@ -273,17 +280,24 @@ else
 }
 
 <div class="@CombinationContainerClass">
-    <CombinationMatrix Busy="@CombinationsBusy" Combination="@Combination" Filters="@Filters"></CombinationMatrix>
-
-    <MatDialog @bind-IsOpen="@ShowCsvExportDialog">
-        <MatDialogTitle>Information!</MatDialogTitle>
-        <MatDialogContent>
-            <p>Choose the file name to download</p>
-            <MatTextField @bind-Value="@CsvExportSettings.FileName"></MatTextField>
-        </MatDialogContent>
-        <MatDialogActions>
-            <MatButton OnClick="@OnDownload">Download</MatButton>
-            <MatButton OnClick="@(e => { ShowCsvExportDialog = false; })">Cancel</MatButton>
-        </MatDialogActions>
-    </MatDialog>
+    @if (string.IsNullOrWhiteSpace(ErrorMessage))
+    {
+        <CombinationMatrix Busy="@CombinationsBusy" Combination="@Combination" Filters="@Filters"></CombinationMatrix>
+    }
+    else
+    {
+        <p class="feature-error-message"><em>Unsupported Combination</em></p>
+    }
 </div>
+
+<MatDialog @bind-IsOpen="@ShowCsvExportDialog">
+    <MatDialogTitle>Information!</MatDialogTitle>
+    <MatDialogContent>
+        <p>Choose the file name to download</p>
+        <MatTextField @bind-Value="@CsvExportSettings.FileName"></MatTextField>
+    </MatDialogContent>
+    <MatDialogActions>
+        <MatButton OnClick="@OnDownload">Download</MatButton>
+        <MatButton OnClick="@(e => { ShowCsvExportDialog = false; })">Cancel</MatButton>
+    </MatDialogActions>
+</MatDialog>
