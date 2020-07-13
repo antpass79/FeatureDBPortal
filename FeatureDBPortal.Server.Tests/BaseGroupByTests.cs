@@ -22,16 +22,15 @@ namespace FeatureDBPortal.Server.Tests
         {
             var result = await CombinationGroupService.GetCombination(new Shared.CombinationSearchDTO
             {
-                Model = IsGroupListContains(LayoutType.LogicalModel, groups) ? null : new ModelDTO { Id = combinationTest.Model.Id },
-                Country = IsGroupListContains(LayoutType.Country, groups) ? null : new CountryDTO { Id = combinationTest.Country.Id },
-                Probe = IsGroupListContains(LayoutType.Probe, groups) ? null : new ProbeDTO { Id = combinationTest.Probe.Id },
-                Option = IsGroupListContains(LayoutType.Option, groups) ? null : new OptionDTO { Id = combinationTest.Option.Id },
-                Application = IsGroupListContains(LayoutType.Application, groups) ? null : new ApplicationDTO { Id = combinationTest.Application.Id },
-                Version = IsGroupListContains(LayoutType.MinorVersionAssociation, groups) ? null : new VersionDTO { Id = combinationTest.Version.Id },
-                Kit = IsGroupListContains(LayoutType.BiopsyKits, groups) ? null : new KitDTO { Id = combinationTest.Kit.Id },
+                ModelId = IsGroupListContains(LayoutType.LogicalModel, groups) ? null : combinationTest.ModelId,
+                CountryId = IsGroupListContains(LayoutType.Country, groups) ? null : combinationTest.CountryId,
+                ProbeId = IsGroupListContains(LayoutType.Probe, groups) ? null : combinationTest.ProbeId,
+                OptionId = IsGroupListContains(LayoutType.Option, groups) ? null : combinationTest.OptionId,
+                ApplicationId = IsGroupListContains(LayoutType.Application, groups) ? null : combinationTest.ApplicationId,
+                VersionId = IsGroupListContains(LayoutType.MinorVersionAssociation, groups) ? null : combinationTest.VersionId,
+                KitId = IsGroupListContains(LayoutType.BiopsyKits, groups) ? null : combinationTest.KitId,
                 UserLevel = combinationTest.User
-            },
-            groups);
+            });
 
             return result;
         }

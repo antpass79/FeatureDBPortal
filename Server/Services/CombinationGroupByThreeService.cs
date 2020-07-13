@@ -19,11 +19,11 @@ namespace FeatureDBPortal.Server.Services
         {
         }
 
-        async override protected Task<CombinationDTO> GroupNormalRules(CombinationSearchDTO search, IQueryable<NormalRule> normalRules, IEnumerable<LayoutType> groupBy)
+        async override protected Task<CombinationDTO> GroupNormalRules(CombinationSearchDTO search, IQueryable<NormalRule> normalRules)
         {
-            var firstLayoutGroup = groupBy.ElementAt(0).ToString();
-            var secondLayoutGroup = groupBy.ElementAt(1).ToString();
-            var thirdLayoutGroup = groupBy.ElementAt(2).ToString();
+            var firstLayoutGroup = search.RowLayout.ToNormalRulePropertyName();
+            var secondLayoutGroup = search.ColumnLayout.ToNormalRulePropertyName();
+            var thirdLayoutGroup = search.CellLayout.ToNormalRulePropertyName();
 
             var orderedSelectedRowField = Context.GetPropertyValue<IQueryable<IQueryableCombination>>(firstLayoutGroup)
                 .AsEnumerable()
@@ -41,8 +41,8 @@ namespace FeatureDBPortal.Server.Services
                 .OrderBy(item => item.Name)
                 .ToList();
 
-            var firstGroupExpression = PropertyExpressionBuilder.Build<NormalRule, int?>($"{firstLayoutGroup}Id").Compile();
-            var thirdGroupExpression = PropertyExpressionBuilder.Build<NormalRule, int?>($"{thirdLayoutGroup}Id").Compile();
+            var firstGroupExpression = PropertyExpressionBuilder.Build<NormalRule, int?>(search.RowLayout.ToNormalRulePropertyNameId()).Compile();
+            var thirdGroupExpression = PropertyExpressionBuilder.Build<NormalRule, int?>(search.CellLayout.ToNormalRulePropertyNameId()).Compile();
 
             var groups = normalRules
                 .GroupBy(firstGroupExpression)
