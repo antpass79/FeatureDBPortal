@@ -1,7 +1,6 @@
 ﻿using FeatureDBPortal.Client.Extensions;
 using FeatureDBPortal.Shared;
 using Microsoft.JSInterop;
-using System;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
@@ -24,21 +23,23 @@ namespace FeatureDBPortal.Client.Services
 
         private readonly HttpClient _httpClient;
 
-        async public Task DownloadCsv(CombinationDTO combination, string downloadedFile)
+        async public Task DownloadCsv(CsvExportDTO csvExport)
         {
             var message = await _httpClient.PostAsync(
                 CSV_EXPORT_ENDPOINT,
-                new StringContent(JsonSerializer.Serialize(combination), Encoding.UTF8, "application/json"));
+                new StringContent(JsonSerializer.Serialize(csvExport), Encoding.UTF8, "application/json"));
 
             var csv = await message.GetByteArrayValue();
-            await DownloadCsv(csv, downloadedFile);
+            await DownloadCsv(csv, csvExport.Settings);
         }
 
-        async private Task DownloadCsv(byte[] csv, string downloadedFile)
+        async private Task DownloadCsv(byte[] csv, CsvExportSettingsDTO csvExportSettings)
         {
+            var fileName = !string.IsNullOrWhiteSpace(csvExportSettings.FileName) ? $"{csvExportSettings.FileName}.csv" : $"{csvExportSettings.DefaultFileName}.csv";
+
             await _jsRuntime.InvokeAsync<object>(
                 SCRIPT_NAME,
-                downloadedFile,
+                fileName,
                 Encoding.UTF8.GetString(csv));
         }
     }

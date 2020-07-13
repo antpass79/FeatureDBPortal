@@ -5,6 +5,6 @@ namespace FeatureDBPortal.Client.Services
 {
     public interface ICsvExportService
     {
-        Task DownloadCsv(CombinationDTO combination, string downloadedFile);
+        Task DownloadCsv(CsvExportDTO csvExport);
     }
 }
