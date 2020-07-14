@@ -12,5 +12,6 @@ namespace FeatureDBPortal.Server.Providers
         public IReadOnlyList<QueryableCombination> Rows { get; }
         public IReadOnlyList<QueryableCombination> Columns { get; }
         IReadOnlyList<RowDTO> Group(IQueryable<NormalRule> normalRules);
+        CombinationDTO GroupFast(IQueryable<NormalRule> normalRules);
     }
 }
