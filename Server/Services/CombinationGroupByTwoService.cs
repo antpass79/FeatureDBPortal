@@ -19,29 +19,9 @@ namespace FeatureDBPortal.Server.Services
         {
         }
 
-        async override protected Task<CombinationDTO> GroupNormalRules(CombinationSearchDTO search, IQueryable<NormalRule> normalRules)
+        async override sealed protected Task<CombinationDTO> BuildCombination(CombinationSearchDTO search, IQueryable<NormalRule> normalRules)
         {
-            var firstLayoutGroup = search.RowLayout.ToNormalRulePropertyName();
-            var secondLayoutGroup = search.ColumnLayout.ToNormalRulePropertyName();
-
-            var fakeIds = Context.GetPropertyValue<IQueryable<IQueryableCombination>>(firstLayoutGroup)
-                .ToList()
-                .Where(item => item.IsFake)
-                .Select(item => item.Id)
-                .ToList();
-
-            var orderedSelectedRowField = Context.GetPropertyValue<IQueryable<IQueryableCombination>>(firstLayoutGroup)
-                .AsEnumerable()
-                .Where(item => !item.IsFake)
-                .Select(item => new QueryableCombination { Id = item.Id, Name = item.Name })
-                .OrderBy(item => item.Name)
-                .ToList();
-
-            var orderedSelectedColumnField = Context.GetPropertyValue<IQueryable<IQueryableCombination>>(secondLayoutGroup)
-                .AsEnumerable()
-                .Select(item => new QueryableCombination { Id = item.Id, Name = item.Name })
-                .OrderBy(item => item.Name)
-                .ToList();
+            var groupProvider = GetGroupProvider(search);
 
             // If in output there are Model and Country:
             // - Foreach groups take ids (in case of model the firstGroup id is ModelId, the secondGroup id is CountryId)
@@ -49,45 +29,41 @@ namespace FeatureDBPortal.Server.Services
             // - Filter rules with the default version (see FilterNormalRules function in the base class)
             // NOTE: only if there isn't a version in the search
 
-            var groups = normalRules
-                .GroupBy(PropertyExpressionBuilder.Build<NormalRule, int?>(search.RowLayout.ToNormalRulePropertyNameId()).Compile())
-                .ToList()
-                .Where(item => item.Key.HasValue && !fakeIds.Contains(item.Key.Value))
-                .Select(group => new
-                {
-                    RowId = group.Key,
-                    RowName = orderedSelectedRowField.SingleOrDefault(item => item.Id == group.Key)?.Name,
-                    Cells = group.Select(groupItem =>
-                    {
-                        var newCell = new CombinationCell
-                        {
-                            RowId = group.Key,
-                            ColumnId = groupItem.GetPropertyIdByGroupName(secondLayoutGroup),
-                            Name = orderedSelectedColumnField.SingleOrDefault(item => item.Id == groupItem.GetPropertyIdByGroupName(secondLayoutGroup))?.Name,
-                            Available = group.All(item => (AllowMode)item.Allow != AllowMode.No),
-                            Visible = group.All(item => (AllowMode)item.Allow == AllowMode.A)
-                        };
-                        newCell.AllowMode = Allower.GetMode(newCell.Visible.Value, newCell.Available.Value);
+            var groups = groupProvider
+                .Group(normalRules);
 
-                        return newCell;
-                    }).ToList()
-                }).ToList();
+            var matrix = BuildMatrix(groupProvider.Rows, groupProvider.Columns);
+            FillMatrix(matrix, groups);
+            var combination = MapToCombination(matrix, groupProvider);
 
-            CombinationDictionary matrix = PrepareMatrix(orderedSelectedRowField, orderedSelectedColumnField);
+            return await Task.FromResult(combination);
+        }
 
+        protected virtual INormalRuleGroupProvider GetGroupProvider(CombinationSearchDTO search)
+        {
+            var groupProvider = new NormalRuleGroupProviderBuilder(Context)
+                .GroupByOne(search.RowLayout)
+                .GroupByTwo(search.ColumnLayout)
+                .Build();
+
+            return groupProvider;
+        }
+
+        protected virtual void FillMatrix(CombinationMatrix matrix, IReadOnlyList<RowDTO> groups)
+        {
             for (var x = 0; x < groups.Count; x++)
             {
-                var rowA = groups[x];
-                for (var y = 0; y < rowA.Cells.Count; y++)
+                var row = groups[x];
+                for (var y = 0; y < row.Cells.Count; y++)
                 {
-                    var columnA = rowA.Cells[y];
+                    var column = row.Cells[y];
 
                     // ANTO why id can be null?
-                    if (!columnA.RowId.HasValue || !columnA.ColumnId.HasValue)
+                    if (!column.RowId.HasValue || !column.ColumnId.HasValue)
                         continue;
 
-                    var rowKey = columnA.RowId.HasValue ? columnA.RowId : -1;
-                    var columnKey = columnA.ColumnId.HasValue ? columnA.ColumnId : -1;
+                    var rowKey = column.RowId.HasValue ? column.RowId : -1;
+                    var columnKey = column.ColumnId.HasValue ? column.ColumnId : -1;
 
                     if (matrix.ContainsKey(rowKey))
                     {
@@ -99,10 +75,9 @@ namespace FeatureDBPortal.Server.Services
                             {
                                 RowId = rowKey,
                                 ColumnId = columnKey,
-                                Name = columnA.Name,
-                                Available = columnA.Available,
-                                Visible = columnA.Visible,
-                                AllowMode = columnA.AllowMode
+                                Available = column.Available,
+                                Visible = column.Visible,
+                                AllowMode = (AllowMode)column.AllowMode
                             };
                         }
                         else
@@ -111,65 +86,64 @@ namespace FeatureDBPortal.Server.Services
                             {
                                 RowId = rowKey,
                                 ColumnId = columnKey,
-                                Name = columnA.Name,
-                                Available = columnA.Available,
-                                Visible = columnA.Visible,
-                                AllowMode = columnA.AllowMode
+                                Available = column.Available,
+                                Visible = column.Visible,
+                                AllowMode = (AllowMode)column.AllowMode
                             });
                         }
                     }
                     else
                     {
-                        var newRow = new RowDictionary(1);
+                        var newRow = new CombinationRow(1);
                         newRow[columnKey] = new CombinationCell()
                         {
                             RowId = rowKey,
                             ColumnId = columnKey,
-                            Name = columnA.Name,
-                            Available = columnA.Available,
-                            Visible = columnA.Visible,
-                            AllowMode = columnA.AllowMode
+                            Available = column.Available,
+                            Visible = column.Visible,
+                            AllowMode = (AllowMode)column.AllowMode
                         };
                         matrix[rowKey] = newRow;
                     }
                 }
             }
-
-            var combination = new CombinationDTO
-            {
-                IntersectionTitle = $"{firstLayoutGroup} / {secondLayoutGroup}",
-                Columns = orderedSelectedColumnField.Select(item => new ColumnDTO { Id = item.Id, Name = item.Name }),
-                Rows = matrix.ToRows()
-            };
-
-            return await Task.FromResult(combination);
         }
 
-        private static CombinationDictionary PrepareMatrix(List<QueryableCombination> orderedSelectedRowField, List<QueryableCombination> orderedSelectedColumnField)
+        private CombinationMatrix BuildMatrix(IReadOnlyList<QueryableCombination> rows, IReadOnlyList<QueryableCombination> columns)
         {
-            var matrix = new CombinationDictionary(orderedSelectedRowField.Count);
+            var matrix = new CombinationMatrix(rows.Count);
 
-            orderedSelectedRowField
-                .ForEach(rowItem =>
+            foreach (var row in rows)
+            {
+                var newRow = new CombinationRow(columns.Count)
                 {
-                    var row = new RowDictionary(orderedSelectedColumnField.Count)
+                    Id = row.Id,
+                    Name = row.Name
+                };
+
+                foreach (var column in columns)
+                {
+                    newRow[column.Id] = new CombinationCell
                     {
-                        RowId = rowItem.Id,
-                        Name = rowItem.Name
+                        RowId = row.Id,
+                        ColumnId = column.Id,
                     };
-                    orderedSelectedColumnField
-                    .ForEach(columnItem =>
-                    {
-                        row[columnItem.Id] = new CombinationCell
-                        {
-                            RowId = rowItem.Id,
-                            ColumnId = columnItem.Id,
-                            Name = columnItem.Name
-                        };
-                    });
-                    matrix[rowItem.Id] = row;
-                });
+                }
+
+                matrix[row.Id] = newRow;
+            }
+
             return matrix;
+        }
+
+        private CombinationDTO MapToCombination(CombinationMatrix matrix, INormalRuleGroupProvider groupProvider)
+        {
+            return new CombinationDTO
+            {
+                IntersectionTitle = groupProvider.GroupName,
+                Columns = groupProvider.Columns.Select(item => new ColumnDTO { Id = item.Id, Name = item.Name }).ToList(),
+                Rows = matrix.ToRows()
+            };
         }
     }
 }

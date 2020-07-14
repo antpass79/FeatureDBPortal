@@ -55,7 +55,7 @@ namespace FeatureDBPortal.Server.gRPC
                 .OrderBy(item => item.Name)
                 .ToList();
 
-            CombinationDictionary matrix = PrepareMatrix(orderedSelectedRowField, orderedSelectedColumnField);
+            CombinationMatrix matrix = PrepareMatrix(orderedSelectedRowField, orderedSelectedColumnField);
 
             for (var x = 0; x < groups.Count; x++)
             {
@@ -92,7 +92,7 @@ namespace FeatureDBPortal.Server.gRPC
                     }
                     else
                     {
-                        var newRow = new RowDictionary(1);
+                        var newRow = new CombinationRow(1);
                         newRow[columnKey] = new CombinationCell()
                         {
                             RowId = rowKey,
@@ -116,15 +116,15 @@ namespace FeatureDBPortal.Server.gRPC
             return await Task.FromResult(combination);
         }
 
-        private static CombinationDictionary PrepareMatrix(List<IQueryableCombination> orderedSelectedRowField, List<IQueryableCombination> orderedSelectedColumnField)
+        private static CombinationMatrix PrepareMatrix(List<IQueryableCombination> orderedSelectedRowField, List<IQueryableCombination> orderedSelectedColumnField)
         {
-            var matrix = new CombinationDictionary(orderedSelectedRowField.Count);
+            var matrix = new CombinationMatrix(orderedSelectedRowField.Count);
 
             orderedSelectedRowField
                 .ForEach(rowItem =>
                 {
-                    var row = new RowDictionary(orderedSelectedColumnField.Count);
-                    row.RowId = rowItem.Id;
+                    var row = new CombinationRow(orderedSelectedColumnField.Count);
+                    row.Id = rowItem.Id;
                     row.Name = rowItem.Name;
                     orderedSelectedColumnField
                     .ForEach(columnItem =>

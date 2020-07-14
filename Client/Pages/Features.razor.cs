@@ -179,6 +179,7 @@ namespace FeatureDBPortal.Client.Pages
         async protected Task OnSearch()
         {
             ErrorMessage = string.Empty;
+            Combination = null;
 
             using var watcher = new Watcher("CLIENT-SERVER ROUNDTRIP");
 

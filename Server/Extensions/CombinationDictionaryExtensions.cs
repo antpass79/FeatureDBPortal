@@ -9,38 +9,39 @@ namespace FeatureDBPortal.Server.Extensions
 {
     public static class CombinationDictionaryExtensions
     {
-        public static IEnumerable<RowDTO> ToRows(this CombinationDictionary matrix)
+        public static IReadOnlyList<RowDTO> ToRows(this CombinationMatrix matrix)
         {
             return matrix.Values
-                .Where(item => item.RowId.HasValue)
+                .Where(item => item.Id.HasValue)
                 .Select(row => new RowDTO
             {
-                RowId = row.RowId,
+                RowId = row.Id,
                 Title = new RowTitleDTO
                 {
-                    Id = row.RowId,
+                    Id = row.Id,
                     Name = row.Name
                 },
                 Cells = row.Values.Select(cell => new CellDTO
                 {
-                    Name = cell.Name,
                     RowId = cell.RowId,
                     ColumnId = cell.ColumnId,
+
                     Available = cell.Available,
                     Visible = cell.Visible,
                     AllowMode = cell.AllowMode.HasValue ? (AllowModeDTO)cell.AllowMode : new Nullable<AllowModeDTO>(),
+
                     Items = cell.Items?.Select(itemCell => new CellItemDTO
                     {
                         RowId = itemCell.RowId,
                         ColumnId = itemCell.ColumnId,
                         ItemId = itemCell.ItemId,
                         Name = itemCell.Name
-                    })
-                })
-            });
+                    }).ToList()
+                }).ToList()
+            }).ToList();
         }
 
-        public static IEnumerable<RowGRPC> ToGRPCRows(this CombinationDictionary matrix)
+        public static IEnumerable<RowGRPC> ToGRPCRows(this CombinationMatrix matrix)
         {
             return matrix.Values.Select(row =>
             {
