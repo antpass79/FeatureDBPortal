@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -58,6 +59,9 @@ namespace FeatureDBPortal.Client
             builder.Services.AddTransient<IAvailabilityCombinationService, AvailabilityCombinationService>();
 
             await builder.Build().RunAsync();
+
+            // Workaround: https://stackoverflow.com/questions/60793142/decoding-jwt-in-blazore-client-side-results-wasm-system-argumentexception-idx1
+            _ = new JwtPayload();
         }
     }
 }

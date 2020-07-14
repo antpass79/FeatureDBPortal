@@ -52,5 +52,10 @@ namespace FeatureDBPortal.Server.Providers
 
             return groups;
         }
+
+        public CombinationDTO GroupFast(IQueryable<NormalRule> normalRules)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
