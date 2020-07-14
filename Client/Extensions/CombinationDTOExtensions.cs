@@ -37,7 +37,7 @@ namespace FeatureDBPortal.Client.Extensions
                                 ColumnId = item.ColumnId,
                                 ItemId = item.ItemId,
                                 Name = item.Name
-                            })
+                            }).ToList()
                         }).ToList()
                     };
 

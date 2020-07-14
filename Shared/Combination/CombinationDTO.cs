@@ -7,8 +7,8 @@ namespace FeatureDBPortal.Shared
     {
         public string IntersectionTitle { get; set; }
 
-        public IEnumerable<ColumnDTO> Columns { get; set; }
+        public IReadOnlyList<ColumnDTO> Columns { get; set; }
 
-        public IEnumerable<RowDTO> Rows { get; set; }
+        public IReadOnlyList<RowDTO> Rows { get; set; }
     }
 }

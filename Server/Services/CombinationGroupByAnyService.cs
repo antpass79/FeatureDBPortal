@@ -17,11 +17,8 @@ namespace FeatureDBPortal.Server.Services
         {
         }
 
-        async override protected Task<CombinationDTO> GroupNormalRules(CombinationSearchDTO search, IQueryable<NormalRule> normalRules)
+        async override protected Task<CombinationDTO> BuildCombination(CombinationSearchDTO search, IQueryable<NormalRule> normalRules)
         {
-            if (normalRules.Count() == 0)
-                return await Task.FromResult(new CombinationDTO());
-
             bool available = false;
             bool visible = false;
             AllowMode allowMode = AllowMode.No;
@@ -50,8 +47,8 @@ namespace FeatureDBPortal.Server.Services
 
             allowMode = Allower.GetMode(visible, available);
 
-            var matrix = new CombinationDictionary(1);
-            matrix[-1] = new RowDictionary(1) { RowId = -1 };
+            var matrix = new CombinationMatrix(1);
+            matrix[-1] = new CombinationRow(1) { Id = -1 };
             matrix[-1][-1] = new CombinationCell()
             {
                 RowId = -1,

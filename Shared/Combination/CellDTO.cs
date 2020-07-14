@@ -13,6 +13,6 @@ namespace FeatureDBPortal.Shared
         public int? RowId { get; set; }
         public int? ColumnId { get; set; }
 
-        public IEnumerable<CellItemDTO> Items { get; set; }
+        public IReadOnlyList<CellItemDTO> Items { get; set; }
     }
 }

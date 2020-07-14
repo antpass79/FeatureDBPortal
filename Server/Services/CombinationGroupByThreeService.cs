@@ -5,78 +5,45 @@ using FeatureDBPortal.Server.Providers;
 using FeatureDBPortal.Server.Utils;
 using FeatureDBPortal.Shared;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace FeatureDBPortal.Server.Services
 {
-    public class CombinationGroupByThreeService : CombinationGroupService
+    public class CombinationGroupByThreeService : CombinationGroupByTwoService
     {
         public CombinationGroupByThreeService(DbContext context, IVersionProvider versionProvider)
             : base(context, versionProvider)
         {
         }
 
-        async override protected Task<CombinationDTO> GroupNormalRules(CombinationSearchDTO search, IQueryable<NormalRule> normalRules)
+        protected override INormalRuleGroupProvider GetGroupProvider(CombinationSearchDTO search)
         {
-            var firstLayoutGroup = search.RowLayout.ToNormalRulePropertyName();
-            var secondLayoutGroup = search.ColumnLayout.ToNormalRulePropertyName();
-            var thirdLayoutGroup = search.CellLayout.ToNormalRulePropertyName();
+            var groupProvider = new NormalRuleGroupProviderBuilder(Context)
+                .GroupByOne(search.RowLayout)
+                .GroupByTwo(search.ColumnLayout)
+                .GroupByThree(search.CellLayout)
+                .Build();
 
-            var orderedSelectedRowField = Context.GetPropertyValue<IQueryable<IQueryableCombination>>(firstLayoutGroup)
-                .AsEnumerable()
-                .Select(item => new QueryableCombination { Id = item.Id, Name = item.Name })
-                .OrderBy(item => item.Name)
-                .ToList();
-            var orderedSelectedColumnField = Context.GetPropertyValue<IQueryable<IQueryableCombination>>(secondLayoutGroup)
-                .AsEnumerable()
-                .Select(item => new QueryableCombination { Id = item.Id, Name = item.Name })
-                .OrderBy(item => item.Name)
-                .ToList();
-            var orderedSelectedCellField = Context.GetPropertyValue<IQueryable<IQueryableCombination>>(thirdLayoutGroup)
-                .AsEnumerable()
-                .Select(item => new QueryableCombination { Id = item.Id, Name = item.Name })
-                .OrderBy(item => item.Name)
-                .ToList();
+            return groupProvider;
+        }
 
-            var firstGroupExpression = PropertyExpressionBuilder.Build<NormalRule, int?>(search.RowLayout.ToNormalRulePropertyNameId()).Compile();
-            var thirdGroupExpression = PropertyExpressionBuilder.Build<NormalRule, int?>(search.CellLayout.ToNormalRulePropertyNameId()).Compile();
-
-            var groups = normalRules
-                .GroupBy(firstGroupExpression)
-                .Select(group => new
-                {
-                    RowId = group.Key,
-                    RowName = orderedSelectedRowField.SingleOrDefault(item => item.Id == group.Key)?.Name,
-                    Cells = group.Select(groupItem => new
-                    {
-                        RowId = group.Key,
-                        ColumnId = groupItem.GetPropertyIdByGroupName(secondLayoutGroup),
-                        Name = orderedSelectedColumnField.SingleOrDefault(item => item.Id == groupItem.GetPropertyIdByGroupName(secondLayoutGroup))?.Name,
-                        Available = group.All(item => (AllowMode)item.Allow != AllowMode.No),
-                        Visible = group.All(item => (AllowMode)item.Allow == AllowMode.A),
-                        AllowMode = Allower.GetMode(group.All(item => (AllowMode)item.Allow == AllowMode.A), group.All(item => (AllowMode)item.Allow != AllowMode.No)),
-                        Items = group.GroupBy(thirdGroupExpression).Select(thirdGroup => new
-                        {
-                            ItemName = orderedSelectedCellField.SingleOrDefault(cellItem => cellItem.Id == thirdGroup.Key)?.Name,
-                            Allow = thirdGroup.All(i => i.Allow != 0)
-                        })
-                    }).ToList()
-                }).ToList();
-
-            CombinationDictionary matrix = PrepareMatrix(orderedSelectedRowField, orderedSelectedColumnField);
-
+        protected override void FillMatrix(CombinationMatrix matrix, IReadOnlyList<RowDTO> groups)
+        {
             for (var x = 0; x < groups.Count; x++)
             {
-                var rowA = groups[x];
-                for (var y = 0; y < rowA.Cells.Count; y++)
+                var row = groups[x];
+                for (var y = 0; y < row.Cells.Count; y++)
                 {
-                    var columnA = rowA.Cells[y];
+                    var column = row.Cells[y];
 
-                    var rowKey = columnA.RowId.HasValue ? columnA.RowId : -1;
-                    var columnKey = columnA.ColumnId.HasValue ? columnA.ColumnId : -1;
+                    // ANTO why id can be null?
+                    if (!column.RowId.HasValue || !column.ColumnId.HasValue)
+                        continue;
+
+                    var rowKey = column.RowId.HasValue ? column.RowId : -1;
+                    var columnKey = column.ColumnId.HasValue ? column.ColumnId : -1;
 
                     if (matrix.ContainsKey(rowKey))
                     {
@@ -88,17 +55,17 @@ namespace FeatureDBPortal.Server.Services
                             {
                                 RowId = rowKey,
                                 ColumnId = columnKey,
-                                Available = columnA.Available,
-                                Visible = columnA.Visible,
-                                AllowMode = columnA.AllowMode,
-                                Items = columnA.Items?
+                                Available = column.Available,
+                                Visible = column.Visible,
+                                AllowMode = (AllowMode)column.AllowMode,
+                                    Items = column.Items?
                                     .Where(cellItem => cellItem.Allow)
-                                .Select(cellItem => new CombinationItem
-                                {
-                                    RowId = rowKey,
-                                    ColumnId = columnKey,
-                                    Name = cellItem.ItemName
-                                })
+                                    .Select(cellItem => new CombinationItem
+                                    {
+                                        RowId = rowKey,
+                                        ColumnId = columnKey,
+                                        Name = cellItem.Name
+                                    })
                             };
                         }
                         else
@@ -107,79 +74,43 @@ namespace FeatureDBPortal.Server.Services
                             {
                                 RowId = rowKey,
                                 ColumnId = columnKey,
-                                Available = columnA.Available,
-                                Visible = columnA.Visible,
-                                AllowMode = columnA.AllowMode,
-                                Items = columnA.Items?
+                                Available = column.Available,
+                                Visible = column.Visible,
+                                AllowMode = (AllowMode)column.AllowMode,
+                                Items = column.Items?
                                     .Where(cellItem => cellItem.Allow)
-                                .Select(cellItem => new CombinationItem
-                                {
-                                    RowId = rowKey,
-                                    ColumnId = columnKey,
-                                    Name = cellItem.ItemName
-                                })
+                                    .Select(cellItem => new CombinationItem
+                                    {
+                                        RowId = rowKey,
+                                        ColumnId = columnKey,
+                                        Name = cellItem.Name
+                                    })
                             });
                         }
                     }
                     else
                     {
-                        var newRow = new RowDictionary(1);
+                        var newRow = new CombinationRow(1);
                         newRow[columnKey] = new CombinationCell()
                         {
                             RowId = rowKey,
                             ColumnId = columnKey,
-                            Available = columnA.Available,
-                            Visible = columnA.Visible,
-                            AllowMode = columnA.AllowMode,
-                            Items = columnA.Items?
+                            Available = column.Available,
+                            Visible = column.Visible,
+                            AllowMode = (AllowMode)column.AllowMode,
+                            Items = column.Items?
                                 .Where(cellItem => cellItem.Allow)
                                 .Select(cellItem => new CombinationItem
                                 {
                                     RowId = rowKey,
                                     ColumnId = columnKey,
-                                    Name = cellItem.ItemName
+                                    Name = cellItem.Name
                                 })
                         };
                         matrix[rowKey] = newRow;
                     }
                 }
             }
-            
-            var combination = new CombinationDTO
-            {
-                IntersectionTitle = $"{firstLayoutGroup} - {secondLayoutGroup} - {thirdLayoutGroup}",
-                Columns = orderedSelectedColumnField.Select(item => new ColumnDTO { Id = item.Id, Name = item.Name }),
-                Rows = matrix.ToRows()
-            };
-
-            return await Task.FromResult(combination);
-        }
-
-        private static CombinationDictionary PrepareMatrix(List<QueryableCombination> orderedSelectedRowField, List<QueryableCombination> orderedSelectedColumnField)
-        {
-            var matrix = new CombinationDictionary(orderedSelectedRowField.Count);
-
-            orderedSelectedRowField
-                .ForEach(rowItem =>
-                {
-                    var row = new RowDictionary(orderedSelectedColumnField.Count)
-                    {
-                        RowId = rowItem.Id,
-                        Name = rowItem.Name
-                    };
-                    orderedSelectedColumnField
-                    .ForEach(columnItem =>
-                    {
-                        row[columnItem.Id] = new CombinationCell
-                        {
-                            RowId = rowItem.Id,
-                            ColumnId = columnItem.Id,
-                            Name = columnItem.Name
-                        };
-                    });
-                    matrix[rowItem.Id] = row;
-                });
-            return matrix;
         }
     }
 }

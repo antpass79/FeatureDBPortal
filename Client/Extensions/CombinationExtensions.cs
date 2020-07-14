@@ -11,6 +11,9 @@ namespace FeatureDBPortal.Client.Extensions
     {
         public static Combination ToModel(this CombinationDTO dto)
         {
+            if (dto == null)
+                return null;
+
             return new Combination
             {
                 IntersectionTitle = dto.IntersectionTitle,
@@ -91,6 +94,9 @@ namespace FeatureDBPortal.Client.Extensions
 
         public static void ApplyFilters(this Combination combination, CombinationFilters filters)
         {
+            if (combination == null)
+                return;
+
             var copiedCombination = combination.Copy();
 
             // Filter Rows

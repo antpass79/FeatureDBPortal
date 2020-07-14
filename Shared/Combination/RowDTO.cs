@@ -6,7 +6,7 @@ namespace FeatureDBPortal.Shared
     public class RowDTO
     {
         public RowTitleDTO Title { get; set; }
-        public IEnumerable<CellDTO> Cells { get; set; }
+        public IReadOnlyList<CellDTO> Cells { get; set; }
         public int? RowId { get; set; }
     }
 }
