@@ -42,7 +42,7 @@ namespace FeatureDBPortal.Server.gRPC
                 .OrderBy(item => item.Name)
                 .ToList();
 
-            CombinationDictionary matrix = PrepareMatrix(orderedSelectedRowField);
+            CombinationMatrix matrix = PrepareMatrix(orderedSelectedRowField);
 
             groups
                 .ToList()
@@ -68,14 +68,14 @@ namespace FeatureDBPortal.Server.gRPC
             return await Task.FromResult(combination);
         }
 
-        private static CombinationDictionary PrepareMatrix(List<IQueryableCombination> orderedSelectedRowField)
+        private static CombinationMatrix PrepareMatrix(List<IQueryableCombination> orderedSelectedRowField)
         {
-            var matrix = new CombinationDictionary(orderedSelectedRowField.Count);
+            var matrix = new CombinationMatrix(orderedSelectedRowField.Count);
 
             orderedSelectedRowField
                 .ForEach(rowItem =>
                 {
-                    var row = new RowDictionary(1) { RowId = rowItem.Id, Name = rowItem.Name };
+                    var row = new CombinationRow(1) { Id = rowItem.Id, Name = rowItem.Name };
                     matrix[rowItem.Id] = row;
                 });
 

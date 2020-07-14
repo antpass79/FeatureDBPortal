@@ -16,5 +16,6 @@ namespace FeatureDBPortal.Shared
         public int? RowId { get; set; }
         public int? ColumnId { get; set; }
         public int? ItemId { get; set; }
+        public bool Allow { get; set; }
     }
 }

@@ -25,8 +25,8 @@ namespace FeatureDBPortal.Server.gRPC
 
             var allow = normalRules.All(normalRule => normalRule.Allow != 0);
 
-            var matrix = new CombinationDictionary(1);
-            matrix[-1] = new RowDictionary(1);
+            var matrix = new CombinationMatrix(1);
+            matrix[-1] = new CombinationRow(1);
             matrix[-1][-1] = new CombinationCell() { Available = allow };
 
             var combination = new CombinationGRPC();

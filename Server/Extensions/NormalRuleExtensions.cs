@@ -5,16 +5,18 @@ namespace FeatureDBPortal.Server.Extensions
 {
     public static class NormalRuleExtensions
     {
-        static public int? GetPropertyIdByGroupName(this NormalRule normalRule, string groupName)
+        static public int? GetPropertyIdByGroupNameId(this NormalRule normalRule, string groupName)
         {
             var result = groupName switch
             {
-                "Application" => normalRule.ApplicationId,
-                "Probe" => normalRule.ProbeId,
-                "Option" => normalRule.OptionId,
-                "Model" => normalRule.LogicalModelId,
-                "Kit" => normalRule.KitId,
-                "Country" => normalRule.CountryId,
+                "ApplicationId" => normalRule.ApplicationId,
+                "ProbeId" => normalRule.ProbeId,
+                "OptionId" => normalRule.OptionId,
+                "LogicalModelId" => normalRule.LogicalModelId,
+                "KitId" => normalRule.KitId,
+                "CountryId" => normalRule.CountryId,
+                "Version" => normalRule.Version,
+                "UserLevel" => normalRule.UserLevel,
                 _ => throw new NotSupportedException()
             };
 

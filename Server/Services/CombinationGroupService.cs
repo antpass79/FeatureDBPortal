@@ -1,13 +1,8 @@
 ﻿using FeatureDBPortal.Server.Data.Models.RD;
 using FeatureDBPortal.Server.Extensions;
-using FeatureDBPortal.Server.Models;
 using FeatureDBPortal.Server.Providers;
-using FeatureDBPortal.Server.Utils;
 using FeatureDBPortal.Shared;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -25,10 +20,13 @@ namespace FeatureDBPortal.Server.Services
             _versionProvider = versionProvider;
         }
 
-        public Task<CombinationDTO> GetCombination(CombinationSearchDTO search)
+        async public Task<CombinationDTO> GetCombination(CombinationSearchDTO search)
         {
             var filteredNornalRules = FilterNormalRules(search);
-            return GroupNormalRules(search, filteredNornalRules);
+            if (filteredNornalRules.Count() == 0)
+                return await Task.FromResult<CombinationDTO>(null);
+
+            return await BuildCombination(search, filteredNornalRules);
         }
 
         // Check for input parameters
@@ -52,7 +50,7 @@ namespace FeatureDBPortal.Server.Services
         //     return false;
         // }
         // return search.InputId < rule.InputId;
-        protected IQueryable<NormalRule> FilterNormalRules(CombinationSearchDTO search)
+        IQueryable<NormalRule> FilterNormalRules(CombinationSearchDTO search)
         {
             if (!search.VersionId.HasValue && search.ModelId.HasValue && search.CountryId.HasValue)
             {
@@ -74,7 +72,7 @@ namespace FeatureDBPortal.Server.Services
             return result;
         }
 
-        protected abstract Task<CombinationDTO> GroupNormalRules(CombinationSearchDTO search, IQueryable<NormalRule> normalRules);
+        abstract protected Task<CombinationDTO> BuildCombination(CombinationSearchDTO search, IQueryable<NormalRule> normalRules);
 
         private bool IsOutputLayoutTypeSelected(CombinationSearchDTO search, LayoutTypeDTO layoutType) => search.RowLayout == layoutType || search.ColumnLayout == layoutType || search.CellLayout == layoutType;
     }

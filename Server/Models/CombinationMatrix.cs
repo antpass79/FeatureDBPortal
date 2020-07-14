@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace FeatureDBPortal.Server.Models
 {
-    public class CombinationDictionary : Dictionary<int?, RowDictionary>
+    public class CombinationMatrix : Dictionary<int?, CombinationRow>
     {
-        public CombinationDictionary(int capacity)
+        public CombinationMatrix(int capacity)
             : base(capacity)
         {
         }
