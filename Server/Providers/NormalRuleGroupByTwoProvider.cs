@@ -60,6 +60,7 @@ namespace FeatureDBPortal.Server.Providers
         public CombinationDTO GroupFast(IQueryable<NormalRule> normalRules)
         {
             var combination = BuildCombination(Rows, Columns);
+            combination.IntersectionTitle = GroupName;
 
             var groups = normalRules
                 .GroupBy(_rowGroupProperties.GroupExpression)
@@ -69,9 +70,6 @@ namespace FeatureDBPortal.Server.Providers
             for (int i = 0; i < groups.Count; i++)
             {
                 var group = groups[i];
-                if (!group.Key.HasValue)
-                    continue;
-
                 var row = combination.Rows[_rowIdToIndexMapper[group.Key]];
 
                 foreach (var normalRule in group)
