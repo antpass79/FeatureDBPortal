@@ -5,6 +5,6 @@ namespace FeatureDBPortal.Client.Services
 {
     public interface IAvailabilityCombinationService
     {
-        Task<CombinationDTO> GetCombinations(CombinationSearchDTO search);
+        Task<CombinationDTO> GetCombination(CombinationSearchDTO search);
     }
 }

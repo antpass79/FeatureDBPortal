@@ -1,14 +1,7 @@
-﻿using CsvHelper;
-using CsvHelper.Configuration;
-using FeatureDBPortal.Server.Services;
+﻿using FeatureDBPortal.Server.Services;
 using FeatureDBPortal.Shared;
 using Microsoft.AspNetCore.Mvc;
-using System.Globalization;
 using System.IO;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace FeatureDBPortal.Server.Controllers

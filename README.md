@@ -51,3 +51,9 @@ Run the Scaffold-DbContext command
 
 - <https://gist.github.com/JaimeStill/539af65518091f7b8e6b9e003a493baa>
 - <https://www.brechtbaekelandt.net/blog/post/authenticating-against-active-directory-with-aspnet-core-2-and-managing-users>
+
+### IIS Configuration
+
+- <https://dotnet.microsoft.com/download/dotnet-core/3.1>
+- <https://www.youtube.com/watch?v=PPaqVyBkwMk>
+- <https://stackoverflow.com/questions/59594744/net-core-3-1-app-shows-handler-aspnetcore-has-a-bad-module-aspnetcoremodule>

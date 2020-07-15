@@ -129,9 +129,11 @@ namespace FeatureDBPortal.Client.Pages
             }
         }
 
+        private CombinationSearchDTO LastSearch { get; set; }
+
         protected Combination Combination { get; private set; }
 
-        public CombinationFilters Filters = new CombinationFilters
+        protected CombinationFilters Filters = new CombinationFilters
         {
             KeepIfIdNotNull = true,
             KeepIfCellModeNotNull = true,
@@ -150,7 +152,6 @@ namespace FeatureDBPortal.Client.Pages
         protected bool DisableUserLevel => IsOutputLayoutTypeSelected(LayoutTypeDTO.UserLevel);
 
         private bool IsOutputLayoutTypeSelected(LayoutTypeDTO layoutType) => SelectedRowLayout == layoutType || SelectedColumnLayout == layoutType || SelectedCellLayout == layoutType;
-
 
         protected override async Task OnInitializedAsync()
         {
@@ -187,7 +188,7 @@ namespace FeatureDBPortal.Client.Pages
 
             try
             {
-                var combinationDTO = await AvailabilityCombinationService.GetCombinations(new CombinationSearchDTO
+                LastSearch = new CombinationSearchDTO
                 {
                     ApplicationId = IsOutputLayoutTypeSelected(LayoutTypeDTO.Application) ? null : SelectedApplication.Id,
                     ProbeId = IsOutputLayoutTypeSelected(LayoutTypeDTO.Probe) ? null : SelectedProbe.Id,
@@ -200,7 +201,8 @@ namespace FeatureDBPortal.Client.Pages
                     RowLayout = SelectedRowLayout,
                     ColumnLayout = SelectedColumnLayout,
                     CellLayout = SelectedCellLayout
-                });
+                };
+                var combinationDTO = await AvailabilityCombinationService.GetCombination(LastSearch);
 
                 Combination combination;
 
@@ -251,6 +253,7 @@ namespace FeatureDBPortal.Client.Pages
                 switch (action.Id)
                 {
                     case BUTTON_ACTION_EXPORT_TO_CSV:
+                        CsvExportSettings.FileName = string.Empty;
                         ShowCsvExportDialog = true;
                         StateHasChanged();
                         break;
@@ -270,6 +273,7 @@ namespace FeatureDBPortal.Client.Pages
             ShowCsvExportDialog = false;
             await CsvExportService.DownloadCsv(new CsvExportDTO
             {
+                Search = LastSearch,
                 Combination = Combination.ToDTO(),
                 Settings = CsvExportSettings
             });
