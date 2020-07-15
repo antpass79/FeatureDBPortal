@@ -36,13 +36,13 @@ namespace FeatureDBPortal.Client.Extensions
                             AllowMode = cell.AllowMode.HasValue ? (AllowMode)cell.AllowMode : new Nullable<AllowMode>(),
                             Name = cell.Name,
                             AggregateItems = cell.Items == null ? string.Empty : string.Join(System.Environment.NewLine, cell.Items.Select(item => item.Name)),
-                            //Items = cell.Items?.Select(item => new CombinationItem
-                            //{
-                            //    RowId = item.RowId,
-                            //    ColumnId = item.ColumnId,
-                            //    ItemId = item.ItemId,
-                            //    Name = item.Name
-                            //})
+                            Items = cell.Items?.Select(item => new CellItem
+                            {
+                                RowId = item.RowId,
+                                ColumnId = item.ColumnId,
+                                ItemId = item.ItemId,
+                                Name = item.Name
+                            })
                         }).ToDictionary(cell => cell.ColumnId.Value)
                     };
 

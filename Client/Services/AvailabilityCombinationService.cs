@@ -19,7 +19,7 @@ namespace FeatureDBPortal.Client.Services
             _httpClient = httpClient;
         }
 
-        async public Task<CombinationDTO> GetCombinations(CombinationSearchDTO search)
+        async public Task<CombinationDTO> GetCombination(CombinationSearchDTO search)
         {
             var message = await _httpClient.SendAsync(new HttpRequestMessage
             {
