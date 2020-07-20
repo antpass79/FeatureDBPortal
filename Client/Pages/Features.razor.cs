@@ -5,8 +5,6 @@ using FeatureDBPortal.Shared;
 using FeatureDBPortal.Shared.Utilities;
 using Microsoft.AspNetCore.Components;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace FeatureDBPortal.Client.Pages
@@ -17,15 +15,12 @@ namespace FeatureDBPortal.Client.Pages
         const string BUTTON_ACTION_SYNC_RA = "BUTTON_ACTION_SYNC_RA";
 
         [Inject]
-        protected IFilterService FilterService { get; set; }
-        [Inject]
         protected IAvailabilityCombinationService AvailabilityCombinationService { get; set; }
         [Inject]
         protected ToolbarButtonsService ButtonsService { get; set; }
         [Inject]
         protected ICsvExportService CsvExportService { get; set; }
 
-        protected bool FiltersBusy { get; set; }
         protected bool CombinationsBusy { get; set; }
         protected string ErrorMessage { get; private set; }
 
@@ -45,95 +40,12 @@ namespace FeatureDBPortal.Client.Pages
         protected bool ShowCsvExportDialog { get; set; }
         protected CsvExportSettingsDTO CsvExportSettings = new CsvExportSettingsDTO();
 
-        protected IEnumerable<ApplicationDTO> Applications { get; set; }
-        protected ApplicationDTO SelectedApplication { get; private set; } = new ApplicationDTO();
-
-        protected IEnumerable<ProbeDTO> Probes { get; set; }
-        protected ProbeDTO SelectedProbe { get; private set; } = new ProbeDTO();
-
-        protected IEnumerable<CountryDTO> Countries { get; set; }
-        protected CountryDTO SelectedCountry { get; private set; } = new CountryDTO();
-
-        protected IEnumerable<VersionDTO> Versions { get; set; }
-        protected VersionDTO SelectedVersion { get; private set; } = new VersionDTO();
-
-        protected IEnumerable<ModelDTO> Models { get; set; }
-        protected ModelDTO SelectedModel { get; set; } = new ModelDTO();
-
-        protected IEnumerable<OptionDTO> Options { get; set; }
-        protected OptionDTO SelectedOption { get; private set; } = new OptionDTO();
-
-        protected IEnumerable<KitDTO> Kits { get; set; }
-        protected KitDTO SelectedKit { get; private set; } = new KitDTO();
-
-        protected IEnumerable<UserLevelDTO> UserLevels { get; set; }
-        protected UserLevelDTO SelectedUserLevel { get; set; }
-
-        string _selectedUserLevelText;
-        public string SelectedUserLevelText
-        {
-            get => _selectedUserLevelText;
-            set
-            {
-                _selectedUserLevelText = value;
-                if (Enum.TryParse<UserLevelDTO>(_selectedUserLevelText, out var userLevel))
-                {
-                    SelectedUserLevel = userLevel;
-                }
-            }
-        }
-
-        protected IEnumerable<LayoutTypeDTO> LayoutViews { get; set; }
-        protected LayoutTypeDTO SelectedRowLayout { get; set; }
-        string _selectedRowLayoutText;
-        public string SelectedRowLayoutText
-        {
-            get => _selectedRowLayoutText;
-            set
-            {
-                _selectedRowLayoutText = value;
-                if (Enum.TryParse<LayoutTypeDTO>(_selectedRowLayoutText, out var layoutType))
-                {
-                    SelectedRowLayout = layoutType;
-                }
-            }
-        }
-
-        protected LayoutTypeDTO SelectedColumnLayout { get; set; }
-        string _selectedColumnLayoutText;
-        public string SelectedColumnLayoutText
-        {
-            get => _selectedColumnLayoutText;
-            set
-            {
-                _selectedColumnLayoutText = value;
-                if (Enum.TryParse<LayoutTypeDTO>(_selectedColumnLayoutText, out var layoutType))
-                {
-                    SelectedColumnLayout = layoutType;
-                }
-            }
-        }
-
-        protected LayoutTypeDTO SelectedCellLayout { get; set; }
-        string _selectedCellLayoutText;
-        public string SelectedCellLayoutText
-        {
-            get => _selectedCellLayoutText;
-            set
-            {
-                _selectedCellLayoutText = value;
-                if (Enum.TryParse<LayoutTypeDTO>(_selectedCellLayoutText, out var layoutType))
-                {
-                    SelectedCellLayout = layoutType;
-                }
-            }
-        }
-
+        protected SearchFilters SearchFilters = new SearchFilters();
         private CombinationSearchDTO LastSearch { get; set; }
 
         protected Combination Combination { get; private set; }
 
-        protected CombinationFilters Filters = new CombinationFilters
+        protected CombinationFilters CombinationFilters = new CombinationFilters
         {
             KeepIfIdNotNull = true,
             KeepIfCellModeNotNull = true,
@@ -142,39 +54,10 @@ namespace FeatureDBPortal.Client.Pages
             KeepIfCellModeNo = true
         };
 
-        protected bool DisableApplication => IsOutputLayoutTypeSelected(LayoutTypeDTO.Application);
-        protected bool DisableProbe => IsOutputLayoutTypeSelected(LayoutTypeDTO.Probe);
-        protected bool DisableModel => IsOutputLayoutTypeSelected(LayoutTypeDTO.Model);
-        protected bool DisableKit => IsOutputLayoutTypeSelected(LayoutTypeDTO.Kit);
-        protected bool DisableOption => IsOutputLayoutTypeSelected(LayoutTypeDTO.Option);
-        protected bool DisableVersion => IsOutputLayoutTypeSelected(LayoutTypeDTO.Version);
-        protected bool DisableCountry => IsOutputLayoutTypeSelected(LayoutTypeDTO.Country);
-        protected bool DisableUserLevel => IsOutputLayoutTypeSelected(LayoutTypeDTO.UserLevel);
-
-        private bool IsOutputLayoutTypeSelected(LayoutTypeDTO layoutType) => SelectedRowLayout == layoutType || SelectedColumnLayout == layoutType || SelectedCellLayout == layoutType;
-
         protected override async Task OnInitializedAsync()
         {
-            FiltersBusy = true;
-
             BuildToolbar();
-
-            Applications = await FilterService.GetApplications();
-            Probes = await FilterService.GetProbes();
-            Countries = await FilterService.GetCountries();
-            Versions = await FilterService.GetVersions();
-            Models = await FilterService.GetModels();
-            Options = await FilterService.GetOptions();
-            Kits = await FilterService.GetKits();
-            UserLevels = Enum.GetValues(typeof(UserLevelDTO)).Cast<UserLevelDTO>().OrderBy(item => item.ToString());
-            LayoutViews = Enum.GetValues(typeof(LayoutTypeDTO)).Cast<LayoutTypeDTO>();
-
-            SelectedModel = Models.FirstOrDefault();
-            SelectedCountry = Countries.FirstOrDefault();
-            SelectedUserLevel = UserLevels.FirstOrDefault();
-            SelectedUserLevelText = SelectedUserLevel.ToString();
-
-            FiltersBusy = false;
+            await Task.CompletedTask;
         }
 
         async protected Task OnSearch()
@@ -190,17 +73,17 @@ namespace FeatureDBPortal.Client.Pages
             {
                 LastSearch = new CombinationSearchDTO
                 {
-                    ApplicationId = IsOutputLayoutTypeSelected(LayoutTypeDTO.Application) ? null : SelectedApplication.Id,
-                    ProbeId = IsOutputLayoutTypeSelected(LayoutTypeDTO.Probe) ? null : SelectedProbe.Id,
-                    CountryId = IsOutputLayoutTypeSelected(LayoutTypeDTO.Country) ? null : SelectedCountry.Id,
-                    VersionId = IsOutputLayoutTypeSelected(LayoutTypeDTO.Version) ? null : SelectedVersion.Id,
-                    ModelId = IsOutputLayoutTypeSelected(LayoutTypeDTO.Model) ? null : SelectedModel.Id,
-                    OptionId = IsOutputLayoutTypeSelected(LayoutTypeDTO.Option) ? null : SelectedOption.Id,
-                    KitId = IsOutputLayoutTypeSelected(LayoutTypeDTO.Kit) ? null : SelectedKit.Id,
-                    UserLevel = IsOutputLayoutTypeSelected(LayoutTypeDTO.UserLevel) ? UserLevelDTO.None : SelectedUserLevel,
-                    RowLayout = SelectedRowLayout,
-                    ColumnLayout = SelectedColumnLayout,
-                    CellLayout = SelectedCellLayout
+                    ApplicationId = SearchFilters.IsOutputLayoutTypeSelected(LayoutTypeDTO.Application) ? null : SearchFilters.Application.Id,
+                    ProbeId = SearchFilters.IsOutputLayoutTypeSelected(LayoutTypeDTO.Probe) ? null : SearchFilters.Probe.Id,
+                    CountryId = SearchFilters.IsOutputLayoutTypeSelected(LayoutTypeDTO.Country) ? null : SearchFilters.Country.Id,
+                    VersionId = SearchFilters.IsOutputLayoutTypeSelected(LayoutTypeDTO.Version) ? null : SearchFilters.Version.Id,
+                    ModelId = SearchFilters.IsOutputLayoutTypeSelected(LayoutTypeDTO.Model) ? null : SearchFilters.Model.Id,
+                    OptionId = SearchFilters.IsOutputLayoutTypeSelected(LayoutTypeDTO.Option) ? null : SearchFilters.Option.Id,
+                    KitId = SearchFilters.IsOutputLayoutTypeSelected(LayoutTypeDTO.Kit) ? null : SearchFilters.Kit.Id,
+                    UserLevel = SearchFilters.IsOutputLayoutTypeSelected(LayoutTypeDTO.UserLevel) ? UserLevelDTO.None : SearchFilters.UserLevel,
+                    RowLayout = SearchFilters.RowLayout,
+                    ColumnLayout = SearchFilters.ColumnLayout,
+                    CellLayout = SearchFilters.CellLayout
                 };
                 var combinationDTO = await AvailabilityCombinationService.GetCombination(LastSearch);
 
@@ -213,7 +96,7 @@ namespace FeatureDBPortal.Client.Pages
 
                 using (var innerWatcher = new Watcher("ApplyFilters"))
                 {
-                    combination.ApplyFilters(Filters);
+                    combination.ApplyFilters(CombinationFilters);
                 }
 
                 Combination = combination;
