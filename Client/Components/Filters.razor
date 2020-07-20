@@ -1,0 +1,228 @@
+﻿@inherits FiltersDataModel
+
+<style>
+    .filters-logo-container {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .filters-logo {
+        display: flex;
+        align-self: center;
+    }
+
+    .filters-logo-text {
+        flex: 1;
+        align-self: center;
+        margin: 15px;
+    }
+
+    .filters-divider {
+        margin-top: 10px !important;
+        margin-bottom: 10px !important;
+    }
+
+    .select-field {
+        display: flex;
+    }
+
+        .select-field > .mdc-select__anchor {
+            flex: 1;
+            height: 36px;
+        }
+</style>
+
+@if (Busy || SearchFilters == null)
+{
+    <div class="filters-logo-container">
+        <div class="filters-logo">
+            <SpinKitCircle />
+            <p class="filters-logo-text"><em>Loading...</em></p>
+        </div>
+    </div>
+}
+else
+{
+    <div class="mat-layout-grid-inner">
+        <div class="mat-layout-grid-cell mat-layout-grid-cell-span-3">
+            @if (Models == null)
+            {
+                <p><em>Models Loading...</em></p>
+            }
+            else
+            {
+                <MatSelect Class="select-field" Label="Select a Model" Outlined="true" @bind-Value="SearchFilters.Model.Id" TValue="int?" Disabled="@DisableModel">
+                    @foreach (var model in Models)
+                    {
+                        <MatOption TValue="int?" Value="@model.Id">@model.Name</MatOption>
+                    }
+                </MatSelect>
+            }
+        </div>
+        <div class="mat-layout-grid-cell mat-layout-grid-cell-span-3">
+            @if (Countries == null)
+            {
+                <p><em>Countries Loading...</em></p>
+            }
+            else
+            {
+                <MatSelect Class="select-field" Label="Select a Country" Outlined="true" @bind-Value="SearchFilters.Country.Id" TValue="int?" Disabled="@DisableCountry">
+                    @foreach (var country in Countries)
+                    {
+                        <MatOption TValue="int?" Value="@country.Id">@country.Name</MatOption>
+                    }
+                </MatSelect>
+            }
+        </div>
+        <div class="mat-layout-grid-cell mat-layout-grid-cell-span-3">
+            @if (UserLevels == null)
+            {
+                <p><em>User Levels Loading...</em></p>
+            }
+            else
+            {
+                <MatSelect Class="select-field" Label="Select an User Level" Outlined="true" @bind-Value="SelectedUserLevelText" TValue="string" Disabled="@DisableUserLevel">
+                    @foreach (var userLevel in UserLevels)
+                    {
+                        <MatOption TValue="string" Value="@userLevel.ToString()">@userLevel</MatOption>
+                    }
+                </MatSelect>
+            }
+        </div>
+        <div class="mat-layout-grid-cell mat-layout-grid-cell-span-3">
+            @if (Applications == null)
+            {
+                <p><em>Applications Loading...</em></p>
+            }
+            else
+            {
+                <MatSelect Class="select-field" Label="Select an Application" Outlined="true" @bind-Value="SearchFilters.Application.Id" TValue="int?" Disabled="@DisableApplication">
+                    <MatOption TValue="int?"></MatOption>
+                    @foreach (var application in Applications)
+                    {
+                        <MatOption TValue="int?" value="@application.Id">@application.Name</MatOption>
+                    }
+                </MatSelect>
+            }
+        </div>
+    </div>
+    <div class="mat-layout-grid-inner">
+        <div class="mat-layout-grid-cell mat-layout-grid-cell-span-3">
+            @if (Probes == null)
+            {
+                <p><em>Probes Loading...</em></p>
+            }
+            else
+            {
+                <MatSelect Class="select-field" Label="Select a Probe" Outlined="true" @bind-Value="SearchFilters.Probe.Id" TValue="int?" Disabled="@DisableProbe">
+                    <MatOption TValue="int?"></MatOption>
+                    @foreach (var probe in Probes)
+                    {
+                        <MatOption TValue="int?" value="@probe.Id">@probe.Name</MatOption>
+                    }
+                </MatSelect>
+            }
+        </div>
+        <div class="mat-layout-grid-cell mat-layout-grid-cell-span-3">
+            @if (Kits == null)
+            {
+                <p><em>Kits Loading...</em></p>
+            }
+            else
+            {
+                <MatSelect Class="select-field" Label="Select a Kit" Outlined="true" @bind-Value="SearchFilters.Kit.Id" TValue="int?" Disabled="@DisableKit">
+                    <MatOption TValue="int?"></MatOption>
+                    @foreach (var kit in Kits)
+                    {
+                        <MatOption TValue="int?" value="@kit.Id">@kit.Name</MatOption>
+                    }
+                </MatSelect>
+            }
+        </div>
+        <div class="mat-layout-grid-cell mat-layout-grid-cell-span-3">
+            @if (Options == null)
+            {
+                <p><em>Options Loading...</em></p>
+            }
+            else
+            {
+                <MatSelect Class="select-field" Label="Select an Option" Outlined="true" @bind-Value="SearchFilters.Option.Id" TValue="int?" Disabled="@DisableOption">
+                    <MatOption TValue="int?"></MatOption>
+                    @foreach (var option in Options)
+                    {
+                        <MatOption TValue="int?" value="@option.Id">@option.Name</MatOption>
+                    }
+                </MatSelect>
+            }
+        </div>
+        <div class="mat-layout-grid-cell mat-layout-grid-cell-span-3">
+            @if (Versions == null)
+            {
+                <p><em>Versions Loading...</em></p>
+            }
+            else
+            {
+                <MatSelect Class="select-field" Label="Select a Version" Outlined="true" @bind-Value="SearchFilters.Version.Id" TValue="int?" Disabled="@DisableVersion">
+                    <MatOption TValue="int?"></MatOption>
+                    @foreach (var version in Versions)
+                    {
+                        <MatOption TValue="int?" value="@version.Id">@version.BuildVersion</MatOption>
+                    }
+                </MatSelect>
+            }
+        </div>
+    </div>
+
+    <MatDivider Class="filters-divider"></MatDivider>
+
+    <div class="mat-layout-grid-inner">
+        <div class="mat-layout-grid-cell mat-layout-grid-cell-span-4">
+            @if (LayoutViews == null)
+            {
+                <p><em>Loading...</em></p>
+            }
+            else
+            {
+                <MatSelect Class="select-field" Label="Select Row Output" Outlined="true" @bind-Value="SelectedRowLayoutText" TValue="string">
+                    <MatOption TValue="string"></MatOption>
+                    @foreach (var layoutView in LayoutViews)
+                    {
+                        <MatOption TValue="string" value="@layoutView.ToString()">@layoutView</MatOption>
+                    }
+                </MatSelect>
+            }
+        </div>
+        <div class="mat-layout-grid-cell mat-layout-grid-cell-span-4">
+            @if (LayoutViews == null)
+            {
+                <p><em>Loading...</em></p>
+            }
+            else
+            {
+                <MatSelect Class="select-field" Label="Select Column Output" Outlined="true" @bind-Value="SelectedColumnLayoutText" TValue="string">
+                    <MatOption TValue="string"></MatOption>
+                    @foreach (var layoutView in LayoutViews)
+                    {
+                        <MatOption TValue="string" value="@layoutView.ToString()">@layoutView</MatOption>
+                    }
+                </MatSelect>
+            }
+        </div>
+        <div class="mat-layout-grid-cell mat-layout-grid-cell-span-4">
+            @if (LayoutViews == null)
+            {
+                <p><em>Loading...</em></p>
+            }
+            else
+            {
+                <MatSelect Class="select-field" Label="Select Cell Output" Outlined="true" @bind-Value="SelectedCellLayoutText" TValue="string">
+                    <MatOption TValue="string"></MatOption>
+                    @foreach (var layoutView in LayoutViews)
+                    {
+                        <MatOption TValue="string" value="@layoutView.ToString()">@layoutView</MatOption>
+                    }
+                </MatSelect>
+            }
+        </div>
+    </div>
+}
