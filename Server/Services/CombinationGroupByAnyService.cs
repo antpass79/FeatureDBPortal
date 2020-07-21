@@ -17,7 +17,7 @@ namespace FeatureDBPortal.Server.Services
         {
         }
 
-        async override protected Task<CombinationDTO> BuildCombination(CombinationSearchDTO search, IQueryable<NormalRule> normalRules, GroupProviderBuilder groupProviderBuilder)
+        async override protected Task<CombinationDTO> BuildCombination(CombinationSearchDTO search, IList<NormalRule> normalRules, GroupProviderBuilder groupProviderBuilder)
         {
             bool available = false;
             bool visible = false;

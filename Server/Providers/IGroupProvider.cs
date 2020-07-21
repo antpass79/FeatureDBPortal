@@ -2,7 +2,6 @@
 using FeatureDBPortal.Server.Models;
 using FeatureDBPortal.Shared;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace FeatureDBPortal.Server.Providers
 {
@@ -11,6 +10,6 @@ namespace FeatureDBPortal.Server.Providers
         string GroupName { get; }
         public IReadOnlyList<QueryableCombination> Rows { get; }
         public IReadOnlyList<QueryableCombination> Columns { get; }
-        CombinationDTO Group(IQueryable<NormalRule> normalRules);
+        CombinationDTO Group(IList<NormalRule> normalRules);
     }
 }

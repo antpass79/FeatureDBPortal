@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using FeatureDBPortal.Server.Data.Models.RD;
 using FeatureDBPortal.Server.Repositories;
+using FeatureDBPortal.Server.Services;
 using FeatureDBPortal.Shared;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -17,17 +18,23 @@ namespace FeatureDBPortal.Server.Controllers
         public OptionController(
             ILogger<OptionController> logger,
             IMapper mapper,
-            IGenericRepository<Option> repository)
-            : base(logger, mapper, repository)
+            IGenericRepository<Option> repository,
+            IFilterCache filterCache)
+            : base(logger, mapper, repository, filterCache)
         {
         }
 
         protected override IQueryable<OptionDTO> PreManipulation(IQueryable<Option> query)
         {
             return query
-                .Where(item => !item.IsFake)
                 .OrderBy(item => item.Name)
-                .Select(item => new OptionDTO { Id = item.Id, Name = item.Name });
+                .Select(item => new OptionDTO { Id = item.Id, Name = item.Name, IsFake = item.IsFake });
+        }
+
+        protected override IEnumerable<OptionDTO> PostManipulation(IEnumerable<OptionDTO> items)
+        {
+            return items
+                .Where(item => !item.IsFake);
         }
     }
 }

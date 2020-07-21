@@ -9,6 +9,15 @@ Install Oracle.EntityFrameworkCore and all related dependeces: version 2.6
 Set for the application project 3.1 .NET version
 Run the Scaffold-DbContext command
 
+## Architecture
+
+The following sections describe the architecture of the system.
+
+### Backend Architecture
+
+![grouping](assets/grouping-class-diagram.jpg)
+
+### Frontend Architecture
 
 ## References
 

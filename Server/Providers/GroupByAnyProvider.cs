@@ -3,7 +3,6 @@ using FeatureDBPortal.Server.Models;
 using FeatureDBPortal.Shared;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace FeatureDBPortal.Server.Providers
 {
@@ -18,7 +17,7 @@ namespace FeatureDBPortal.Server.Providers
         public IReadOnlyList<QueryableCombination> Rows => throw new NotImplementedException();
         public IReadOnlyList<QueryableCombination> Columns => throw new NotSupportedException();
 
-        public CombinationDTO Group(IQueryable<NormalRule> normalRules)
+        public CombinationDTO Group(IList<NormalRule> normalRules)
         {
             throw new NotImplementedException();
         }

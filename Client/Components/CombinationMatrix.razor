@@ -102,7 +102,7 @@
         <MatStringField Class="mat-component" Icon="search" Label="Filter Rows" @bind-Value="@Filters.KeepIfRowTitleContains"></MatStringField>
         <MatStringField Class="mat-component" Icon="search" Label="Filter Columns" @bind-Value="@Filters.KeepIfColumnTitleContains"></MatStringField>
         <div class="mat-elevation-z3 feature-elevation">
-            <MatCheckbox Class="mat-component feature-checkbox" Label="Row/Columns ids not Empty" TValue="bool" @bind-Value="@Filters.KeepIfIdNotNull"></MatCheckbox>
+            <MatCheckbox Class="mat-component feature-checkbox" Label="Row/Column ids not Empty" TValue="bool" @bind-Value="@Filters.KeepIfIdNotNull"></MatCheckbox>
             <MatCheckbox Class="mat-component feature-checkbox" Label="Mode not Empty" TValue="bool" @bind-Value="@Filters.KeepIfCellModeNotNull"></MatCheckbox>
             <MatCheckbox Class="mat-component feature-checkbox" Label="A" TValue="bool" @bind-Value="@Filters.KeepIfCellModeA"></MatCheckbox>
             <MatCheckbox Class="mat-component feature-checkbox" Label="Def" TValue="bool" @bind-Value="@Filters.KeepIfCellModeDef"></MatCheckbox>

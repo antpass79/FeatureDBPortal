@@ -5,6 +5,7 @@ using FeatureDBPortal.Server.Utils;
 using FeatureDBPortal.Shared;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace FeatureDBPortal.Server.Providers
 {
@@ -22,15 +23,20 @@ namespace FeatureDBPortal.Server.Providers
             _rowGroupProperties = rowGroupProperties;
             _columnGroupProperties = columnGroupProperties;
             _cellGroupProperties = cellGroupProperties;
+
+            _rows = _rowGroupProperties.GroupableItems.Values.ToList();
+            _columns = _columnGroupProperties.GroupableItems.Values.ToList();
         }
 
         public string GroupName => $"{_rowGroupProperties.LayoutType} / {_columnGroupProperties.LayoutType} / {_cellGroupProperties.LayoutType}";
 
-        public IReadOnlyList<QueryableCombination> Rows => _rowGroupProperties.GroupableItems;
-        public IReadOnlyList<QueryableCombination> Columns => _columnGroupProperties.GroupableItems;
+        IReadOnlyList<QueryableCombination> _rows;
+        public IReadOnlyList<QueryableCombination> Rows => _rows;
+        IReadOnlyList<QueryableCombination> _columns;
+        public IReadOnlyList<QueryableCombination> Columns => _columns;
 
 
-        public CombinationDTO Group(IQueryable<NormalRule> normalRules)
+        public CombinationDTO Group(IList<NormalRule> normalRules)
         {
             var combination = BuildCombination(Rows, Columns);
             combination.IntersectionTitle = GroupName;
@@ -40,33 +46,33 @@ namespace FeatureDBPortal.Server.Providers
                 .Where(item => item.Key.HasValue && !_rowGroupProperties.DiscardItemIds.Contains(item.Key.Value))
                 .ToList();
 
-            for (int i = 0; i < groups.Count; i++)
+            Parallel.For(0, groups.Count, (i) =>
             {
                 var group = groups[i];
 
                 var row = combination.Rows[_rowIdToIndexMapper[group.Key]];
 
-                foreach (var normalRule in group)
+                Parallel.ForEach(group, (normalRule) =>
                 {
                     var columnId = normalRule.GetPropertyIdByGroupNameId(_columnGroupProperties.NormalRulePropertyNameId);
-                    if (!columnId.HasValue)
-                        continue;
-
-                    var cell = row.Cells[_columnIdToIndexMapper[columnId]];
-
-                    cell.Available = group.All(item => (AllowModeDTO)item.Allow != AllowModeDTO.No);
-                    cell.Visible = group.All(item => (AllowModeDTO)item.Allow == AllowModeDTO.A);
-                    cell.AllowMode = (AllowModeDTO)Allower.GetMode(cell.Visible.Value, cell.Available.Value);
-
-                    cell.Items = group.GroupBy(_cellGroupProperties.GroupExpression).Select(thirdGroup => new CellItemDTO
+                    if (columnId.HasValue)
                     {
-                        Name = _cellGroupProperties.GroupableItems.SingleOrDefault(cellItem => cellItem.Id == thirdGroup.Key)?.Name,
-                        Allow = thirdGroup.All(i => i.Allow != 0)
-                    })
-                        .Where(item => item.Allow)
-                        .ToList();
-                }
-            }
+                        var cell = row.Cells[_columnIdToIndexMapper[columnId]];
+
+                        cell.Available = group.All(item => (AllowModeDTO)item.Allow != AllowModeDTO.No);
+                        cell.Visible = group.All(item => (AllowModeDTO)item.Allow == AllowModeDTO.A);
+                        cell.AllowMode = (AllowModeDTO)Allower.GetMode(cell.Visible.Value, cell.Available.Value);
+
+                        cell.Items = group.GroupBy(_cellGroupProperties.GroupExpression).Select(thirdGroup => new CellItemDTO
+                        {
+                            Name = thirdGroup.Key.HasValue && _cellGroupProperties.GroupableItems.ContainsKey(thirdGroup.Key.Value) ? _cellGroupProperties.GroupableItems[thirdGroup.Key.Value].Name : string.Empty,
+                            Allow = thirdGroup.All(i => i.Allow != 0)
+                        })
+                            .Where(item => item.Allow)
+                            .ToList();
+                    }
+                });
+            });
 
             return combination;
         }
