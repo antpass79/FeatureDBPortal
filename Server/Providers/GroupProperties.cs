@@ -10,7 +10,7 @@ namespace FeatureDBPortal.Server.Providers
 {
     public class GroupProperties
     {
-        public GroupProperties(LayoutTypeDTO layoutType, List<QueryableCombination> groupableItems, IList<int> discardItemIds)
+        public GroupProperties(LayoutTypeDTO layoutType, IDictionary<int, QueryableCombination> groupableItems, IList<int> discardItemIds)
         {
             LayoutType = layoutType;
 
@@ -30,7 +30,7 @@ namespace FeatureDBPortal.Server.Providers
         public string NormalRulePropertyName { get; }
         public string NormalRulePropertyNameId { get; }
 
-        public List<QueryableCombination> GroupableItems { get; }
+        public IDictionary<int, QueryableCombination> GroupableItems { get; }
         public IList<int> DiscardItemIds { get; }
 
         public Func<NormalRule, int?> GroupExpression { get; }

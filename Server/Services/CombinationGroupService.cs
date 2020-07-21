@@ -3,6 +3,7 @@ using FeatureDBPortal.Server.Extensions;
 using FeatureDBPortal.Server.Providers;
 using FeatureDBPortal.Shared;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -25,7 +26,7 @@ namespace FeatureDBPortal.Server.Services
         async public Task<CombinationDTO> GetCombination(CombinationSearchDTO search)
         {
             var filteredNormalRules = FilterNormalRules(search);
-            if (filteredNormalRules == null || filteredNormalRules.Count() == 0)
+            if (filteredNormalRules == null || filteredNormalRules.Count == 0)
                 return await Task.FromResult<CombinationDTO>(null);
 
             return await BuildCombination(search, filteredNormalRules, _groupProviderBuilder);
@@ -52,7 +53,7 @@ namespace FeatureDBPortal.Server.Services
         //     return false;
         // }
         // return search.InputId < rule.InputId;
-        IQueryable<NormalRule> FilterNormalRules(CombinationSearchDTO search)
+        IList<NormalRule> FilterNormalRules(CombinationSearchDTO search)
         {
             if (!search.VersionId.HasValue && search.ModelId.HasValue && search.CountryId.HasValue)
             {
@@ -71,10 +72,10 @@ namespace FeatureDBPortal.Server.Services
             .WhereIf(normalRule => !normalRule.ApplicationId.HasValue || search.ApplicationId.HasValue && search.ApplicationId == normalRule.ApplicationId, !IsOutputLayoutTypeSelected(search, LayoutTypeDTO.Application))
             .WhereIf(normalRule => !normalRule.Version.HasValue || search.VersionId.HasValue && search.VersionId < normalRule.Version, !IsOutputLayoutTypeSelected(search, LayoutTypeDTO.Version));
 
-            return result;
+            return result.ToList();
         }
 
-        abstract protected Task<CombinationDTO> BuildCombination(CombinationSearchDTO search, IQueryable<NormalRule> normalRules, GroupProviderBuilder groupProviderBuilder);
+        abstract protected Task<CombinationDTO> BuildCombination(CombinationSearchDTO search, IList<NormalRule> normalRules, GroupProviderBuilder groupProviderBuilder);
 
         private bool IsOutputLayoutTypeSelected(CombinationSearchDTO search, LayoutTypeDTO layoutType) => search.RowLayout == layoutType || search.ColumnLayout == layoutType || search.CellLayout == layoutType;
     }

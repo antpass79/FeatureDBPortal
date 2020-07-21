@@ -14,14 +14,17 @@ namespace FeatureDBPortal.Server.Providers
         public GroupByOneProvider(GroupProperties groupProperties)
         {
             _groupProperties = groupProperties;
+            _rows = _groupProperties.GroupableItems.Values.ToList();
         }
 
         public string GroupName => _groupProperties.NormalRulePropertyName;
 
-        public IReadOnlyList<QueryableCombination> Rows => _groupProperties.GroupableItems;
+
+        IReadOnlyList<QueryableCombination> _rows;
+        public IReadOnlyList<QueryableCombination> Rows => _rows;
         public IReadOnlyList<QueryableCombination> Columns => throw new NotSupportedException();
 
-        public CombinationDTO Group(IQueryable<NormalRule> normalRules)
+        public CombinationDTO Group(IList<NormalRule> normalRules)
         {
             // Maybe add firstLayoutGroup + "Id" == null
             var groups = normalRules
@@ -33,7 +36,7 @@ namespace FeatureDBPortal.Server.Providers
                     Title = new RowTitleDTO
                     {
                         Id = group.Key,
-                        Name = _groupProperties.GroupableItems.SingleOrDefault(item => item.Id == group.Key)?.Name
+                        Name = _groupProperties.GroupableItems[group.Key.Value].Name
                     },
                     Cells = new List<CellDTO>
                     {

@@ -75,6 +75,8 @@ namespace FeatureDBPortal.Server
                 .AddScoped<IGenericRepository<Option>, GenericRepository<FeaturesContext, Option>>()
                 .AddScoped<IGenericRepository<Probe>, GenericRepository<FeaturesContext, Probe>>();
             services
+                .AddSingleton<IFilterCache, FilterCache>();
+            services
                 .AddScoped<IVersionProvider, VersionProvider>()
                 .AddScoped<IAsyncCsvService, CsvService>()
                 .AddScoped<IAvailabilityCombinationService, AvailabilityCombinationService>();

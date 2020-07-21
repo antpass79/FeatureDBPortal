@@ -1,6 +1,7 @@
 ﻿using FeatureDBPortal.Server.Data.Models.RD;
 using FeatureDBPortal.Server.Extensions;
 using FeatureDBPortal.Server.Models;
+using FeatureDBPortal.Server.Services;
 using FeatureDBPortal.Shared;
 using System.Linq;
 
@@ -9,14 +10,16 @@ namespace FeatureDBPortal.Server.Providers
     public class GroupProviderBuilder
     {
         private readonly FeaturesContext _context;
+        private readonly IFilterCache _filterCache;
 
         private LayoutTypeDTO _groupByOne = LayoutTypeDTO.None;
         private LayoutTypeDTO _groupByTwo = LayoutTypeDTO.None;
         private LayoutTypeDTO _groupByThree = LayoutTypeDTO.None;
 
-        public GroupProviderBuilder(FeaturesContext context)
+        public GroupProviderBuilder(FeaturesContext context, IFilterCache filterCache)
         {
             _context = context;
+            _filterCache = filterCache;
         }
 
         public GroupProviderBuilder GroupByOne(LayoutTypeDTO groupType)
@@ -57,18 +60,19 @@ namespace FeatureDBPortal.Server.Providers
             if (groupType == LayoutTypeDTO.None)
                 return null;
 
-            var items = _context.GetPropertyValue<IQueryable<IQueryableCombination>>(groupType.ToTableName())
-                .AsEnumerable();
+            //var items = _context.GetPropertyValue<IQueryable<IQueryableCombination>>(groupType.ToTableName())
+            //    .AsEnumerable();
+            var items = _filterCache.Get(groupType.ToTableName());
 
             var groupableItems = items
                 .Where(item => !item.IsFake)
-                .Select(item => new QueryableCombination { Id = item.Id, Name = item.Name })
+                .Select(item => new QueryableCombination { Id = item.Id.Value, Name = item.Name })
                 .OrderBy(item => item.Name)
-                .ToList();
+                .ToDictionary(item => item.Id);
 
             var discardItemIds = items
                 .Where(item => item.IsFake)
-                .Select(item => item.Id)
+                .Select(item => item.Id.Value)
                 .ToList();
 
             return new GroupProperties(groupType, groupableItems, discardItemIds);

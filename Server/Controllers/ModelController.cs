@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using FeatureDBPortal.Server.Data.Models.RD;
 using FeatureDBPortal.Server.Repositories;
+using FeatureDBPortal.Server.Services;
 using FeatureDBPortal.Shared;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -16,8 +17,9 @@ namespace FeatureDBPortal.Server.Controllers
         public ModelController(
             ILogger<ModelController> logger,
             IMapper mapper,
-            IGenericRepository<LogicalModel> repository)
-            : base(logger, mapper, repository)
+            IGenericRepository<LogicalModel> repository,
+            IFilterCache filterCache)
+            : base(logger, mapper, repository, filterCache)
         {
         }
 

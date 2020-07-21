@@ -20,14 +20,19 @@ namespace FeatureDBPortal.Server.Providers
         {
             _rowGroupProperties = rowGroupProperties;
             _columnGroupProperties = columnGroupProperties;
+
+            _rows = _rowGroupProperties.GroupableItems.Values.ToList();
+            _columns = _columnGroupProperties.GroupableItems.Values.ToList();
         }
 
         public string GroupName => $"{_rowGroupProperties.LayoutType} / {_columnGroupProperties.LayoutType}";
 
-        public IReadOnlyList<QueryableCombination> Rows => _rowGroupProperties.GroupableItems;
-        public IReadOnlyList<QueryableCombination> Columns => _columnGroupProperties.GroupableItems;
+        IReadOnlyList<QueryableCombination> _rows;
+        public IReadOnlyList<QueryableCombination> Rows => _rows;
+        IReadOnlyList<QueryableCombination> _columns;
+        public IReadOnlyList<QueryableCombination> Columns => _columns;
 
-        public CombinationDTO Group(IQueryable<NormalRule> normalRules)
+        public CombinationDTO Group(IList<NormalRule> normalRules)
         {
             var combination = BuildCombination(Rows, Columns);
             combination.IntersectionTitle = GroupName;

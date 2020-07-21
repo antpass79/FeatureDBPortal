@@ -19,7 +19,7 @@ namespace FeatureDBPortal.Server.Services
         {
         }
 
-        async override sealed protected Task<CombinationDTO> BuildCombination(CombinationSearchDTO search, IQueryable<NormalRule> normalRules, GroupProviderBuilder groupProviderBuilder)
+        async override sealed protected Task<CombinationDTO> BuildCombination(CombinationSearchDTO search, IList<NormalRule> normalRules, GroupProviderBuilder groupProviderBuilder)
         {
             var groupProvider = GetGroupProvider(search, groupProviderBuilder);
 

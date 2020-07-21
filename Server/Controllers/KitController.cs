@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using FeatureDBPortal.Server.Data.Models.RD;
 using FeatureDBPortal.Server.Repositories;
+using FeatureDBPortal.Server.Services;
 using FeatureDBPortal.Shared;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -16,8 +17,9 @@ namespace FeatureDBPortal.Server.Controllers
         public KitController(
             ILogger<KitController> logger,
             IMapper mapper,
-            IGenericRepository<BiopsyKits> repository)
-            : base(logger, mapper, repository)
+            IGenericRepository<BiopsyKits> repository,
+            IFilterCache filterCache)
+            : base(logger, mapper, repository, filterCache)
         {
         }
 
