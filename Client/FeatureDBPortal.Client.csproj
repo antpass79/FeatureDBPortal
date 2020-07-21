@@ -10,7 +10,7 @@
   <ItemGroup>
     <PackageReference Include="Blazored.LocalStorage" Version="2.1.6" />
     <PackageReference Include="Faso.Blazor.SpinKit" Version="1.0.1" />
-    <PackageReference Include="Grpc.Net.Client.Web" Version="2.30.0-pre1" />
+    <PackageReference Include="Grpc.Net.Client.Web" Version="2.30.0" />
     <PackageReference Include="MatBlazor" Version="2.6.2" />
     <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="5.0.0-preview.6.20312.15" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="5.0.0-preview.6.20312.15" />

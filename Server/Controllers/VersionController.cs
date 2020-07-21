@@ -2,6 +2,7 @@
 using FeatureDBPortal.Server.Data.Models.RD;
 using FeatureDBPortal.Server.Providers;
 using FeatureDBPortal.Server.Repositories;
+using FeatureDBPortal.Server.Services;
 using FeatureDBPortal.Shared;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -21,8 +22,9 @@ namespace FeatureDBPortal.Server.Controllers
             ILogger<VersionController> logger,
             IMapper mapper,
             IGenericRepository<MinorVersionAssociation> repository,
+            IFilterCache filterCache,
             IVersionProvider versionProvider)
-            : base(logger, mapper, repository)
+            : base(logger, mapper, repository, filterCache)
         {
             _versionProvider = versionProvider;
         }
