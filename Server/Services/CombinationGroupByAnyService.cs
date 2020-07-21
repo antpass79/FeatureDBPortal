@@ -12,12 +12,12 @@ namespace FeatureDBPortal.Server.Services
 {
     public class CombinationGroupByAnyService : CombinationGroupService
     {
-        public CombinationGroupByAnyService(DbContext context, IVersionProvider versionProvider)
-            : base(context, versionProvider)
+        public CombinationGroupByAnyService(FeaturesContext context, IVersionProvider versionProvider, GroupProviderBuilder groupProviderBuilder)
+            : base(context, versionProvider, groupProviderBuilder)
         {
         }
 
-        async override protected Task<CombinationDTO> BuildCombination(CombinationSearchDTO search, IQueryable<NormalRule> normalRules)
+        async override protected Task<CombinationDTO> BuildCombination(CombinationSearchDTO search, IQueryable<NormalRule> normalRules, GroupProviderBuilder groupProviderBuilder)
         {
             bool available = false;
             bool visible = false;

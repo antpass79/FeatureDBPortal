@@ -23,10 +23,10 @@ namespace FeatureDBPortal.Server.gRPC
         private readonly IGRPCCombinationGroupService _combinationGroupByTwoService;
         private readonly IGRPCCombinationGroupService _combinationGroupByThreeService;
 
-        public CombinationService(IMapper mapper, DbContext context)
+        public CombinationService(IMapper mapper, FeaturesContext context)
         {
             _mapper = mapper;
-            _context = context as FeaturesContext;
+            _context = context;
 
             _combinationGroupByAnyService = new GRPCCombinationGroupByAnyService(context);
             _combinationGroupByOneService = new GRPCCombinationGroupByOneService(context);

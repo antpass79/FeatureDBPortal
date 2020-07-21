@@ -1,8 +1,6 @@
 ﻿using FeatureDBPortal.Server.Data.Models.RD;
 using FeatureDBPortal.Server.Models;
-using FeatureDBPortal.Shared;
 using GrpcCombination;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +10,7 @@ namespace FeatureDBPortal.Server.gRPC
 {
     public class GRPCCombinationGroupByAnyService : GRPCCombinationGroupService
     {
-        public GRPCCombinationGroupByAnyService(DbContext context)
+        public GRPCCombinationGroupByAnyService(FeaturesContext context)
             : base(context)
         {
         }

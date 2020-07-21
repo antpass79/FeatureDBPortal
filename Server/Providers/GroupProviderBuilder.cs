@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace FeatureDBPortal.Server.Providers
 {
-    public class NormalRuleGroupProviderBuilder
+    public class GroupProviderBuilder
     {
         private readonly FeaturesContext _context;
 
@@ -14,45 +14,45 @@ namespace FeatureDBPortal.Server.Providers
         private LayoutTypeDTO _groupByTwo = LayoutTypeDTO.None;
         private LayoutTypeDTO _groupByThree = LayoutTypeDTO.None;
 
-        public NormalRuleGroupProviderBuilder(FeaturesContext context)
+        public GroupProviderBuilder(FeaturesContext context)
         {
             _context = context;
         }
 
-        public NormalRuleGroupProviderBuilder GroupByOne(LayoutTypeDTO groupType)
+        public GroupProviderBuilder GroupByOne(LayoutTypeDTO groupType)
         {
             _groupByOne = groupType;
             return this;
         }
-        public NormalRuleGroupProviderBuilder GroupByTwo(LayoutTypeDTO groupType)
+        public GroupProviderBuilder GroupByTwo(LayoutTypeDTO groupType)
         {
             _groupByTwo = groupType;
             return this;
         }
-        public NormalRuleGroupProviderBuilder GroupByThree(LayoutTypeDTO groupType)
+        public GroupProviderBuilder GroupByThree(LayoutTypeDTO groupType)
         {
             _groupByThree = groupType;
             return this;
         }
 
-        public INormalRuleGroupProvider Build()
+        public IGroupProvider Build()
         {
-            var rowGroupProperties = BuildProperties(_groupByOne);
-            var columnGroupProperties = BuildProperties(_groupByTwo);
-            var cellGroupProperties = BuildProperties(_groupByThree);
+            var rowGroupProperties = BuildGroupProperties(_groupByOne);
+            var columnGroupProperties = BuildGroupProperties(_groupByTwo);
+            var cellGroupProperties = BuildGroupProperties(_groupByThree);
 
-            INormalRuleGroupProvider normalRuleProvider = null;
+            IGroupProvider groupProvider = null;
             if (rowGroupProperties != null && columnGroupProperties == null && cellGroupProperties == null)
-                normalRuleProvider = new NormalRuleGroupByOneProvider(rowGroupProperties);
+                groupProvider = new GroupByOneProvider(rowGroupProperties);
             else if (rowGroupProperties != null && columnGroupProperties != null && cellGroupProperties == null)
-                normalRuleProvider = new NormalRuleGroupByTwoProvider(rowGroupProperties, columnGroupProperties);
+                groupProvider = new GroupByTwoProvider(rowGroupProperties, columnGroupProperties);
             else if (rowGroupProperties != null && columnGroupProperties != null && cellGroupProperties != null)
-                normalRuleProvider = new NormalRuleGroupByThreeProvider(rowGroupProperties, columnGroupProperties, cellGroupProperties);
+                groupProvider = new GroupByThreeProvider(rowGroupProperties, columnGroupProperties, cellGroupProperties);
 
-            return normalRuleProvider;
+            return groupProvider;
         }
 
-        private NormalRuleGroupProperties BuildProperties(LayoutTypeDTO groupType)
+        private GroupProperties BuildGroupProperties(LayoutTypeDTO groupType)
         {
             if (groupType == LayoutTypeDTO.None)
                 return null;
@@ -71,7 +71,7 @@ namespace FeatureDBPortal.Server.Providers
                 .Select(item => item.Id)
                 .ToList();
 
-            return new NormalRuleGroupProperties(groupType, groupableItems, discardItemIds);
+            return new GroupProperties(groupType, groupableItems, discardItemIds);
         }
     }
 }

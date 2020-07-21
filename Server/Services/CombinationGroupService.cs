@@ -11,22 +11,24 @@ namespace FeatureDBPortal.Server.Services
     public abstract class CombinationGroupService : ICombinationGroupService
     {
         private readonly IVersionProvider _versionProvider;
+        private readonly GroupProviderBuilder _groupProviderBuilder;
 
         protected FeaturesContext Context { get; }
 
-        protected CombinationGroupService(DbContext context, IVersionProvider versionProvider)
+        protected CombinationGroupService(FeaturesContext context, IVersionProvider versionProvider, GroupProviderBuilder groupProviderBuilder)
         {
-            Context = context as FeaturesContext;
+            Context = context;
             _versionProvider = versionProvider;
+            _groupProviderBuilder = groupProviderBuilder;
         }
 
         async public Task<CombinationDTO> GetCombination(CombinationSearchDTO search)
         {
-            var filteredNornalRules = FilterNormalRules(search);
-            if (filteredNornalRules.Count() == 0)
+            var filteredNormalRules = FilterNormalRules(search);
+            if (filteredNormalRules == null || filteredNormalRules.Count() == 0)
                 return await Task.FromResult<CombinationDTO>(null);
 
-            return await BuildCombination(search, filteredNornalRules);
+            return await BuildCombination(search, filteredNormalRules, _groupProviderBuilder);
         }
 
         // Check for input parameters
@@ -72,7 +74,7 @@ namespace FeatureDBPortal.Server.Services
             return result;
         }
 
-        abstract protected Task<CombinationDTO> BuildCombination(CombinationSearchDTO search, IQueryable<NormalRule> normalRules);
+        abstract protected Task<CombinationDTO> BuildCombination(CombinationSearchDTO search, IQueryable<NormalRule> normalRules, GroupProviderBuilder groupProviderBuilder);
 
         private bool IsOutputLayoutTypeSelected(CombinationSearchDTO search, LayoutTypeDTO layoutType) => search.RowLayout == layoutType || search.ColumnLayout == layoutType || search.CellLayout == layoutType;
     }

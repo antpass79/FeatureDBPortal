@@ -3,8 +3,10 @@ using FeatureDBPortal.Server.Data.Models.RD;
 using FeatureDBPortal.Server.Repositories;
 using FeatureDBPortal.Shared;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FeatureDBPortal.Server.Controllers
 {
@@ -18,6 +20,13 @@ namespace FeatureDBPortal.Server.Controllers
             IGenericRepository<Probe> repository)
             : base(logger, mapper, repository)
         {
+        }
+
+        protected override IQueryable<ProbeDTO> PreManipulation(IQueryable<Probe> query)
+        {
+            return query
+                .OrderBy(item => item.SaleName)
+                .Select(item => new ProbeDTO { Id = item.Id, Name = item.SaleName });
         }
     }
 }

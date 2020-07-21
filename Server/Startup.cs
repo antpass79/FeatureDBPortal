@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace FeatureDBPortal.Server
@@ -54,11 +55,11 @@ namespace FeatureDBPortal.Server
             _ = databaseOptions.DatabaseType switch
             {
                 DatabaseType.SqlServer =>
-                    services.AddDbContext<DbContext, FeaturesContext>(
+                    services.AddDbContext<FeaturesContext>(
                         options => options.UseSqlServer(databaseOptions.DefaultSqlServerConnectionString),
                         ServiceLifetime.Scoped),
                 DatabaseType.Sqlite =>
-                    services.AddDbContext<DbContext, FeaturesContext>(
+                    services.AddDbContext<FeaturesContext>(
                         options => options.UseSqlite(databaseOptions.DefaultSqliteConnectionString),
                         ServiceLifetime.Scoped),
                 _ => throw new NotSupportedException("DbContext not supported")
@@ -66,17 +67,36 @@ namespace FeatureDBPortal.Server
 
             // Feature Services
             services
-                .AddScoped<IGenericRepository<Application>, GenericRepository<Application>>()
-                .AddScoped<IGenericRepository<Country>, GenericRepository<Country>>()
-                .AddScoped<IGenericRepository<LogicalModel>, GenericRepository<LogicalModel>>()
-                .AddScoped<IGenericRepository<MinorVersionAssociation>, GenericRepository<MinorVersionAssociation>>()
-                .AddScoped<IGenericRepository<BiopsyKits>, GenericRepository<BiopsyKits>>()
-                .AddScoped<IGenericRepository<Option>, GenericRepository<Option>>()
-                .AddScoped<IGenericRepository<Probe>, GenericRepository<Probe>>();
+                .AddScoped<IGenericRepository<Application>, GenericRepository<FeaturesContext, Application>>()
+                .AddScoped<IGenericRepository<Country>, GenericRepository<FeaturesContext, Country>>()
+                .AddScoped<IGenericRepository<LogicalModel>, GenericRepository<FeaturesContext, LogicalModel>>()
+                .AddScoped<IGenericRepository<MinorVersionAssociation>, GenericRepository<FeaturesContext, MinorVersionAssociation>>()
+                .AddScoped<IGenericRepository<BiopsyKits>, GenericRepository<FeaturesContext, BiopsyKits>>()
+                .AddScoped<IGenericRepository<Option>, GenericRepository<FeaturesContext, Option>>()
+                .AddScoped<IGenericRepository<Probe>, GenericRepository<FeaturesContext, Probe>>();
             services
                 .AddScoped<IVersionProvider, VersionProvider>()
                 .AddScoped<IAsyncCsvService, CsvService>()
                 .AddScoped<IAvailabilityCombinationService, AvailabilityCombinationService>();
+            services
+                .AddTransient<GroupProviderBuilder>()
+                .AddTransient<CombinationGroupByAnyService>()
+                .AddTransient<CombinationGroupByOneService>()
+                .AddTransient<CombinationGroupByTwoService>()
+                .AddTransient<CombinationGroupByThreeService>();
+            services.AddTransient<CombinationGroupServiceResolver>(serviceProvider => key =>
+            {
+                ICombinationGroupService combinationGroupService = key switch
+                {
+                    CombinationGroupServiceTypes.COMBINATION_GROUP_BY_ANY => serviceProvider.GetService<CombinationGroupByAnyService>(),
+                    CombinationGroupServiceTypes.COMBINATION_GROUP_BY_ONE => serviceProvider.GetService<CombinationGroupByOneService>(),
+                    CombinationGroupServiceTypes.COMBINATION_GROUP_BY_TWO => serviceProvider.GetService<CombinationGroupByTwoService>(),
+                    CombinationGroupServiceTypes.COMBINATION_GROUP_BY_THREE => serviceProvider.GetService<CombinationGroupByThreeService>(),
+                    _ => throw new KeyNotFoundException()
+                };
+
+                return combinationGroupService;
+            });
 
             // Active Directory
             services
