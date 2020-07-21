@@ -4,6 +4,7 @@ using FeatureDBPortal.Server.Repositories;
 using FeatureDBPortal.Server.Services;
 using FeatureDBPortal.Shared;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Linq;
 
@@ -25,8 +26,8 @@ namespace FeatureDBPortal.Server.Controllers
         protected override IQueryable<CountryDTO> PreManipulation(IQueryable<Country> query)
         {
             return query
-                .Select(item => new CountryDTO { Id = item.Id, CountryName = item.Name, Code = item.Code })
-                .OrderBy(item => item.Name);
+                .OrderBy(item => item.Name)
+                .Select(item => new CountryDTO { Id = item.Id, CountryName = item.Name, Code = item.Code });
         }
     }
 }
