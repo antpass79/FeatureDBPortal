@@ -17,6 +17,10 @@ namespace FeatureDBPortal.Server.Services
         {
             lock (_lock)
             {
+                if (_cache.ContainsKey(key))
+                {
+                    _cache.Remove(key);
+                }
                 _cache.Add(key, items.ToList());
             }
         }
