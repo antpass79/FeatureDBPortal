@@ -6,12 +6,11 @@ using System.Linq;
 
 namespace FeatureDBPortal.Server.Providers
 {
-    public interface INormalRuleGroupProvider
+    public interface IGroupProvider
     {
         string GroupName { get; }
         public IReadOnlyList<QueryableCombination> Rows { get; }
         public IReadOnlyList<QueryableCombination> Columns { get; }
-        IReadOnlyList<RowDTO> Group(IQueryable<NormalRule> normalRules);
-        CombinationDTO GroupFast(IQueryable<NormalRule> normalRules);
+        CombinationDTO Group(IQueryable<NormalRule> normalRules);
     }
 }

@@ -17,8 +17,7 @@ namespace FeatureDBPortal.Server.Controllers
     {
         private readonly ILogger<TController> _logger;
         private readonly IMapper _mapper;
-
-        protected IGenericRepository<TEntity> Repository { get; }
+        private readonly IGenericRepository<TEntity> _repository;
 
         protected BaseInputFilterController(
             ILogger<TController> logger,
@@ -27,28 +26,24 @@ namespace FeatureDBPortal.Server.Controllers
         {
             _logger = logger;
             _mapper = mapper;
-            Repository = repository;
+            _repository = repository;
         }
 
         [HttpGet]
         async public Task<IEnumerable<TDTO>> Get()
         {
-            var items = PreFilter(Repository.Get());
+            var query = PreManipulation(_repository.Query());
 
-            var mappedItems = await Task.FromResult(
+            var items = await Task.FromResult(
                 _mapper
-                    .Map<IEnumerable<TDTO>>(items)
-                    .OrderBy(item => item.OrderableProperty));
+                    .Map<IEnumerable<TDTO>>(query.ToList()));
 
-            return PostFilter(mappedItems);
+            return PostManipulation(items);
         }
 
-        virtual protected IEnumerable<TEntity> PreFilter(IEnumerable<TEntity> entities)
-        {
-            return entities;
-        }
+        abstract protected IQueryable<TDTO> PreManipulation(IQueryable<TEntity> query);
 
-        virtual protected IEnumerable<TDTO> PostFilter(IEnumerable<TDTO> items)
+        virtual protected IEnumerable<TDTO> PostManipulation(IEnumerable<TDTO> items)
         {
             return items;
         }

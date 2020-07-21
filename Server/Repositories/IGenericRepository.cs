@@ -8,6 +8,14 @@ namespace FeatureDBPortal.Server.Repositories
     public interface IGenericRepository<TEntity>
     {
         /// <summary>
+        /// Get query for entity
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="orderBy"></param>
+        /// <returns></returns>
+        IQueryable<TEntity> Query(Expression<Func<TEntity, bool>> filter = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null);
+
+        /// <summary>
         /// Get all entities from db
         /// </summary>
         /// <param name="filter"></param>

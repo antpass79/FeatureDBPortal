@@ -13,14 +13,14 @@ namespace FeatureDBPortal.Server.Services
 {
     public class CombinationGroupByOneService : CombinationGroupService
     {
-        public CombinationGroupByOneService(DbContext context, IVersionProvider versionProvider)
-            : base(context, versionProvider)
+        public CombinationGroupByOneService(FeaturesContext context, IVersionProvider versionProvider, GroupProviderBuilder groupProviderBuilder)
+            : base(context, versionProvider, groupProviderBuilder)
         {
         }
 
-        async override protected Task<CombinationDTO> BuildCombination(CombinationSearchDTO search, IQueryable<NormalRule> normalRules)
+        async override protected Task<CombinationDTO> BuildCombination(CombinationSearchDTO search, IQueryable<NormalRule> normalRules, GroupProviderBuilder groupProviderBuilder)
         {
-            var groupProvider = new NormalRuleGroupProviderBuilder(Context)
+            var groupProvider = groupProviderBuilder
                 .GroupByOne(search.RowLayout)
                 .Build();
 
@@ -31,18 +31,7 @@ namespace FeatureDBPortal.Server.Services
             // NOTE: only if there isn't a version in the search
 
             // Maybe add firstLayoutGroup + "Id" == null
-            var groups = groupProvider.Group(normalRules);
-
-            var combination = new CombinationDTO
-            {
-                IntersectionTitle = groupProvider.GroupName,
-                Columns = new List<ColumnDTO>
-                {
-                    new ColumnDTO { Id = -1, Name = "Allow" }
-                },
-                Rows = groups
-            };
-
+            var combination = groupProvider.Group(normalRules);
             return await Task.FromResult(combination);
         }
     }

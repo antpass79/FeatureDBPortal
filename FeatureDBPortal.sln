@@ -20,6 +20,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{5D16462E
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeatureDBPortal.Server.Tests", "FeatureDBPortal.Server.Tests\FeatureDBPortal.Server.Tests.csproj", "{8329F62A-1161-436A-8442-8257FEC31408}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "assets", "assets", "{B5F56583-1C74-4900-8E79-1DF17ABEF5D8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,6 +50,7 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{8329F62A-1161-436A-8442-8257FEC31408} = {5D16462E-19B9-4DC5-B44A-A2A5AAF6AA94}
+		{B5F56583-1C74-4900-8E79-1DF17ABEF5D8} = {F389ABDD-1608-44FE-98A7-0A145A376ECE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {096DA65C-1B31-4211-A9AC-27A325358204}

@@ -14,33 +14,28 @@ namespace FeatureDBPortal.Server.Services
 {
     public class CombinationGroupByTwoService : CombinationGroupService
     {
-        public CombinationGroupByTwoService(DbContext context, IVersionProvider versionProvider)
-            : base(context, versionProvider)
+        public CombinationGroupByTwoService(FeaturesContext context, IVersionProvider versionProvider, GroupProviderBuilder groupProviderBuilder)
+            : base(context, versionProvider, groupProviderBuilder)
         {
         }
 
-        async override sealed protected Task<CombinationDTO> BuildCombination(CombinationSearchDTO search, IQueryable<NormalRule> normalRules)
+        async override sealed protected Task<CombinationDTO> BuildCombination(CombinationSearchDTO search, IQueryable<NormalRule> normalRules, GroupProviderBuilder groupProviderBuilder)
         {
-            var groupProvider = GetGroupProvider(search);
-            //var groups = groupProvider.Group(normalRules);
+            var groupProvider = GetGroupProvider(search, groupProviderBuilder);
 
-            var combination = groupProvider.GroupFast(normalRules);
+            var combination = groupProvider.Group(normalRules);
             // If in output there are Model and Country:
             // - Foreach groups take ids (in case of model the firstGroup id is ModelId, the secondGroup id is CountryId)
             // - Build the default version with firstGroup.Id and secondGroup.Id
             // - Filter rules with the default version (see FilterNormalRules function in the base class)
             // NOTE: only if there isn't a version in the search
 
-            //var matrix = BuildMatrix(groupProvider.Rows, groupProvider.Columns);
-            //FillMatrix(matrix, groups);
-            //var combination = MapToCombination(matrix, groupProvider);
-
             return await Task.FromResult(combination);
         }
 
-        protected virtual INormalRuleGroupProvider GetGroupProvider(CombinationSearchDTO search)
+        protected virtual IGroupProvider GetGroupProvider(CombinationSearchDTO search, GroupProviderBuilder groupProviderBuilder)
         {
-            var groupProvider = new NormalRuleGroupProviderBuilder(Context)
+            var groupProvider = groupProviderBuilder
                 .GroupByOne(search.RowLayout)
                 .GroupByTwo(search.ColumnLayout)
                 .Build();
@@ -134,16 +129,6 @@ namespace FeatureDBPortal.Server.Services
             }
 
             return matrix;
-        }
-
-        private CombinationDTO MapToCombination(CombinationMatrix matrix, INormalRuleGroupProvider groupProvider)
-        {
-            return new CombinationDTO
-            {
-                IntersectionTitle = groupProvider.GroupName,
-                Columns = groupProvider.Columns.Select(item => new ColumnDTO { Id = item.Id, Name = item.Name }).ToList(),
-                Rows = matrix.ToRows()
-            };
         }
     }
 }

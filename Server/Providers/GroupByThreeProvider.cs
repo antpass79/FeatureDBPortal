@@ -8,16 +8,16 @@ using System.Linq;
 
 namespace FeatureDBPortal.Server.Providers
 {
-    public class NormalRuleGroupByThreeProvider : INormalRuleGroupProvider
+    public class GroupByThreeProvider : IGroupProvider
     {
-        private readonly NormalRuleGroupProperties _rowGroupProperties;
-        private readonly NormalRuleGroupProperties _columnGroupProperties;
-        private readonly NormalRuleGroupProperties _cellGroupProperties;
+        private readonly GroupProperties _rowGroupProperties;
+        private readonly GroupProperties _columnGroupProperties;
+        private readonly GroupProperties _cellGroupProperties;
 
-        public NormalRuleGroupByThreeProvider(
-            NormalRuleGroupProperties rowGroupProperties,
-            NormalRuleGroupProperties columnGroupProperties,
-            NormalRuleGroupProperties cellGroupProperties)
+        public GroupByThreeProvider(
+            GroupProperties rowGroupProperties,
+            GroupProperties columnGroupProperties,
+            GroupProperties cellGroupProperties)
         {
             _rowGroupProperties = rowGroupProperties;
             _columnGroupProperties = columnGroupProperties;
@@ -29,38 +29,8 @@ namespace FeatureDBPortal.Server.Providers
         public IReadOnlyList<QueryableCombination> Rows => _rowGroupProperties.GroupableItems;
         public IReadOnlyList<QueryableCombination> Columns => _columnGroupProperties.GroupableItems;
 
-        public IReadOnlyList<RowDTO> Group(IQueryable<NormalRule> normalRules)
-        {
-            var groups = normalRules
-                .GroupBy(_rowGroupProperties.GroupExpression)
-                .Select(group => new RowDTO
-                {
-                    RowId = group.Key,
-                    Title = new RowTitleDTO
-                    {
-                        Id = group.Key,
-                        Name = _rowGroupProperties.GroupableItems.SingleOrDefault(item => item.Id == group.Key)?.Name
-                    },
-                    Cells = group.Select(groupItem => new CellDTO
-                    {
-                        RowId = group.Key,
-                        ColumnId = groupItem.GetPropertyIdByGroupNameId(_columnGroupProperties.NormalRulePropertyNameId),
-                        Available = group.All(item => (AllowModeDTO)item.Allow != AllowModeDTO.No),
 
-                        Visible = group.All(item => (AllowModeDTO)item.Allow == AllowModeDTO.A),
-                        AllowMode = (AllowModeDTO)Allower.GetMode(group.All(item => (AllowModeDTO)item.Allow == AllowModeDTO.A), group.All(item => (AllowModeDTO)item.Allow != AllowModeDTO.No)),
-                        Items = group.GroupBy(_cellGroupProperties.GroupExpression).Select(thirdGroup => new CellItemDTO
-                        {
-                            Name = _cellGroupProperties.GroupableItems.SingleOrDefault(cellItem => cellItem.Id == thirdGroup.Key)?.Name,
-                            Allow = thirdGroup.All(i => i.Allow != 0)
-                        }).ToList()
-                    }).ToList()
-                }).ToList();
-
-            return groups;
-        }
-
-        public CombinationDTO GroupFast(IQueryable<NormalRule> normalRules)
+        public CombinationDTO Group(IQueryable<NormalRule> normalRules)
         {
             var combination = BuildCombination(Rows, Columns);
             combination.IntersectionTitle = GroupName;
@@ -83,10 +53,11 @@ namespace FeatureDBPortal.Server.Providers
                         continue;
 
                     var cell = row.Cells[_columnIdToIndexMapper[columnId]];
-                    cell.ColumnId = columnId;
+
                     cell.Available = group.All(item => (AllowModeDTO)item.Allow != AllowModeDTO.No);
                     cell.Visible = group.All(item => (AllowModeDTO)item.Allow == AllowModeDTO.A);
                     cell.AllowMode = (AllowModeDTO)Allower.GetMode(cell.Visible.Value, cell.Available.Value);
+
                     cell.Items = group.GroupBy(_cellGroupProperties.GroupExpression).Select(thirdGroup => new CellItemDTO
                     {
                         Name = _cellGroupProperties.GroupableItems.SingleOrDefault(cellItem => cellItem.Id == thirdGroup.Key)?.Name,

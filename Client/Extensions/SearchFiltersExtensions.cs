@@ -1,9 +1,5 @@
 ﻿using FeatureDBPortal.Client.Models;
 using FeatureDBPortal.Shared;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace FeatureDBPortal.Client.Extensions
 {

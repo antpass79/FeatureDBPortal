@@ -8,9 +8,9 @@ using System.Collections.Generic;
 
 namespace FeatureDBPortal.Server.Providers
 {
-    public class NormalRuleGroupProperties
+    public class GroupProperties
     {
-        public NormalRuleGroupProperties(LayoutTypeDTO layoutType, List<QueryableCombination> groupableItems, IList<int> discardItemIds)
+        public GroupProperties(LayoutTypeDTO layoutType, List<QueryableCombination> groupableItems, IList<int> discardItemIds)
         {
             LayoutType = layoutType;
 

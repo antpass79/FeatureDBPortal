@@ -10,9 +10,9 @@ namespace FeatureDBPortal.Server.Providers
     {
         private readonly FeaturesContext _context;
 
-        public VersionProvider(DbContext context)
+        public VersionProvider(FeaturesContext context)
         {
-            _context = context as FeaturesContext;
+            _context = context;
             Update();
         }
 

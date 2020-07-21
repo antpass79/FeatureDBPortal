@@ -3,7 +3,9 @@ using FeatureDBPortal.Server.Data.Models.RD;
 using FeatureDBPortal.Server.Repositories;
 using FeatureDBPortal.Shared;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Linq;
 
 namespace FeatureDBPortal.Server.Controllers
 {
@@ -17,6 +19,13 @@ namespace FeatureDBPortal.Server.Controllers
             IGenericRepository<BiopsyKits> repository)
             : base(logger, mapper, repository)
         {
+        }
+
+        protected override IQueryable<KitDTO> PreManipulation(IQueryable<BiopsyKits> query)
+        {
+            return query
+                .OrderBy(item => item.Name)
+                .Select(item => new KitDTO { Id = item.Id, Name = item.Name });
         }
     }
 }

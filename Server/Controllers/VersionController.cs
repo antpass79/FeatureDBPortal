@@ -4,6 +4,7 @@ using FeatureDBPortal.Server.Providers;
 using FeatureDBPortal.Server.Repositories;
 using FeatureDBPortal.Shared;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,7 +27,14 @@ namespace FeatureDBPortal.Server.Controllers
             _versionProvider = versionProvider;
         }
 
-        protected override IEnumerable<VersionDTO> PostFilter(IEnumerable<VersionDTO> items)
+        protected override IQueryable<VersionDTO> PreManipulation(IQueryable<MinorVersionAssociation> query)
+        {
+            return query
+                .OrderBy(item => item.BuildVersion)
+                .Select(item => new VersionDTO { Id = item.Id, BuildVersion = item.BuildVersion });
+        }
+
+        protected override IEnumerable<VersionDTO> PostManipulation(IEnumerable<VersionDTO> items)
         {
             return _versionProvider.Versions.Select(version => new VersionDTO
             {
