@@ -1,26 +1,19 @@
 ﻿using FeatureDBPortal.Server.Data.Models.RD;
-using FeatureDBPortal.Server.Extensions;
-using FeatureDBPortal.Server.Models;
 using FeatureDBPortal.Server.Providers;
-using FeatureDBPortal.Server.Utils;
 using FeatureDBPortal.Shared;
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace FeatureDBPortal.Server.Services
 {
     public class CombinationGroupByThreeService : CombinationGroupByTwoService
     {
-        public CombinationGroupByThreeService(DbContext context, IVersionProvider versionProvider)
-            : base(context, versionProvider)
+        public CombinationGroupByThreeService(FeaturesContext context, IVersionProvider versionProvider, GroupProviderBuilder groupProviderBuilder)
+            : base(context, versionProvider, groupProviderBuilder)
         {
         }
 
-        protected override INormalRuleGroupProvider GetGroupProvider(CombinationSearchDTO search)
+        protected override IGroupProvider GetGroupProvider(CombinationSearchDTO search, GroupProviderBuilder groupProviderBuilder)
         {
-            var groupProvider = new NormalRuleGroupProviderBuilder(Context)
+            var groupProvider = groupProviderBuilder
                 .GroupByOne(search.RowLayout)
                 .GroupByTwo(search.ColumnLayout)
                 .GroupByThree(search.CellLayout)

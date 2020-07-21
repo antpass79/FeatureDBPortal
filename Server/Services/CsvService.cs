@@ -3,7 +3,6 @@ using CsvHelper.Configuration;
 using FeatureDBPortal.Server.Data.Models.RD;
 using FeatureDBPortal.Server.Models;
 using FeatureDBPortal.Shared;
-using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -33,9 +32,9 @@ namespace FeatureDBPortal.Server.Services
     {
         private readonly FeaturesContext _context;
 
-        public CsvService(DbContext context)
+        public CsvService(FeaturesContext context)
         {
-            _context = context as FeaturesContext;
+            _context = context;
         }
 
         async public Task<byte[]> BuildCsv(CsvExportDTO csvExport)

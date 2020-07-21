@@ -3,6 +3,7 @@ using FeatureDBPortal.Server.Data.Models.RD;
 using FeatureDBPortal.Server.Repositories;
 using FeatureDBPortal.Shared;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,10 +22,12 @@ namespace FeatureDBPortal.Server.Controllers
         {
         }
 
-        protected override IEnumerable<Application> PreFilter(IEnumerable<Application> entities)
+        protected override IQueryable<ApplicationDTO> PreManipulation(IQueryable<Application> query)
         {
-            return entities
-                .Where(item => !item.IsFake);
+            return query
+                .Where(item => !item.IsFake)
+                .OrderBy(item => item.Name)
+                .Select(item => new ApplicationDTO { Id = item.Id, Name = item.Name });
         }
     }
 }

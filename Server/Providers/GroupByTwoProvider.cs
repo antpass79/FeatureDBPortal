@@ -5,17 +5,18 @@ using FeatureDBPortal.Server.Utils;
 using FeatureDBPortal.Shared;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace FeatureDBPortal.Server.Providers
 {
-    public class NormalRuleGroupByTwoProvider : INormalRuleGroupProvider
+    public class GroupByTwoProvider : IGroupProvider
     {
-        private readonly NormalRuleGroupProperties _rowGroupProperties;
-        private readonly NormalRuleGroupProperties _columnGroupProperties;
+        private readonly GroupProperties _rowGroupProperties;
+        private readonly GroupProperties _columnGroupProperties;
 
-        public NormalRuleGroupByTwoProvider(
-            NormalRuleGroupProperties rowGroupProperties,
-            NormalRuleGroupProperties columnGroupProperties)
+        public GroupByTwoProvider(
+            GroupProperties rowGroupProperties,
+            GroupProperties columnGroupProperties)
         {
             _rowGroupProperties = rowGroupProperties;
             _columnGroupProperties = columnGroupProperties;
@@ -26,38 +27,7 @@ namespace FeatureDBPortal.Server.Providers
         public IReadOnlyList<QueryableCombination> Rows => _rowGroupProperties.GroupableItems;
         public IReadOnlyList<QueryableCombination> Columns => _columnGroupProperties.GroupableItems;
 
-        public IReadOnlyList<RowDTO> Group(IQueryable<NormalRule> normalRules)
-        {
-            var groups = normalRules
-                .GroupBy(_rowGroupProperties.GroupExpression)
-                .Where(item => item.Key.HasValue && !_rowGroupProperties.DiscardItemIds.Contains(item.Key.Value))
-                .Select(group => new RowDTO
-                {
-                    RowId = group.Key,
-                    Title = new RowTitleDTO
-                    {
-                        Id = group.Key,
-                        Name = _rowGroupProperties.GroupableItems.SingleOrDefault(item => item.Id == group.Key)?.Name
-                    },
-                    Cells = group.Select(normalRule =>
-                    {
-                        var newCell = new CellDTO
-                        {
-                            RowId = group.Key,
-                            ColumnId = normalRule.GetPropertyIdByGroupNameId(_columnGroupProperties.NormalRulePropertyNameId),
-                            Available = group.All(item => (AllowModeDTO)item.Allow != AllowModeDTO.No),
-                            Visible = group.All(item => (AllowModeDTO)item.Allow == AllowModeDTO.A)
-                        };
-                        newCell.AllowMode = (AllowModeDTO)Allower.GetMode(newCell.Visible.Value, newCell.Available.Value);
-
-                        return newCell;
-                    }).ToList()
-                }).ToList();
-
-            return groups;
-        }
-
-        public CombinationDTO GroupFast(IQueryable<NormalRule> normalRules)
+        public CombinationDTO Group(IQueryable<NormalRule> normalRules)
         {
             var combination = BuildCombination(Rows, Columns);
             combination.IntersectionTitle = GroupName;
@@ -67,24 +37,24 @@ namespace FeatureDBPortal.Server.Providers
                 .Where(item => item.Key.HasValue && !_rowGroupProperties.DiscardItemIds.Contains(item.Key.Value))
                 .ToList();
 
-            for (int i = 0; i < groups.Count; i++)
+            Parallel.For(0, groups.Count, (i) =>
             {
                 var group = groups[i];
                 var row = combination.Rows[_rowIdToIndexMapper[group.Key]];
 
-                foreach (var normalRule in group)
+                Parallel.ForEach(group, (normalRule) =>
                 {
                     var columnId = normalRule.GetPropertyIdByGroupNameId(_columnGroupProperties.NormalRulePropertyNameId);
-                    if (!columnId.HasValue)
-                        continue;
+                    if (columnId.HasValue)
+                    {
+                        var cell = row.Cells[_columnIdToIndexMapper[columnId]];
 
-                    var cell = row.Cells[_columnIdToIndexMapper[columnId]];
-                    cell.ColumnId = columnId;
-                    cell.Available = group.All(item => (AllowModeDTO)item.Allow != AllowModeDTO.No);
-                    cell.Visible = group.All(item => (AllowModeDTO)item.Allow == AllowModeDTO.A);
-                    cell.AllowMode = (AllowModeDTO)Allower.GetMode(cell.Visible.Value, cell.Available.Value);
-                }
-            }
+                        cell.Available = group.All(item => (AllowModeDTO)item.Allow != AllowModeDTO.No);
+                        cell.Visible = group.All(item => (AllowModeDTO)item.Allow == AllowModeDTO.A);
+                        cell.AllowMode = (AllowModeDTO)Allower.GetMode(cell.Visible.Value, cell.Available.Value);
+                    }
+                });
+            });
 
             return combination;
         }

@@ -8,10 +8,10 @@ using System.Linq;
 
 namespace FeatureDBPortal.Server.Providers
 {
-    public class NormalRuleGroupByOneProvider : INormalRuleGroupProvider
+    public class GroupByOneProvider : IGroupProvider
     {
-        private readonly NormalRuleGroupProperties _groupProperties;
-        public NormalRuleGroupByOneProvider(NormalRuleGroupProperties groupProperties)
+        private readonly GroupProperties _groupProperties;
+        public GroupByOneProvider(GroupProperties groupProperties)
         {
             _groupProperties = groupProperties;
         }
@@ -21,7 +21,7 @@ namespace FeatureDBPortal.Server.Providers
         public IReadOnlyList<QueryableCombination> Rows => _groupProperties.GroupableItems;
         public IReadOnlyList<QueryableCombination> Columns => throw new NotSupportedException();
 
-        public IReadOnlyList<RowDTO> Group(IQueryable<NormalRule> normalRules)
+        public CombinationDTO Group(IQueryable<NormalRule> normalRules)
         {
             // Maybe add firstLayoutGroup + "Id" == null
             var groups = normalRules
@@ -50,12 +50,17 @@ namespace FeatureDBPortal.Server.Providers
                 .OrderBy(item => item.Title.Name)
                 .ToList();
 
-            return groups;
-        }
+            var combination = new CombinationDTO
+            {
+                IntersectionTitle = GroupName,
+                Columns = new List<ColumnDTO>
+                {
+                    new ColumnDTO { Id = -1, Name = "Allow" }
+                },
+                Rows = groups
+            };
 
-        public CombinationDTO GroupFast(IQueryable<NormalRule> normalRules)
-        {
-            throw new NotImplementedException();
+            return combination;
         }
     }
 }

@@ -1,36 +1,24 @@
-﻿using AutoMapper;
-using FeatureDBPortal.Server.Data.Models.RD;
-using FeatureDBPortal.Server.Providers;
-using FeatureDBPortal.Shared;
+﻿using FeatureDBPortal.Shared;
 using FeatureDBPortal.Shared.Utilities;
-using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace FeatureDBPortal.Server.Services
 {
     public class AvailabilityCombinationService : IAvailabilityCombinationService
     {
-        private readonly FeaturesContext _context;
-        private readonly IMapper _mapper;
-
         private readonly ICombinationGroupService _combinationGroupByAnyService;
         private readonly ICombinationGroupService _combinationGroupByOneService;
         private readonly ICombinationGroupService _combinationGroupByTwoService;
         private readonly ICombinationGroupService _combinationGroupByThreeService;
 
-        public AvailabilityCombinationService(IMapper mapper, DbContext context, IVersionProvider versionProvider)
+        public AvailabilityCombinationService(CombinationGroupServiceResolver combinationGroupServiceResolver)
         {
-            _mapper = mapper;
-            _context = context as FeaturesContext;
-
-            _combinationGroupByAnyService = new CombinationGroupByAnyService(context, versionProvider);
-            _combinationGroupByOneService = new CombinationGroupByOneService(context, versionProvider);
-            _combinationGroupByTwoService = new CombinationGroupByTwoService(context, versionProvider);
-            _combinationGroupByThreeService = new CombinationGroupByThreeService(context, versionProvider);
+            _combinationGroupByAnyService = combinationGroupServiceResolver(CombinationGroupServiceTypes.COMBINATION_GROUP_BY_ANY);
+            _combinationGroupByOneService = combinationGroupServiceResolver(CombinationGroupServiceTypes.COMBINATION_GROUP_BY_ONE);
+            _combinationGroupByTwoService = combinationGroupServiceResolver(CombinationGroupServiceTypes.COMBINATION_GROUP_BY_TWO);
+            _combinationGroupByThreeService = combinationGroupServiceResolver(CombinationGroupServiceTypes.COMBINATION_GROUP_BY_THREE);
         }
 
         async public Task<CombinationDTO> Get(CombinationSearchDTO search)
