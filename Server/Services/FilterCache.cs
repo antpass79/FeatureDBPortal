@@ -1,4 +1,5 @@
-﻿using FeatureDBPortal.Shared;
+﻿using FeatureDBPortal.Server.Models;
+using FeatureDBPortal.Shared;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -32,12 +33,12 @@ namespace FeatureDBPortal.Server.Services
                 return _cache[key];
             }
         }
-
-        public void Clear()
+        public IReadOnlyList<IQueryableItem> Get<TEntity>()
+            where TEntity : IQueryableEntity
         {
             lock (_lock)
             {
-                _cache.Clear();
+                return _cache[typeof(TEntity).Name];
             }
         }
     }

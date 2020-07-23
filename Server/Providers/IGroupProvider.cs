@@ -8,8 +8,8 @@ namespace FeatureDBPortal.Server.Providers
     public interface IGroupProvider
     {
         string GroupName { get; }
-        public IReadOnlyList<QueryableCombination> Rows { get; }
-        public IReadOnlyList<QueryableCombination> Columns { get; }
-        CombinationDTO Group(IList<NormalRule> normalRules);
+        public IReadOnlyList<QueryableEntity> Rows { get; }
+        public IReadOnlyList<QueryableEntity> Columns { get; }
+        CombinationDTO Group(GroupParameters parameters);
     }
 }

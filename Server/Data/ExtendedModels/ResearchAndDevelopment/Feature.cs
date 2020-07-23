@@ -2,7 +2,7 @@
 
 namespace FeatureDBPortal.Server.Data.Models.RD
 {
-    public partial class Feature : IQueryableCombination
+    public partial class Feature : IQueryableEntity
     {
     }
 }

@@ -9,7 +9,7 @@ namespace FeatureDBPortal.Server.Providers
         int Max { get; }
 
         IEnumerable<int> VersioNumbers { get; }
-        IEnumerable<IQueryableCombination> Versions { get; }
+        IEnumerable<IQueryableEntity> Versions { get; }
         void Update();
         int BuildDefaultVersion(int countryId, int modelId);
         string BuildStringVersion(int version);

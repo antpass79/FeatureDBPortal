@@ -22,7 +22,7 @@ namespace FeatureDBPortal.Server.gRPC
                 .ElementAt(0)
                 .ToString();
 
-            var selectedRowField = Context.GetPropertyValue<IQueryable<IQueryableCombination>>(firstLayoutGroup);
+            var selectedRowField = Context.GetPropertyValue<IQueryable<IQueryableEntity>>(firstLayoutGroup);
 
             IEnumerable<NormalRule> normalRules = FilterNormalRules(search);
 
@@ -66,7 +66,7 @@ namespace FeatureDBPortal.Server.gRPC
             return await Task.FromResult(combination);
         }
 
-        private static CombinationMatrix PrepareMatrix(List<IQueryableCombination> orderedSelectedRowField)
+        private static CombinationMatrix PrepareMatrix(List<IQueryableEntity> orderedSelectedRowField)
         {
             var matrix = new CombinationMatrix(orderedSelectedRowField.Count);
 

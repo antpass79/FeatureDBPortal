@@ -4,9 +4,7 @@ using FeatureDBPortal.Server.Repositories;
 using FeatureDBPortal.Server.Services;
 using FeatureDBPortal.Shared;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace FeatureDBPortal.Server.Controllers

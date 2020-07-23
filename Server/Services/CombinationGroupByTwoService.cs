@@ -23,7 +23,7 @@ namespace FeatureDBPortal.Server.Services
         {
             var groupProvider = GetGroupProvider(search, groupProviderBuilder);
 
-            var combination = groupProvider.Group(normalRules);
+            var combination = groupProvider.Group(new GroupParameters { NormalRules = normalRules, ProbeId = search.ProbeId });
             // If in output there are Model and Country:
             // - Foreach groups take ids (in case of model the firstGroup id is ModelId, the secondGroup id is CountryId)
             // - Build the default version with firstGroup.Id and secondGroup.Id
@@ -92,7 +92,7 @@ namespace FeatureDBPortal.Server.Services
                 ColumnId = cell.ColumnId,
                 Available = cell.Available,
                 Visible = cell.Visible,
-                AllowMode = (AllowMode)cell.AllowMode,
+                AllowMode = cell.AllowMode,
                 Items = cell.Items?
                                    .Where(cellItem => cellItem.Allow)
                                    .Select(cellItem => new CombinationItem
@@ -102,33 +102,6 @@ namespace FeatureDBPortal.Server.Services
                                        Name = cellItem.Name
                                    })
             };
-        }
-
-        private CombinationMatrix BuildMatrix(IReadOnlyList<QueryableCombination> rows, IReadOnlyList<QueryableCombination> columns)
-        {
-            var matrix = new CombinationMatrix(rows.Count);
-
-            foreach (var row in rows)
-            {
-                var newRow = new CombinationRow(columns.Count)
-                {
-                    Id = row.Id,
-                    Name = row.Name
-                };
-
-                foreach (var column in columns)
-                {
-                    newRow[column.Id] = new CombinationCell
-                    {
-                        RowId = row.Id,
-                        ColumnId = column.Id,
-                    };
-                }
-
-                matrix[row.Id] = newRow;
-            }
-
-            return matrix;
         }
     }
 }

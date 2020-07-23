@@ -13,31 +13,35 @@ namespace FeatureDBPortal.Server.Providers
     {
         private readonly GroupProperties _rowGroupProperties;
         private readonly GroupProperties _columnGroupProperties;
+        private readonly IAllowModeProvider _allowModeProvider;
 
         public GroupByTwoProvider(
             GroupProperties rowGroupProperties,
-            GroupProperties columnGroupProperties)
+            GroupProperties columnGroupProperties,
+            IAllowModeProvider allowModeProvider)
         {
             _rowGroupProperties = rowGroupProperties;
             _columnGroupProperties = columnGroupProperties;
 
             _rows = _rowGroupProperties.GroupableItems.Values.ToList();
             _columns = _columnGroupProperties.GroupableItems.Values.ToList();
+
+            _allowModeProvider = allowModeProvider;
         }
 
         public string GroupName => $"{_rowGroupProperties.LayoutType} / {_columnGroupProperties.LayoutType}";
 
-        IReadOnlyList<QueryableCombination> _rows;
-        public IReadOnlyList<QueryableCombination> Rows => _rows;
-        IReadOnlyList<QueryableCombination> _columns;
-        public IReadOnlyList<QueryableCombination> Columns => _columns;
+        IReadOnlyList<QueryableEntity> _rows;
+        public IReadOnlyList<QueryableEntity> Rows => _rows;
+        IReadOnlyList<QueryableEntity> _columns;
+        public IReadOnlyList<QueryableEntity> Columns => _columns;
 
-        public CombinationDTO Group(IList<NormalRule> normalRules)
+        public CombinationDTO Group(GroupParameters parameters)
         {
             var combination = BuildCombination(Rows, Columns);
             combination.IntersectionTitle = GroupName;
 
-            var groups = normalRules
+            var groups = parameters.NormalRules
                 .GroupBy(_rowGroupProperties.GroupExpression)
                 .Where(item => item.Key.HasValue && !_rowGroupProperties.DiscardItemIds.Contains(item.Key.Value))
                 .ToList();
@@ -54,9 +58,10 @@ namespace FeatureDBPortal.Server.Providers
                     {
                         var cell = row.Cells[_columnIdToIndexMapper[columnId]];
 
-                        cell.Available = group.All(item => (AllowModeDTO)item.Allow != AllowModeDTO.No);
-                        cell.Visible = group.All(item => (AllowModeDTO)item.Allow == AllowModeDTO.A);
-                        cell.AllowMode = (AllowModeDTO)Allower.GetMode(cell.Visible.Value, cell.Available.Value);
+                        var allowModeProperties = _allowModeProvider.Properties(group, parameters.ProbeId);
+                        cell.Visible = allowModeProperties.Visible;
+                        cell.Available = allowModeProperties.Available;
+                        cell.AllowMode = allowModeProperties.AllowMode;
                     }
                 });
             });
@@ -66,7 +71,7 @@ namespace FeatureDBPortal.Server.Providers
 
         Dictionary<int?, int> _rowIdToIndexMapper = new Dictionary<int?, int>();
         Dictionary<int?, int> _columnIdToIndexMapper = new Dictionary<int?, int>();
-        CombinationDTO BuildCombination(IReadOnlyList<QueryableCombination> rows, IReadOnlyList<QueryableCombination> columns)
+        CombinationDTO BuildCombination(IReadOnlyList<QueryableEntity> rows, IReadOnlyList<QueryableEntity> columns)
         {
             var combination = new CombinationDTO();
             var newRows = new List<RowDTO>();
