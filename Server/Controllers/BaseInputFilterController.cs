@@ -12,8 +12,8 @@ using System.Threading.Tasks;
 namespace FeatureDBPortal.Server.Controllers
 {
     public abstract class BaseInputFilterController<TEntity, TDTO, TController> : ControllerBase
-        where TEntity: IQueryableCombination
-        where TDTO: IOrderablePropertyName
+        where TEntity: IQueryableEntity
+        where TDTO: IQueryableItem
         where TController: BaseInputFilterController<TEntity, TDTO, TController>
     {
         private readonly ILogger<TController> _logger;
@@ -51,7 +51,8 @@ namespace FeatureDBPortal.Server.Controllers
 
         virtual protected IEnumerable<TDTO> PostManipulation(IEnumerable<TDTO> items)
         {
-            return items;
+            return items
+                .Where(item => !item.IsFake);
         }
 
         private void PutInCache(IEnumerable<TDTO> items)

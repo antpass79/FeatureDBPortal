@@ -25,8 +25,8 @@ namespace FeatureDBPortal.Server.Providers
         IEnumerable<int> _versioNumbers;
         public IEnumerable<int> VersioNumbers => _versioNumbers;
 
-        IEnumerable<IQueryableCombination> _versions;
-        public IEnumerable<IQueryableCombination> Versions => _versions;
+        IEnumerable<IQueryableEntity> _versions;
+        public IEnumerable<IQueryableEntity> Versions => _versions;
 
         #region Public Functions
 
@@ -41,7 +41,7 @@ namespace FeatureDBPortal.Server.Providers
                 .Range(Min, Max - Min + 1)
                 .Select(version => GetNumericVersionFromMajor(version));
 
-            _versions = _versioNumbers.Select(item => new QueryableCombination
+            _versions = _versioNumbers.Select(item => new QueryableEntity
             {
                 Id = item,
                 Name = BuildStringVersion(item)

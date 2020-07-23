@@ -31,7 +31,7 @@ namespace FeatureDBPortal.Server.Services
             // NOTE: only if there isn't a version in the search
 
             // Maybe add firstLayoutGroup + "Id" == null
-            var combination = groupProvider.Group(normalRules);
+            var combination = groupProvider.Group(new GroupParameters { NormalRules = normalRules, ProbeId = search.ProbeId });
             return await Task.FromResult(combination);
         }
     }

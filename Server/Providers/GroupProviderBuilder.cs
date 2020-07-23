@@ -10,15 +10,20 @@ namespace FeatureDBPortal.Server.Providers
     public class GroupProviderBuilder
     {
         private readonly FeaturesContext _context;
+        private readonly IAllowModeProvider _allowModeProvider;
         private readonly IFilterCache _filterCache;
 
         private LayoutTypeDTO _groupByOne = LayoutTypeDTO.None;
         private LayoutTypeDTO _groupByTwo = LayoutTypeDTO.None;
         private LayoutTypeDTO _groupByThree = LayoutTypeDTO.None;
 
-        public GroupProviderBuilder(FeaturesContext context, IFilterCache filterCache)
+        public GroupProviderBuilder(
+            FeaturesContext context,
+            IAllowModeProvider allowModeProvider,
+            IFilterCache filterCache)
         {
             _context = context;
+            _allowModeProvider = allowModeProvider;
             _filterCache = filterCache;
         }
 
@@ -45,12 +50,14 @@ namespace FeatureDBPortal.Server.Providers
             var cellGroupProperties = BuildGroupProperties(_groupByThree);
 
             IGroupProvider groupProvider = null;
+            if (rowGroupProperties == null && columnGroupProperties == null && cellGroupProperties == null)
+                groupProvider = new GroupByAnyProvider(_allowModeProvider);
             if (rowGroupProperties != null && columnGroupProperties == null && cellGroupProperties == null)
-                groupProvider = new GroupByOneProvider(rowGroupProperties);
+                groupProvider = new GroupByOneProvider(rowGroupProperties, _allowModeProvider);
             else if (rowGroupProperties != null && columnGroupProperties != null && cellGroupProperties == null)
-                groupProvider = new GroupByTwoProvider(rowGroupProperties, columnGroupProperties);
+                groupProvider = new GroupByTwoProvider(rowGroupProperties, columnGroupProperties, _allowModeProvider);
             else if (rowGroupProperties != null && columnGroupProperties != null && cellGroupProperties != null)
-                groupProvider = new GroupByThreeProvider(rowGroupProperties, columnGroupProperties, cellGroupProperties);
+                groupProvider = new GroupByThreeProvider(rowGroupProperties, columnGroupProperties, cellGroupProperties, _allowModeProvider);
 
             return groupProvider;
         }
@@ -60,13 +67,11 @@ namespace FeatureDBPortal.Server.Providers
             if (groupType == LayoutTypeDTO.None)
                 return null;
 
-            //var items = _context.GetPropertyValue<IQueryable<IQueryableCombination>>(groupType.ToTableName())
-            //    .AsEnumerable();
             var items = _filterCache.Get(groupType.ToTableName());
 
             var groupableItems = items
                 .Where(item => !item.IsFake)
-                .Select(item => new QueryableCombination { Id = item.Id.Value, Name = item.Name })
+                .Select(item => new QueryableEntity { Id = item.Id.Value, Name = item.Name })
                 .OrderBy(item => item.Name)
                 .ToDictionary(item => item.Id);
 

@@ -1,4 +1,5 @@
-﻿using FeatureDBPortal.Shared;
+﻿using FeatureDBPortal.Server.Models;
+using FeatureDBPortal.Shared;
 using System.Collections.Generic;
 
 namespace FeatureDBPortal.Server.Services
@@ -7,6 +8,7 @@ namespace FeatureDBPortal.Server.Services
     {
         void Add(string key, IEnumerable<IQueryableItem> items);
         IReadOnlyList<IQueryableItem> Get(string key);
-        void Clear();
+        IReadOnlyList<IQueryableItem> Get<TEntity>()
+            where TEntity: IQueryableEntity;
     }
 }
