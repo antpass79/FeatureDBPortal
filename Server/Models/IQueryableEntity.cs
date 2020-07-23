@@ -1,6 +1,6 @@
 ﻿namespace FeatureDBPortal.Server.Models
 {
-    public interface IQueryableCombination
+    public interface IQueryableEntity
     {
         int Id { get; }
         string Name { get; }

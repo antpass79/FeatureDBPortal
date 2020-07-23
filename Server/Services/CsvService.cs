@@ -57,14 +57,14 @@ namespace FeatureDBPortal.Server.Services
 
         async Task WriteFiltersAsync(CsvWriter csvWriter, CombinationSearchDTO search)
         {
-            IQueryableCombination model = await _context.LogicalModel.FindAsync(search.ModelId);
-            IQueryableCombination country = await _context.Country.FindAsync(search.CountryId);
+            IQueryableEntity model = await _context.LogicalModel.FindAsync(search.ModelId);
+            IQueryableEntity country = await _context.Country.FindAsync(search.CountryId);
             var user = search.UserLevel;
-            IQueryableCombination application = await _context.Application.FindAsync(search.ApplicationId);
-            IQueryableCombination probe = await _context.Probe.FindAsync(search.ProbeId);
-            IQueryableCombination kit = await _context.BiopsyKits.FindAsync(search.KitId);
-            IQueryableCombination option = await _context.Option.FindAsync(search.OptionId);
-            IQueryableCombination version = await _context.MinorVersionAssociation.FindAsync(search.VersionId);
+            IQueryableEntity application = await _context.Application.FindAsync(search.ApplicationId);
+            IQueryableEntity probe = await _context.Probe.FindAsync(search.ProbeId);
+            IQueryableEntity kit = await _context.BiopsyKits.FindAsync(search.KitId);
+            IQueryableEntity option = await _context.Option.FindAsync(search.OptionId);
+            IQueryableEntity version = await _context.MinorVersionAssociation.FindAsync(search.VersionId);
 
             var rowGroup = search.RowLayout;
             var columnGroup = search.ColumnLayout;
@@ -148,7 +148,7 @@ namespace FeatureDBPortal.Server.Services
             await Task.CompletedTask;
         }
 
-        private void WriteField(CsvWriter csvWriter, string title, IQueryableCombination field)
+        private void WriteField(CsvWriter csvWriter, string title, IQueryableEntity field)
         {
             if (field == null)
                 return;

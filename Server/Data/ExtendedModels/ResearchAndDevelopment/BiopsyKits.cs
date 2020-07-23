@@ -2,7 +2,7 @@
 
 namespace FeatureDBPortal.Server.Data.Models.RD
 {
-    public partial class BiopsyKits : IQueryableCombination
+    public partial class BiopsyKits : IQueryableEntity
     {
     }
 }

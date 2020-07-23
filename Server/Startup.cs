@@ -78,6 +78,7 @@ namespace FeatureDBPortal.Server
                 .AddSingleton<IFilterCache, FilterCache>();
             services
                 .AddScoped<IVersionProvider, VersionProvider>()
+                .AddScoped<IAllowModeProvider, AllowModeProvider>()
                 .AddScoped<IAsyncCsvService, CsvService>()
                 .AddScoped<IAvailabilityCombinationService, AvailabilityCombinationService>();
             services

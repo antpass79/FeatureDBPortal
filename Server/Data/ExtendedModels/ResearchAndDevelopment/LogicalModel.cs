@@ -2,7 +2,7 @@
 
 namespace FeatureDBPortal.Server.Data.Models.RD
 {
-    public partial class LogicalModel : IQueryableCombination
+    public partial class LogicalModel : IQueryableEntity
     {
     }
 }

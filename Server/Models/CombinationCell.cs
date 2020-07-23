@@ -1,4 +1,4 @@
-﻿using FeatureDBPortal.Server.Utils;
+﻿using FeatureDBPortal.Shared;
 using System.Collections.Generic;
 
 namespace FeatureDBPortal.Server.Models
@@ -10,7 +10,7 @@ namespace FeatureDBPortal.Server.Models
 
         public bool? Available { get; set; }
         public bool? Visible { get; set; }
-        public AllowMode? AllowMode { get; set; }
+        public AllowModeDTO? AllowMode { get; set; }
 
         public IEnumerable<CombinationItem> Items { get; set; }
     }
