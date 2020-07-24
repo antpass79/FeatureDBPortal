@@ -1,8 +1,9 @@
-﻿using FeatureDBPortal.Server.Data.Models.RD;
+﻿using FeatureDBPortal.Server.Builders;
+using FeatureDBPortal.Server.Data.Models.RD;
 using FeatureDBPortal.Server.Extensions;
+using FeatureDBPortal.Server.Models;
 using FeatureDBPortal.Server.Providers;
 using FeatureDBPortal.Shared;
-using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,7 +17,10 @@ namespace FeatureDBPortal.Server.Services
 
         protected FeaturesContext Context { get; }
 
-        protected CombinationGroupService(FeaturesContext context, IVersionProvider versionProvider, GroupProviderBuilder groupProviderBuilder)
+        protected CombinationGroupService(
+            FeaturesContext context,
+            IVersionProvider versionProvider,
+            GroupProviderBuilder groupProviderBuilder)
         {
             Context = context;
             _versionProvider = versionProvider;
@@ -29,7 +33,10 @@ namespace FeatureDBPortal.Server.Services
             if (filteredNormalRules == null || filteredNormalRules.Count == 0)
                 return await Task.FromResult<CombinationDTO>(null);
 
-            return await BuildCombination(search, filteredNormalRules, _groupProviderBuilder);
+            var groupProvider = BuildGroupProvider(search, _groupProviderBuilder);
+
+            var combination = groupProvider.Group(new GroupParameters { NormalRules = filteredNormalRules, ProbeId = search.ProbeId });
+            return await Task.FromResult(combination);
         }
 
         // Check for input parameters
@@ -57,8 +64,7 @@ namespace FeatureDBPortal.Server.Services
         {
             if (!search.VersionId.HasValue && search.ModelId.HasValue && search.CountryId.HasValue)
             {
-                int version = _versionProvider.BuildDefaultVersion(search.CountryId.Value, search.ModelId.Value);
-                search.VersionId = version;
+                search.VersionId = _versionProvider.BuildDefaultVersion(search.CountryId.Value, search.ModelId.Value);
             }
 
             var result = Context
@@ -75,7 +81,7 @@ namespace FeatureDBPortal.Server.Services
             return result.ToList();
         }
 
-        abstract protected Task<CombinationDTO> BuildCombination(CombinationSearchDTO search, IList<NormalRule> normalRules, GroupProviderBuilder groupProviderBuilder);
+        abstract protected IGroupProvider BuildGroupProvider(CombinationSearchDTO search, GroupProviderBuilder groupProviderBuilder);
 
         private bool IsOutputLayoutTypeSelected(CombinationSearchDTO search, LayoutTypeDTO layoutType) => search.RowLayout == layoutType || search.ColumnLayout == layoutType || search.CellLayout == layoutType;
     }

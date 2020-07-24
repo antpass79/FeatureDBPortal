@@ -1,8 +1,8 @@
-﻿using FeatureDBPortal.Server.Data.Models.RD;
+﻿using FeatureDBPortal.Server.Builders;
 using FeatureDBPortal.Server.Extensions;
 using FeatureDBPortal.Server.Models;
-using FeatureDBPortal.Server.Utils;
 using FeatureDBPortal.Shared;
+using FeatureDBPortal.Shared.Utilities;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,11 +14,13 @@ namespace FeatureDBPortal.Server.Providers
         private readonly GroupProperties _rowGroupProperties;
         private readonly GroupProperties _columnGroupProperties;
         private readonly IAllowModeProvider _allowModeProvider;
+        private readonly CombinationIndexerBuilder _combinationIndexerBuilder;
 
         public GroupByTwoProvider(
             GroupProperties rowGroupProperties,
             GroupProperties columnGroupProperties,
-            IAllowModeProvider allowModeProvider)
+            IAllowModeProvider allowModeProvider,
+            CombinationIndexerBuilder combinationIndexerBuilder)
         {
             _rowGroupProperties = rowGroupProperties;
             _columnGroupProperties = columnGroupProperties;
@@ -27,6 +29,7 @@ namespace FeatureDBPortal.Server.Providers
             _columns = _columnGroupProperties.GroupableItems.Values.ToList();
 
             _allowModeProvider = allowModeProvider;
+            _combinationIndexerBuilder = combinationIndexerBuilder;
         }
 
         public string GroupName => $"{_rowGroupProperties.LayoutType} / {_columnGroupProperties.LayoutType}";
@@ -38,97 +41,37 @@ namespace FeatureDBPortal.Server.Providers
 
         public CombinationDTO Group(GroupParameters parameters)
         {
-            var combination = BuildCombination(Rows, Columns);
-            combination.IntersectionTitle = GroupName;
+            var combinationIndexer = _combinationIndexerBuilder
+                .Rows(Rows)
+                .Columns(Columns)
+                .Title(GroupName)
+                .Build();
 
             var groups = parameters.NormalRules
                 .GroupBy(_rowGroupProperties.GroupExpression)
-                .Where(item => item.Key.HasValue && !_rowGroupProperties.DiscardItemIds.Contains(item.Key.Value))
-                .ToList();
+                .Where(item => item.Key.HasValue && !_rowGroupProperties.DiscardItemIds.Contains(item.Key.Value));
 
-            Parallel.For(0, groups.Count, (i) =>
+            using (var watcher = new Watcher("GROUP BY 2 PARALLEL"))
             {
-                var group = groups[i];
-                var row = combination.Rows[_rowIdToIndexMapper[group.Key]];
-
-                Parallel.ForEach(group, (normalRule) =>
+                Parallel.ForEach(groups, (group) =>
                 {
-                    var columnId = normalRule.GetPropertyIdByGroupNameId(_columnGroupProperties.NormalRulePropertyNameId);
-                    if (columnId.HasValue)
+                    Parallel.ForEach(group, (normalRule) =>
                     {
-                        var cell = row.Cells[_columnIdToIndexMapper[columnId]];
+                        var columnId = normalRule.GetPropertyIdByGroupNameId(_columnGroupProperties.NormalRulePropertyNameId);
+                        if (columnId.HasValue)
+                        {
+                            var cell = combinationIndexer[group.Key, columnId];
+                            var allowModeProperties = _allowModeProvider.Properties(group, parameters.ProbeId);
 
-                        var allowModeProperties = _allowModeProvider.Properties(group, parameters.ProbeId);
-                        cell.Visible = allowModeProperties.Visible;
-                        cell.Available = allowModeProperties.Available;
-                        cell.AllowMode = allowModeProperties.AllowMode;
-                    }
+                            cell.Visible = allowModeProperties.Visible;
+                            cell.Available = allowModeProperties.Available;
+                            cell.AllowMode = allowModeProperties.AllowMode;
+                        }
+                    });
                 });
-            });
-
-            return combination;
-        }
-
-        Dictionary<int?, int> _rowIdToIndexMapper = new Dictionary<int?, int>();
-        Dictionary<int?, int> _columnIdToIndexMapper = new Dictionary<int?, int>();
-        CombinationDTO BuildCombination(IReadOnlyList<QueryableEntity> rows, IReadOnlyList<QueryableEntity> columns)
-        {
-            var combination = new CombinationDTO();
-            var newRows = new List<RowDTO>();
-
-            var rowIndex = 0;
-            foreach (var row in rows)
-            {
-                _rowIdToIndexMapper.Add(row.Id, rowIndex);
-
-                var newRow = new RowDTO
-                {
-                    RowId = row.Id,
-                    Title = new RowTitleDTO
-                    {
-                        Id = row.Id,
-                        Name = row.Name
-                    }
-                };
-
-                var newCells = new List<CellDTO>();
-                foreach (var column in columns)
-                {
-                    var newCell = new CellDTO
-                    {
-                        RowId = row.Id,
-                        ColumnId = column.Id,
-                    };
-
-                    newCells.Add(newCell);
-                }
-                newRow.Cells = newCells;
-
-                newRows.Add(newRow);
-
-                rowIndex++;
             }
 
-            int columnIndex = 0;
-            var newColumns = new List<ColumnDTO>();
-            foreach (var column in columns)
-            {
-                _columnIdToIndexMapper.Add(column.Id, columnIndex);
-                var newColumn = new ColumnDTO
-                {
-                    Id = column.Id,
-                    Name = column.Name
-                };
-
-                newColumns.Add(newColumn);
-
-                columnIndex++;
-            }
-
-            combination.Rows = newRows;
-            combination.Columns = newColumns;
-
-            return combination;
+            return combinationIndexer.Combination;
         }
     }
 }

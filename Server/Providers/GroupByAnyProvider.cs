@@ -1,4 +1,4 @@
-﻿using FeatureDBPortal.Server.Data.Models.RD;
+﻿using FeatureDBPortal.Server.Builders;
 using FeatureDBPortal.Server.Models;
 using FeatureDBPortal.Shared;
 using System;
@@ -9,54 +9,57 @@ namespace FeatureDBPortal.Server.Providers
     public class GroupByAnyProvider : IGroupProvider
     {
         private readonly IAllowModeProvider _allowModeProvider;
+        private readonly CombinationIndexerBuilder _combinationIndexerBuilder;
 
-        public GroupByAnyProvider(IAllowModeProvider allowModeProvider)
+        public GroupByAnyProvider(
+            IAllowModeProvider allowModeProvider,
+            CombinationIndexerBuilder combinationIndexerBuilder)
         {
+            _rows = new List<QueryableEntity>
+                            {
+                                new QueryableEntity
+                                {
+                                    Id = -1,
+                                    Name = "Value"
+                                }
+                            };
+            _columns = new List<QueryableEntity>
+                            {
+                                new QueryableEntity
+                                {
+                                    Id = -1,
+                                    Name = "Allow"
+                                }
+                            };
+
             _allowModeProvider = allowModeProvider;
+            _combinationIndexerBuilder = combinationIndexerBuilder;
         }
 
         public string GroupName => string.Empty;
 
-        public IReadOnlyList<QueryableEntity> Rows => throw new NotImplementedException();
-        public IReadOnlyList<QueryableEntity> Columns => throw new NotSupportedException();
+        IReadOnlyList<QueryableEntity> _rows;
+        public IReadOnlyList<QueryableEntity> Rows => _rows;
+
+        IReadOnlyList<QueryableEntity> _columns;
+        public IReadOnlyList<QueryableEntity> Columns => _columns;
 
         public CombinationDTO Group(GroupParameters parameters)
         {
+            var combinationIndexer = _combinationIndexerBuilder
+                .Rows(Rows)
+                .Columns(Columns)
+                .Title(GroupName)
+                .Build();
+
+            var cell = combinationIndexer[-1, -1];
             var allowModeProperties = _allowModeProvider.Properties(parameters.NormalRules, parameters.ProbeId);
 
-            var combination = new CombinationDTO
-            {
-                IntersectionTitle = GroupName,
-                Columns = new List<ColumnDTO>
-                {
-                    new ColumnDTO { Id = -1, Name = "Allow" },
-                },
-                Rows = new List<RowDTO>
-                {
-                    new RowDTO
-                    {
-                        RowId = -1,
-                        Title = new RowTitleDTO
-                        {
-                            Id = -1,
-                            Name = "Value"
-                        },
-                        Cells = new List<CellDTO>
-                        {
-                            new CellDTO
-                            {
-                                RowId = -1,
-                                ColumnId = -1,
-                                Available = allowModeProperties.Available,
-                                Visible = allowModeProperties.Visible,
-                                AllowMode = allowModeProperties.AllowMode
-                            }
-                        }
-                    }
-                }
-            };
+            cell.Visible = allowModeProperties.Visible;
+            cell.Available = allowModeProperties.Available;
+            cell.AllowMode = allowModeProperties.AllowMode;
 
-            return combination;
+            return combinationIndexer.Combination;
         }
     }
 }

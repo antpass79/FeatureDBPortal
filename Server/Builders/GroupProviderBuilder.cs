@@ -1,30 +1,31 @@
-﻿using FeatureDBPortal.Server.Data.Models.RD;
-using FeatureDBPortal.Server.Extensions;
+﻿using FeatureDBPortal.Server.Extensions;
 using FeatureDBPortal.Server.Models;
+using FeatureDBPortal.Server.Providers;
 using FeatureDBPortal.Server.Services;
 using FeatureDBPortal.Shared;
+using FeatureDBPortal.Shared.Utilities;
 using System.Linq;
 
-namespace FeatureDBPortal.Server.Providers
+namespace FeatureDBPortal.Server.Builders
 {
     public class GroupProviderBuilder
     {
-        private readonly FeaturesContext _context;
         private readonly IAllowModeProvider _allowModeProvider;
         private readonly IFilterCache _filterCache;
+        private readonly CombinationIndexerBuilder _combinationIndexerBuilder;
 
         private LayoutTypeDTO _groupByOne = LayoutTypeDTO.None;
         private LayoutTypeDTO _groupByTwo = LayoutTypeDTO.None;
         private LayoutTypeDTO _groupByThree = LayoutTypeDTO.None;
 
         public GroupProviderBuilder(
-            FeaturesContext context,
             IAllowModeProvider allowModeProvider,
-            IFilterCache filterCache)
+            IFilterCache filterCache,
+            CombinationIndexerBuilder combinationIndexerBuilder)
         {
-            _context = context;
             _allowModeProvider = allowModeProvider;
             _filterCache = filterCache;
+            _combinationIndexerBuilder = combinationIndexerBuilder;
         }
 
         public GroupProviderBuilder GroupByOne(LayoutTypeDTO groupType)
@@ -45,19 +46,21 @@ namespace FeatureDBPortal.Server.Providers
 
         public IGroupProvider Build()
         {
+            using var watcher = new Watcher("GROUP PROVIDER BUILDER --> BUILD");
+
             var rowGroupProperties = BuildGroupProperties(_groupByOne);
             var columnGroupProperties = BuildGroupProperties(_groupByTwo);
             var cellGroupProperties = BuildGroupProperties(_groupByThree);
 
             IGroupProvider groupProvider = null;
             if (rowGroupProperties == null && columnGroupProperties == null && cellGroupProperties == null)
-                groupProvider = new GroupByAnyProvider(_allowModeProvider);
+                groupProvider = new GroupByAnyProvider(_allowModeProvider, _combinationIndexerBuilder);
             if (rowGroupProperties != null && columnGroupProperties == null && cellGroupProperties == null)
-                groupProvider = new GroupByOneProvider(rowGroupProperties, _allowModeProvider);
+                groupProvider = new GroupByOneProvider(rowGroupProperties, _allowModeProvider, _combinationIndexerBuilder);
             else if (rowGroupProperties != null && columnGroupProperties != null && cellGroupProperties == null)
-                groupProvider = new GroupByTwoProvider(rowGroupProperties, columnGroupProperties, _allowModeProvider);
+                groupProvider = new GroupByTwoProvider(rowGroupProperties, columnGroupProperties, _allowModeProvider, _combinationIndexerBuilder);
             else if (rowGroupProperties != null && columnGroupProperties != null && cellGroupProperties != null)
-                groupProvider = new GroupByThreeProvider(rowGroupProperties, columnGroupProperties, cellGroupProperties, _allowModeProvider);
+                groupProvider = new GroupByThreeProvider(rowGroupProperties, columnGroupProperties, cellGroupProperties, _allowModeProvider, _combinationIndexerBuilder);
 
             return groupProvider;
         }

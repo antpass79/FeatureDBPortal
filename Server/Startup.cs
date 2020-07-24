@@ -1,5 +1,6 @@
 using AutoMapper;
 using FeatureDBPortal.Server.ActiveDirectory;
+using FeatureDBPortal.Server.Builders;
 using FeatureDBPortal.Server.Data.Models.RD;
 using FeatureDBPortal.Server.gRPC;
 using FeatureDBPortal.Server.Options;
@@ -82,6 +83,7 @@ namespace FeatureDBPortal.Server
                 .AddScoped<IAsyncCsvService, CsvService>()
                 .AddScoped<IAvailabilityCombinationService, AvailabilityCombinationService>();
             services
+                .AddTransient<CombinationIndexerBuilder>()
                 .AddTransient<GroupProviderBuilder>()
                 .AddTransient<CombinationGroupByAnyService>()
                 .AddTransient<CombinationGroupByOneService>()
