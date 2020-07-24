@@ -1,3 +1,4 @@
+using FeatureDBPortal.Server.Builders;
 using FeatureDBPortal.Server.Data.Models.RD;
 using FeatureDBPortal.Server.Providers;
 using FeatureDBPortal.Server.Services;
@@ -23,7 +24,7 @@ namespace FeatureDBPortal.Server.Tests
             optionsBuilder.UseSqlServer("Server=PC\\SQLExpress;Database=Features;Trusted_Connection=True;");
             var context = new FeaturesContext(optionsBuilder.Options);
 
-            return new CombinationGroupByAnyService(context, new VersionProvider(context), new GroupProviderBuilder(context, new AllowModeProvider(context), new FilterCache()), new AllowModeProvider(context));
+            return new CombinationGroupByAnyService(context, new VersionProvider(context), new GroupProviderBuilder(new AllowModeProvider(context), new FilterCache(), new CombinationIndexerBuilder()));
         }
 
         [Theory]

@@ -1,7 +1,8 @@
-﻿using FeatureDBPortal.Server.Data.Models.RD;
+﻿using FeatureDBPortal.Server.Builders;
 using FeatureDBPortal.Server.Extensions;
 using FeatureDBPortal.Server.Models;
 using FeatureDBPortal.Shared;
+using FeatureDBPortal.Shared.Utilities;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,12 +15,14 @@ namespace FeatureDBPortal.Server.Providers
         private readonly GroupProperties _columnGroupProperties;
         private readonly GroupProperties _cellGroupProperties;
         private readonly IAllowModeProvider _allowModeProvider;
+        private readonly CombinationIndexerBuilder _combinationIndexerBuilder;
 
         public GroupByThreeProvider(
             GroupProperties rowGroupProperties,
             GroupProperties columnGroupProperties,
             GroupProperties cellGroupProperties,
-            IAllowModeProvider allowModeProvider)
+            IAllowModeProvider allowModeProvider,
+            CombinationIndexerBuilder combinationIndexerBuilder)
         {
             _rowGroupProperties = rowGroupProperties;
             _columnGroupProperties = columnGroupProperties;
@@ -29,6 +32,7 @@ namespace FeatureDBPortal.Server.Providers
             _columns = _columnGroupProperties.GroupableItems.Values.ToList();
 
             _allowModeProvider = allowModeProvider;
+            _combinationIndexerBuilder = combinationIndexerBuilder;
         }
 
         public string GroupName => $"{_rowGroupProperties.LayoutType} / {_columnGroupProperties.LayoutType} / {_cellGroupProperties.LayoutType}";
@@ -41,106 +45,47 @@ namespace FeatureDBPortal.Server.Providers
 
         public CombinationDTO Group(GroupParameters parameters)
         {
-            var combination = BuildCombination(Rows, Columns);
-            combination.IntersectionTitle = GroupName;
+            var combinationIndexer = _combinationIndexerBuilder
+                .Rows(Rows)
+                .Columns(Columns)
+                .Title(GroupName)
+                .Build();
 
             var groups = parameters.NormalRules
                 .GroupBy(_rowGroupProperties.GroupExpression)
-                .Where(item => item.Key.HasValue && !_rowGroupProperties.DiscardItemIds.Contains(item.Key.Value))
-                .ToList();
+                .Where(item => item.Key.HasValue && !_rowGroupProperties.DiscardItemIds.Contains(item.Key.Value));
 
-            Parallel.For(0, groups.Count, (i) =>
+            using (var watcher = new Watcher("GROUP BY 3 PARALLEL"))
             {
-                var group = groups[i];
-
-                var row = combination.Rows[_rowIdToIndexMapper[group.Key]];
-
-                Parallel.ForEach(group, (normalRule) =>
+                Parallel.ForEach(groups, (group) =>
                 {
-                    var columnId = normalRule.GetPropertyIdByGroupNameId(_columnGroupProperties.NormalRulePropertyNameId);
-                    if (columnId.HasValue)
+                    Parallel.ForEach(group, (normalRule) =>
                     {
-                        var cell = row.Cells[_columnIdToIndexMapper[columnId]];
-
-                        var allowModeProperties = _allowModeProvider.Properties(group, parameters.ProbeId);
-                        cell.Visible = allowModeProperties.Visible;
-                        cell.Available = allowModeProperties.Available;
-                        cell.AllowMode = allowModeProperties.AllowMode;
-
-                        cell.Items = group.GroupBy(_cellGroupProperties.GroupExpression).Select(thirdGroup => new CellItemDTO
+                        var columnId = normalRule.GetPropertyIdByGroupNameId(_columnGroupProperties.NormalRulePropertyNameId);
+                        if (columnId.HasValue)
                         {
-                            Name = thirdGroup.Key.HasValue && _cellGroupProperties.GroupableItems.ContainsKey(thirdGroup.Key.Value) ? _cellGroupProperties.GroupableItems[thirdGroup.Key.Value].Name : string.Empty,
-                            Allow = thirdGroup.All(i => i.Allow != 0)
-                        })
-                            .Where(item => item.Allow)
-                            .ToList();
-                    }
+                            var cell = combinationIndexer[group.Key, columnId];
+                            var allowModeProperties = _allowModeProvider.Properties(group, parameters.ProbeId);
+
+                            cell.Visible = allowModeProperties.Visible;
+                            cell.Available = allowModeProperties.Available;
+                            cell.AllowMode = allowModeProperties.AllowMode;
+
+                            var innerGroup = group
+                                .GroupBy(_cellGroupProperties.GroupExpression)
+                                .Where(item => item.All(i => i.Allow != 0) && item.Key.HasValue && _cellGroupProperties.GroupableItems.ContainsKey(item.Key.Value));
+
+                            cell.Items = innerGroup.Select(thirdGroup => new CellItemDTO
+                            {
+                                Name = _cellGroupProperties.GroupableItems[thirdGroup.Key.Value].Name
+                            })
+                                .ToList();
+                        }
+                    });
                 });
-            });
-
-            return combination;
-        }
-
-        Dictionary<int?, int> _rowIdToIndexMapper = new Dictionary<int?, int>();
-        Dictionary<int?, int> _columnIdToIndexMapper = new Dictionary<int?, int>();
-        CombinationDTO BuildCombination(IReadOnlyList<QueryableEntity> rows, IReadOnlyList<QueryableEntity> columns)
-        {
-            var combination = new CombinationDTO();
-            var newRows = new List<RowDTO>();
-
-            var rowIndex = 0;
-            foreach (var row in rows)
-            {
-                _rowIdToIndexMapper.Add(row.Id, rowIndex);
-
-                var newRow = new RowDTO
-                {
-                    RowId = row.Id,
-                    Title = new RowTitleDTO
-                    {
-                        Id = row.Id,
-                        Name = row.Name
-                    }
-                };
-
-                var newCells = new List<CellDTO>();
-                foreach (var column in columns)
-                {
-                    var newCell = new CellDTO
-                    {
-                        RowId = row.Id,
-                        ColumnId = column.Id,
-                    };
-
-                    newCells.Add(newCell);
-                }
-                newRow.Cells = newCells;
-
-                newRows.Add(newRow);
-
-                rowIndex++;
             }
 
-            int columnIndex = 0;
-            var newColumns = new List<ColumnDTO>();
-            foreach (var column in columns)
-            {
-                _columnIdToIndexMapper.Add(column.Id, columnIndex);
-                var newColumn = new ColumnDTO
-                {
-                    Id = column.Id,
-                    Name = column.Name
-                };
-
-                newColumns.Add(newColumn);
-
-                columnIndex++;
-            }
-
-            combination.Rows = newRows;
-            combination.Columns = newColumns;
-
-            return combination;
+            return combinationIndexer.Combination;
         }
     }
 }

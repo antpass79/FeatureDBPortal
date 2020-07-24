@@ -25,8 +25,7 @@ namespace FeatureDBPortal.Server.Providers
 			{
 				// Probe 50: TLC 3-13 => 2 transducers
 				var transducers = _context.ProbeTransducers
-					.Where(item => item.ProbeId == probeId)
-					.ToList();
+					.Where(item => item.ProbeId == probeId);
 
 				foreach (var transducer in transducers)
 				{
