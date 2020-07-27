@@ -14,7 +14,6 @@ namespace FeatureDBPortal.Server.Providers
         {
             LayoutType = layoutType;
 
-            TableName = LayoutType.ToNormalRulePropertyName();
             NormalRulePropertyName = LayoutType.ToNormalRulePropertyName();
             NormalRulePropertyNameId = LayoutType.ToNormalRulePropertyNameId();
 
@@ -26,7 +25,6 @@ namespace FeatureDBPortal.Server.Providers
 
         public LayoutTypeDTO LayoutType { get; }
 
-        public string TableName { get; }
         public string NormalRulePropertyName { get; }
         public string NormalRulePropertyNameId { get; }
 
