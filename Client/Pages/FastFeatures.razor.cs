@@ -2,6 +2,7 @@
 using FeatureDBPortal.Client.Models;
 using FeatureDBPortal.Client.Services;
 using FeatureDBPortal.Shared;
+using FeatureDBPortal.Shared.Utilities;
 using GrpcCombination;
 using Microsoft.AspNetCore.Components;
 using System;
@@ -15,111 +16,171 @@ namespace FeatureDBPortal.Client.Pages
 {
     public class FastFeaturesDataModel : ComponentBase
     {
+        const string BUTTON_ACTION_EXPORT_TO_CSV = "BUTTON_ACTION_EXPORT_TO_CSV";
+        const string BUTTON_ACTION_SYNC_RA = "BUTTON_ACTION_SYNC_RA";
+
         [Inject]
         Filter.FilterClient Filter { get; set; }
         [Inject]
         Combiner.CombinerClient Combiner { get; set; }
+        [Inject]
+        protected ToolbarButtonsService ButtonsService { get; set; }
+        [Inject]
+        protected ICsvExportService CsvExportService { get; set; }
 
-        protected bool FiltersBusy { get; set; }
+
         protected bool CombinationsBusy { get; set; }
+        protected string ErrorMessage { get; private set; }
 
-        protected IEnumerable<ApplicationGRPC> Applications { get; set; }
-        protected ApplicationGRPC SelectedApplication { get; private set; } = new ApplicationGRPC();
+        bool _filtersOpened = true;
+        protected bool FiltersOpened
+        {
+            get => _filtersOpened;
+            set
+            {
+                _filtersOpened = value;
+                CombinationContainerClass = FiltersOpened ? "feature-combination-filters-opened" : "feature-combination-filters-closed";
+            }
+        }
+        protected bool KeepOpen { get; set; }
+        protected string CombinationContainerClass { get; set; } = "feature-combination-filters-opened";
 
-        protected IEnumerable<ProbeGRPC> Probes { get; set; }
-        protected ProbeGRPC SelectedProbe { get; private set; } = new ProbeGRPC();
+        protected bool ShowCsvExportDialog { get; set; }
+        protected CsvExportSettingsDTO CsvExportSettings = new CsvExportSettingsDTO();
 
-        protected IEnumerable<CountryGRPC> Countries { get; set; }
-        protected CountryGRPC SelectedCountry { get; private set; } = new CountryGRPC();
-
-        protected IEnumerable<VersionGRPC> Versions { get; set; }
-        protected VersionGRPC SelectedVersion { get; private set; } = new VersionGRPC();
-
-        protected IEnumerable<ModelGRPC> Models { get; set; }
-        protected ModelGRPC SelectedModel { get; private set; } = new ModelGRPC();
-
-        protected IEnumerable<OptionGRPC> Options { get; set; }
-        protected OptionGRPC SelectedOption { get; private set; } = new OptionGRPC();
-
-        protected IEnumerable<KitGRPC> Kits { get; set; }
-        protected KitGRPC SelectedKit { get; private set; } = new KitGRPC();
-
-        protected IEnumerable UserLevels { get; set; }
-        protected UserLevelGRPC SelectedUserLevel { get; set; }
-
-        protected IEnumerable LayoutViews { get; set; }
-        protected LayoutTypeGRPC SelectedRowLayout { get; set; } = LayoutTypeGRPC.None;
-        protected LayoutTypeGRPC SelectedColumnLayout { get; set; } = LayoutTypeGRPC.None;
-        protected LayoutTypeGRPC SelectedCellLayout { get; set; } = LayoutTypeGRPC.None;
+        protected SearchFilters SearchFilters = new SearchFilters();
+        private CombinationSearchGRPC LastSearch { get; set; }
 
         protected Combination Combination { get; private set; }
 
-        protected LayoutTypeGRPC CurrentHeader { get; set; }
-
-        protected bool DisableApplication => SelectedRowLayout == LayoutTypeGRPC.Application || SelectedColumnLayout == LayoutTypeGRPC.Application || SelectedCellLayout == LayoutTypeGRPC.Application;
-        protected bool DisableProbe => SelectedRowLayout == LayoutTypeGRPC.Probe || SelectedColumnLayout == LayoutTypeGRPC.Probe || SelectedCellLayout == LayoutTypeGRPC.Probe;
-        protected bool DisableModel => SelectedRowLayout == LayoutTypeGRPC.Model || SelectedColumnLayout == LayoutTypeGRPC.Model || SelectedCellLayout == LayoutTypeGRPC.Model;
-        protected bool DisableKit => SelectedRowLayout == LayoutTypeGRPC.Kit || SelectedColumnLayout == LayoutTypeGRPC.Kit || SelectedCellLayout == LayoutTypeGRPC.Kit;
-        protected bool DisableOption => SelectedRowLayout == LayoutTypeGRPC.Option || SelectedColumnLayout == LayoutTypeGRPC.Option || SelectedCellLayout == LayoutTypeGRPC.Option;
-        protected bool DisableVersion => SelectedRowLayout == LayoutTypeGRPC.Version || SelectedColumnLayout == LayoutTypeGRPC.Version || SelectedCellLayout == LayoutTypeGRPC.Version;
-        protected bool DisableCountry => SelectedRowLayout == LayoutTypeGRPC.Country || SelectedColumnLayout == LayoutTypeGRPC.Country || SelectedCellLayout == LayoutTypeGRPC.Country;
-        protected bool DisableUserLevel => SelectedRowLayout == LayoutTypeGRPC.UserLevel || SelectedColumnLayout == LayoutTypeGRPC.UserLevel || SelectedCellLayout == LayoutTypeGRPC.UserLevel;
-
-        private bool IsOutputLayoutTypeSelected(LayoutTypeGRPC layoutType) => SelectedRowLayout == layoutType || SelectedColumnLayout == layoutType || SelectedCellLayout == layoutType;
+        protected CombinationFilters CombinationFilters = new CombinationFilters
+        {
+            KeepIfIdNotNull = true,
+            KeepIfCellModeNotNull = true,
+            KeepIfCellModeA = true,
+            KeepIfCellModeDef = true,
+            KeepIfCellModeNo = true
+        };
 
         protected override async Task OnInitializedAsync()
         {
-            FiltersBusy = true;
-
-            Applications = (await Filter.GetApplicationsAsync(new EmptyParam())).Applications;
-            Probes = (await Filter.GetProbesAsync(new EmptyParam())).Probes;
-            Countries = (await Filter.GetCountriesAsync(new EmptyParam())).Countries;
-            Versions = (await Filter.GetVersionsAsync(new EmptyParam())).Versions;
-            Models = (await Filter.GetModelsAsync(new EmptyParam())).Models;
-            Options = (await Filter.GetOptionsAsync(new EmptyParam())).Options;
-            Kits = (await Filter.GetKitsAsync(new EmptyParam())).Kits;
-            UserLevels = Enum.GetValues(typeof(UserLevelGRPC));
-            LayoutViews = Enum.GetValues(typeof(LayoutTypeGRPC));
-
-            SelectedModel = Models.FirstOrDefault();
-            SelectedCountry = Countries.FirstOrDefault();
-            SelectedUserLevel = UserLevels.Cast<UserLevelGRPC>().FirstOrDefault();
-
-            FiltersBusy = false;
-
+            BuildToolbar();
             await Task.CompletedTask;
         }
 
         async protected Task OnSearch()
         {
-            var start = DateTime.Now;
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
+            ErrorMessage = string.Empty;
+            Combination = null;
+
+            using var watcher = new Watcher("CLIENT-SERVER ROUNDTRIP");
 
             CombinationsBusy = true;
 
-            var combinationGRPC = await Combiner.GetCombinationAsync(new CombinationSearchGRPC
+            try
             {
-                Application = IsOutputLayoutTypeSelected(LayoutTypeGRPC.Application) ? null : SelectedApplication,
-                Probe = IsOutputLayoutTypeSelected(LayoutTypeGRPC.Probe) ? null : SelectedProbe,
-                Country = IsOutputLayoutTypeSelected(LayoutTypeGRPC.Country) || SelectedCellLayout == LayoutTypeGRPC.Country ? null : SelectedCountry,
-                Version = IsOutputLayoutTypeSelected(LayoutTypeGRPC.Version) ? null : SelectedVersion,
-                Model = IsOutputLayoutTypeSelected(LayoutTypeGRPC.Model) ? null : SelectedModel,
-                Option = IsOutputLayoutTypeSelected(LayoutTypeGRPC.Option) ? null : SelectedOption,
-                Kit = IsOutputLayoutTypeSelected(LayoutTypeGRPC.Kit) ? null : SelectedKit,
-                UserLevel = IsOutputLayoutTypeSelected(LayoutTypeGRPC.UserLevel) ? UserLevelGRPC.None : SelectedUserLevel,
-                RowLayout = SelectedRowLayout,
-                ColumnLayout = SelectedColumnLayout,
-                CellLayout = SelectedCellLayout
+                LastSearch = new CombinationSearchGRPC
+                {                    
+                    ApplicationId = SearchFilters.IsOutputLayoutTypeSelected(LayoutTypeDTO.Application) ? null : SearchFilters.Application.Id,
+                    ProbeId = SearchFilters.IsOutputLayoutTypeSelected(LayoutTypeDTO.Probe) ? null : SearchFilters.Probe.Id,
+                    CountryId = SearchFilters.IsOutputLayoutTypeSelected(LayoutTypeDTO.Country) ? null : SearchFilters.Country.Id,
+                    VersionId = SearchFilters.IsOutputLayoutTypeSelected(LayoutTypeDTO.Version) ? null : SearchFilters.Version.Id,
+                    ModelId = SearchFilters.IsOutputLayoutTypeSelected(LayoutTypeDTO.Model) ? null : SearchFilters.Model.Id,
+                    OptionId = SearchFilters.IsOutputLayoutTypeSelected(LayoutTypeDTO.Option) ? null : SearchFilters.Option.Id,
+                    KitId = SearchFilters.IsOutputLayoutTypeSelected(LayoutTypeDTO.Kit) ? null : SearchFilters.Kit.Id,
+                    UserLevel = SearchFilters.IsOutputLayoutTypeSelected(LayoutTypeDTO.UserLevel) ? UserLevelGRPC.None : (UserLevelGRPC)SearchFilters.UserLevel,
+                    RowLayout = (LayoutTypeGRPC)SearchFilters.RowLayout,
+                    ColumnLayout = (LayoutTypeGRPC)SearchFilters.ColumnLayout,
+                    CellLayout = (LayoutTypeGRPC)SearchFilters.CellLayout
+                };
+                var combinationGRPC = await Combiner.GetCombinationAsync(LastSearch);
+
+                Combination combination;
+
+                using (var innerWatcher = new Watcher("ToModel"))
+                {
+                    combination = combinationGRPC.ToModel();
+                }
+
+                using (var innerWatcher = new Watcher("ApplyFilters"))
+                {
+                    combination.ApplyFilters(CombinationFilters);
+                }
+
+                Combination = combination;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                ErrorMessage = "Unsupported Combination";
+                Combination = null;
+            }
+            finally
+            {
+                CombinationsBusy = false;
+                FiltersOpened = KeepOpen || false;
+
+                StateHasChanged();
+            }
+        }
+
+        private void BuildToolbar()
+        {
+            ButtonsService.Actions.Add(new ButtonAction
+            {
+                Id = BUTTON_ACTION_EXPORT_TO_CSV,
+                Label = "Export to CSV",
+                IconName = "import_export"
+            });
+            ButtonsService.Actions.Add(new ButtonAction
+            {
+                Id = BUTTON_ACTION_SYNC_RA,
+                Label = "Sync RA",
+                IconName = "sync"
             });
 
-            Combination = combinationGRPC.ToModel();
-            CurrentHeader = SelectedRowLayout;
+            ButtonsService.FireAction = (action) =>
+            {
+                switch (action.Id)
+                {
+                    case BUTTON_ACTION_EXPORT_TO_CSV:
+                        CsvExportSettings.FileName = string.Empty;
+                        ShowCsvExportDialog = true;
+                        StateHasChanged();
+                        break;
+                    case BUTTON_ACTION_SYNC_RA:
+                        break;
+                }
+            };
+        }
 
-            CombinationsBusy = false;
+        public void Dispose()
+        {
+            ButtonsService.Actions.Clear();
+        }
 
-            Trace.WriteLine(string.Empty);
-            Trace.WriteLine($"FAST FEATURE: Process starts at {start} and stops at {DateTime.Now} with duration of {stopwatch.Elapsed}");
+        async protected Task OnDownload()
+        {
+            ShowCsvExportDialog = false;
+            await CsvExportService.DownloadCsv(new CsvExportDTO
+            {
+                Search = new CombinationSearchDTO
+                {
+                    ModelId = LastSearch.ModelId,
+                    CountryId = LastSearch.CountryId,
+                    UserLevel = (UserLevelDTO)LastSearch.UserLevel,
+                    ApplicationId = LastSearch.ApplicationId,
+                    ProbeId = LastSearch.ProbeId,
+                    KitId = LastSearch.KitId,
+                    OptionId = LastSearch.OptionId,
+                    VersionId = LastSearch.VersionId,
+                    RowLayout = (LayoutTypeDTO)LastSearch.RowLayout,
+                    ColumnLayout = (LayoutTypeDTO)LastSearch.ColumnLayout,
+                    CellLayout = (LayoutTypeDTO)LastSearch.CellLayout,
+                },
+                Combination = Combination.ToDTO(),
+                Settings = CsvExportSettings
+            });
         }
     }
 }
