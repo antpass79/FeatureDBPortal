@@ -83,6 +83,12 @@ message KitGRPC {
     google.protobuf.StringValue Name = 2;
 }
 
+enum AllowModeGRPC {
+    ALLOW_MODE_NO = 0;
+    ALLOW_MODE_Def = 1;
+    ALLOW_MODE_A = 2;
+}
+
 enum UserLevelGRPC {
     USER_LEVEL_GRPC_RS = 0;
     USER_LEVEL_GRPC_Service = 1;
@@ -109,46 +115,59 @@ enum LayoutTypeGRPC {
 }
 
 message CombinationSearchGRPC {
-    ApplicationGRPC Application = 1;
-    ProbeGRPC Probe  = 2;
-    CountryGRPC Country  = 3;
-    VersionGRPC Version  = 4;
-    ModelGRPC Model  = 5;
-    OptionGRPC Option  = 6;
-    KitGRPC Kit  = 7;
+    google.protobuf.Int32Value ApplicationId = 1;
+    google.protobuf.Int32Value ProbeId = 2;
+    google.protobuf.Int32Value CountryId = 3;
+    google.protobuf.Int32Value VersionId = 4;
+    google.protobuf.Int32Value ModelId = 5;
+    google.protobuf.Int32Value OptionId = 6;
+    google.protobuf.Int32Value KitId = 7;
 
     UserLevelGRPC UserLevel  = 8;
+
     LayoutTypeGRPC RowLayout  = 9;
     LayoutTypeGRPC ColumnLayout  = 10;
     LayoutTypeGRPC CellLayout  = 11;
 }
 
-message ColumnTitleGRPC {
-    google.protobuf.Int32Value Id = 1;
-    google.protobuf.StringValue Name = 2;
-}
-
-message CombinationItemGRPC {
+message CellItemGRPC {
     google.protobuf.StringValue Name = 1;
     google.protobuf.Int32Value RowId = 2;
     google.protobuf.Int32Value ColumnId = 3;
     google.protobuf.Int32Value ItemId = 4;
+    google.protobuf.BoolValue Allow = 5;
 }
 
-message CombinationCellGRPC {
+message CellGRPC {
     google.protobuf.StringValue Name = 1;
-    google.protobuf.BoolValue Allow = 2;
-    google.protobuf.Int32Value RowId = 3;
-    google.protobuf.Int32Value ColumnId = 4;
-    repeated CombinationItemGRPC Items = 5;
+    google.protobuf.BoolValue Available = 2;
+    google.protobuf.BoolValue Visible = 3;
+    AllowModeGRPC AllowMode = 4;
+
+    google.protobuf.Int32Value RowId = 5;
+    google.protobuf.Int32Value ColumnId = 6;
+
+    repeated CellItemGRPC Items = 7;
+}
+
+message RowTitleGRPC {
+    google.protobuf.Int32Value Id = 1;
+    google.protobuf.StringValue Name = 2;
 }
 
 message RowGRPC {
-    CombinationCellGRPC TitleCell = 1;
-    repeated CombinationCellGRPC Cells = 2;
+    RowTitleGRPC Title = 1;
+    repeated CellGRPC Cells = 2;
+    google.protobuf.Int32Value RowId = 3;
+}
+
+message ColumnGRPC {
+    google.protobuf.Int32Value Id = 1;
+    google.protobuf.StringValue Name = 2;
 }
 
 message CombinationGRPC {
-    repeated ColumnTitleGRPC Headers = 1;
-    repeated RowGRPC Rows = 2;
+    google.protobuf.StringValue IntersectionTitle = 1;
+    repeated ColumnGRPC Columns = 2;
+    repeated RowGRPC Rows = 3;
 }
