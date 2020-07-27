@@ -43,7 +43,7 @@ namespace FeatureDBPortal.Server.Providers
         IReadOnlyList<QueryableEntity> _columns;
         public IReadOnlyList<QueryableEntity> Columns => _columns;
         
-        public CombinationDTO Group(GroupParameters parameters)
+        public CombinationDTO Group(IList<NormalRule> normalRules, GroupParameters parameters)
         {
             var combinationIndexer = _combinationIndexerBuilder
                 .Rows(Rows)
@@ -52,7 +52,7 @@ namespace FeatureDBPortal.Server.Providers
                 .Build();
 
             // Maybe add firstLayoutGroup + "Id" == null
-            var groups = parameters.NormalRules
+            var groups = normalRules
                 .GroupBy(_groupProperties.GroupExpression)
                 .Where(item => item.Key.HasValue && !_groupProperties.DiscardItemIds.Contains(item.Key.Value));
 

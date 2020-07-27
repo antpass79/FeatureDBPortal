@@ -1,4 +1,5 @@
 ﻿using FeatureDBPortal.Server.Builders;
+using FeatureDBPortal.Server.Data.Models.RD;
 using FeatureDBPortal.Server.Extensions;
 using FeatureDBPortal.Server.Models;
 using FeatureDBPortal.Shared;
@@ -39,7 +40,7 @@ namespace FeatureDBPortal.Server.Providers
         IReadOnlyList<QueryableEntity> _columns;
         public IReadOnlyList<QueryableEntity> Columns => _columns;
 
-        public CombinationDTO Group(GroupParameters parameters)
+        public CombinationDTO Group(IList<NormalRule> normalRules, GroupParameters parameters)
         {
             var combinationIndexer = _combinationIndexerBuilder
                 .Rows(Rows)
@@ -47,7 +48,7 @@ namespace FeatureDBPortal.Server.Providers
                 .Title(GroupName)
                 .Build();
 
-            var groups = parameters.NormalRules
+            var groups = normalRules
                 .GroupBy(_rowGroupProperties.GroupExpression)
                 .Where(item => item.Key.HasValue && !_rowGroupProperties.DiscardItemIds.Contains(item.Key.Value));
 

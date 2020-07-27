@@ -35,7 +35,7 @@ namespace FeatureDBPortal.Server.Services
 
             var groupProvider = BuildGroupProvider(search, _groupProviderBuilder);
 
-            var combination = groupProvider.Group(new GroupParameters { NormalRules = filteredNormalRules, ProbeId = search.ProbeId });
+            var combination = groupProvider.Group(filteredNormalRules, new GroupParameters { ProbeId = search.ProbeId });
             return await Task.FromResult(combination);
         }
 

@@ -10,6 +10,6 @@ namespace FeatureDBPortal.Server.Providers
         string GroupName { get; }
         public IReadOnlyList<QueryableEntity> Rows { get; }
         public IReadOnlyList<QueryableEntity> Columns { get; }
-        CombinationDTO Group(GroupParameters parameters);
+        CombinationDTO Group(IList<NormalRule> normalRules, GroupParameters parameters);
     }
 }
