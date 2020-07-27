@@ -122,7 +122,12 @@ namespace FeatureDBPortal.Server
                 });
             services.AddRazorPages();
 
-            services.AddGrpc();
+            services.AddGrpc(options =>
+            {
+                options.MaxReceiveMessageSize = 10 * 1024 * 1024;
+                options.MaxSendMessageSize = 10 * 1024 * 1024;
+                options.EnableDetailedErrors = true;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

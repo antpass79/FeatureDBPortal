@@ -56,35 +56,46 @@ namespace FeatureDBPortal.Client.Extensions
             };
         }
 
-        public static Combination ToModel(this CombinationGRPC dto)
+        public static Combination ToModel(this CombinationGRPC grpc)
         {
+            if (grpc == null)
+                return null;
+
             return new Combination
             {
-                Rows = dto.Rows.Select(row => new Row
+                IntersectionTitle = grpc.IntersectionTitle,
+                Rows = grpc.Rows.Select(row =>
                 {
-                    Id = row.TitleCell.RowId,
-                    Title = new RowTitle
+                    var newRow = new Row
                     {
-                        Id = row.TitleCell.RowId,
-                        Name = row.TitleCell.Name
-                    },
-                    Cells = row.Cells.Select(cell => new Cell
-                    {
-                        RowId = cell.RowId,
-                        ColumnId = cell.ColumnId,
-                        Available = cell.Allow,
-                        Name = cell.Name,
-                        AggregateItems = cell.Items == null ? string.Empty : string.Join(System.Environment.NewLine, cell.Items.Select(item => item.Name)),
-                        //Items = cell.Items?.Select(item => new CombinationItem
-                        //{
-                        //    RowId = item.RowId,
-                        //    ColumnId = item.ColumnId,
-                        //    ItemId = item.ItemId,
-                        //    Name = item.Name
-                        //})
-                    }).ToDictionary(cell => cell.ColumnId.Value)
+                        Id = row.Title.Id,
+                        Title = new RowTitle
+                        {
+                            Id = row.Title.Id,
+                            Name = row.Title.Name
+                        },
+                        Cells = row.Cells.Select(cell => new Cell
+                        {
+                            RowId = cell.RowId,
+                            ColumnId = cell.ColumnId,
+                            Available = cell.Available,
+                            Visible = cell.Visible,
+                            AllowMode = (AllowMode)cell.AllowMode,
+                            Name = cell.Name,
+                            AggregateItems = cell.Items == null ? string.Empty : string.Join(System.Environment.NewLine, cell.Items.Select(item => item.Name)),
+                            Items = cell.Items?.Select(item => new CellItem
+                            {
+                                RowId = item.RowId,
+                                ColumnId = item.ColumnId,
+                                ItemId = item.ItemId,
+                                Name = item.Name
+                            })
+                        }).ToDictionary(cell => cell.ColumnId.Value)
+                    };
+
+                    return newRow;
                 }).ToDictionary(item => item.Id.Value),
-                Columns = dto.Headers.Select(header => new Column
+                Columns = grpc.Columns.Select(header => new Column
                 {
                     Id = header.Id,
                     Name = header.Name
