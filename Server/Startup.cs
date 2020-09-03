@@ -72,7 +72,9 @@ namespace FeatureDBPortal.Server
                 .AddScoped<IGenericRepository<MinorVersionAssociation>, GenericRepository<MinorVersionAssociation>>()
                 .AddScoped<IGenericRepository<BiopsyKits>, GenericRepository<BiopsyKits>>()
                 .AddScoped<IGenericRepository<Option>, GenericRepository<Option>>()
-                .AddScoped<IGenericRepository<Probe>, GenericRepository<Probe>>();
+                .AddScoped<IGenericRepository<Probe>, GenericRepository<Probe>>()
+                .AddScoped<IGenericRepository<Distributor>, GenericRepository<Distributor>>()
+                .AddScoped<IGenericRepository<Certifier>, GenericRepository<Certifier>>();
             services
                 .AddScoped<IVersionProvider, VersionProvider>()
                 .AddScoped<IAsyncCsvService, CsvService>()

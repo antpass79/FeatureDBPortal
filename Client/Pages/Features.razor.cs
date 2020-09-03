@@ -153,19 +153,19 @@ namespace FeatureDBPortal.Client.Pages
         private bool IsOutputLayoutTypeSelected(LayoutTypeDTO layoutType) => SelectedRowLayout == layoutType || SelectedColumnLayout == layoutType || SelectedCellLayout == layoutType;
 
 
-        protected override async Task OnInitializedAsync()
+        async protected override Task OnInitializedAsync()
         {
             FiltersBusy = true;
 
             BuildToolbar();
 
-            Applications = await FilterService.GetApplications();
-            Probes = await FilterService.GetProbes();
-            Countries = await FilterService.GetCountries();
-            Versions = await FilterService.GetVersions();
-            Models = await FilterService.GetModels();
-            Options = await FilterService.GetOptions();
-            Kits = await FilterService.GetKits();
+            Applications = await FilterService.GetApplicationsAsync();
+            Probes = await FilterService.GetProbesAsync();
+            Countries = await FilterService.GetCountriesAsync();
+            Versions = await FilterService.GetVersionsAsync();
+            Models = await FilterService.GetModelsAsync();
+            Options = await FilterService.GetOptionsAsync();
+            Kits = await FilterService.GetKitsAsync();
             UserLevels = Enum.GetValues(typeof(UserLevelDTO)).Cast<UserLevelDTO>().OrderBy(item => item.ToString());
             LayoutViews = Enum.GetValues(typeof(LayoutTypeDTO)).Cast<LayoutTypeDTO>();
 
