@@ -74,7 +74,10 @@ namespace FeatureDBPortal.Server
                 .AddScoped<IGenericRepository<MinorVersionAssociation>, GenericRepository<FeaturesContext, MinorVersionAssociation>>()
                 .AddScoped<IGenericRepository<BiopsyKits>, GenericRepository<FeaturesContext, BiopsyKits>>()
                 .AddScoped<IGenericRepository<Option>, GenericRepository<FeaturesContext, Option>>()
-                .AddScoped<IGenericRepository<Probe>, GenericRepository<FeaturesContext, Probe>>();
+                .AddScoped<IGenericRepository<Probe>, GenericRepository<FeaturesContext, Probe>>()
+                .AddScoped<IGenericRepository<Distributor>, GenericRepository<FeaturesContext, Distributor>>()
+                .AddScoped<IGenericRepository<Certifier>, GenericRepository<FeaturesContext, Certifier>>();
+            
             services
                 .AddSingleton<IFilterCache, FilterCache>();
             services
