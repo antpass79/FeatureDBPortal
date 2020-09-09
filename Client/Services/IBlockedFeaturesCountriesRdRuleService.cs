@@ -4,18 +4,19 @@ using System.Threading.Tasks;
 
 namespace FeatureDBPortal.Client.Services
 {
-    public interface IFilterService
+    public interface IBlockedFeaturesCountriesRdRuleService
     {
+        Task<IEnumerable<OptionDTO>> GetOptionsAsync();
         Task<IEnumerable<ApplicationDTO>> GetApplicationsAsync();
         Task<IEnumerable<ProbeDTO>> GetProbesAsync();
-        Task<IEnumerable<CountryDTO>> GetCountriesAsync();
-        Task<IEnumerable<VersionDTO>> GetVersionsAsync();
+        Task<IEnumerable<KitDTO>> GetKitsAsync();
         Task<IEnumerable<ModelDTO>> GetModelsAsync();
         Task<IEnumerable<ModelFamilyDTO>> GetModelFamiliesAsync();
-        Task<IEnumerable<OptionDTO>> GetOptionsAsync();
-        Task<IEnumerable<KitDTO>> GetKitsAsync();
+        Task<IEnumerable<CountryDTO>> GetCountriesAsync();
         Task<IEnumerable<DistributorDTO>> GetDistributorsAsync();
         Task<IEnumerable<CertifierDTO>> GetCertifiersAsync();
         Task<IEnumerable<UserLevelDTO>> GetUsersAsync();
+
+        Task InsertAsync(BlockedFeaturesCountriesRdRuleDTO rule);
     }
 }
