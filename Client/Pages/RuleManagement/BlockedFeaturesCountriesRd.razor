@@ -1,0 +1,266 @@
+﻿@page "/rules/blockedfeaturescountriesrd"
+@inherits BlockedFeaturesCountriesRdDataModel
+
+<style>
+    .feature-combination-filters-opened {
+        margin-top: 15px;
+        height: calc(100% - 300px);
+    }
+
+    .feature-combination-filters-closed {
+        margin-top: 15px;
+        height: calc(100% - 80px);
+    }
+
+    .feature-layout-grid {
+        padding: 0px !important;
+        width: 100%;
+    }
+
+    .feature-filter-divider {
+        margin-top: 10px !important;
+        margin-bottom: 10px !important;
+    }
+
+    .feature-accordion-header {
+        flex: 1;
+    }
+
+    .feature-accordion-header-content {
+        align-self: flex-end;
+    }
+
+    .mat-layout-grid-inner > .mat-layout-grid-cell {
+        margin: 10px;
+    }
+
+    .feature-logo {
+        display: flex;
+        align-self: center;
+    }
+
+    .feature-logo-text {
+        flex: 1;
+        align-self: center;
+        margin: 15px;
+    }
+
+    .select-field {
+        display: flex;
+    }
+
+        .select-field > .mdc-select__anchor {
+            flex: 1;
+            height: 36px;
+        }
+</style>
+
+@if (FiltersBusy)
+{
+    <div class="feature-logo">
+        <SpinKitCircle />
+        <p class="feature-logo-text"><em>Loading Filters...</em></p>
+    </div>
+}
+else
+{
+    <MatAccordion>
+        <MatExpansionPanel>
+            <MatExpansionPanelSummary>
+                <MatExpansionPanelHeader>Filters</MatExpansionPanelHeader>
+            </MatExpansionPanelSummary>
+            <MatExpansionPanelDetails>
+
+                <div class="mat-layout-grid feature-layout-grid">
+                    <div class="mat-layout-grid-inner">
+                        <div class="mat-layout-grid-cell mat-layout-grid-cell-span-11">
+                            <div class="mat-layout-grid-inner">
+                                <div class="mat-layout-grid-cell mat-layout-grid-cell-span-3">
+                                    @if (Models == null)
+                                    {
+                                        <p><em>Models Loading...</em></p>
+                                    }
+                                    else
+                                    {
+                                        <MatSelect Class="select-field" Label="Select a Model" Outlined="true" @bind-Value="SelectedModel.Id" TValue="int?">
+                                            @foreach (var model in Models)
+                                            {
+                                                <MatOption TValue="int?" Value="@model.Id">@model.Name</MatOption>
+                                            }
+                                        </MatSelect>
+                                    }
+                                </div>
+                                <div class="mat-layout-grid-cell mat-layout-grid-cell-span-3">
+                                    @if (Countries == null)
+                                    {
+                                        <p><em>Countries Loading...</em></p>
+                                    }
+                                    else
+                                    {
+                                        <MatSelect Class="select-field" Label="Select a Country" Outlined="true" @bind-Value="SelectedCountry.Id" TValue="int?">
+                                            @foreach (var country in Countries)
+                                            {
+                                                <MatOption TValue="int?" Value="@country.Id">@country.Name</MatOption>
+                                            }
+                                        </MatSelect>
+                                    }
+                                </div>
+                                <div class="mat-layout-grid-cell mat-layout-grid-cell-span-3">
+                                    @if (UserLevels == null)
+                                    {
+                                        <p><em>User Levels Loading...</em></p>
+                                    }
+                                    else
+                                    {
+                                        <MatSelect Class="select-field" Label="Select an User Level" Outlined="true" @bind-Value="SelectedUserLevelText" TValue="string">
+                                            @foreach (var userLevel in UserLevels)
+                                            {
+                                                <MatOption TValue="string" Value="@userLevel.ToString()">@userLevel</MatOption>
+                                            }
+                                        </MatSelect>
+                                    }
+                                </div>
+                                <div class="mat-layout-grid-cell mat-layout-grid-cell-span-3">
+                                    @if (Applications == null)
+                                    {
+                                        <p><em>Applications Loading...</em></p>
+                                    }
+                                    else
+                                    {
+                                        <MatSelect Class="select-field" Label="Select an Application" Outlined="true" @bind-Value="SelectedApplication.Id" TValue="int?">
+                                            <MatOption TValue="int?"></MatOption>
+                                            @foreach (var application in Applications)
+                                            {
+                                                <MatOption TValue="int?" value="@application.Id">@application.Name</MatOption>
+                                            }
+                                        </MatSelect>
+                                    }
+                                </div>
+                            </div>
+                            <div class="mat-layout-grid-inner">
+                                <div class="mat-layout-grid-cell mat-layout-grid-cell-span-3">
+                                    @if (Probes == null)
+                                    {
+                                        <p><em>Probes Loading...</em></p>
+                                    }
+                                    else
+                                    {
+                                        <MatSelect Class="select-field" Label="Select a Probe" Outlined="true" @bind-Value="SelectedProbe.Id" TValue="int?">
+                                            <MatOption TValue="int?"></MatOption>
+                                            @foreach (var probe in Probes)
+                                            {
+                                                <MatOption TValue="int?" value="@probe.Id">@probe.Name</MatOption>
+                                            }
+                                        </MatSelect>
+                                    }
+                                </div>
+                                <div class="mat-layout-grid-cell mat-layout-grid-cell-span-3">
+                                    @if (Kits == null)
+                                    {
+                                        <p><em>Kits Loading...</em></p>
+                                    }
+                                    else
+                                    {
+                                        <MatSelect Class="select-field" Label="Select a Kit" Outlined="true" @bind-Value="SelectedKit.Id" TValue="int?">
+                                            <MatOption TValue="int?"></MatOption>
+                                            @foreach (var kit in Kits)
+                                            {
+                                                <MatOption TValue="int?" value="@kit.Id">@kit.Name</MatOption>
+                                            }
+                                        </MatSelect>
+                                    }
+                                </div>
+                                <div class="mat-layout-grid-cell mat-layout-grid-cell-span-3">
+                                    @if (Options == null)
+                                    {
+                                        <p><em>Options Loading...</em></p>
+                                    }
+                                    else
+                                    {
+                                        <MatSelect Class="select-field" Label="Select an Option" Outlined="true" @bind-Value="SelectedOption.Id" TValue="int?">
+                                            <MatOption TValue="int?"></MatOption>
+                                            @foreach (var option in Options)
+                                            {
+                                                <MatOption TValue="int?" value="@option.Id">@option.Name</MatOption>
+                                            }
+                                        </MatSelect>
+                                    }
+                                </div>
+                                <div class="mat-layout-grid-cell mat-layout-grid-cell-span-3">
+                                    @if (Versions == null)
+                                    {
+                                        <p><em>Versions Loading...</em></p>
+                                    }
+                                    else
+                                    {
+                                        <MatSelect Class="select-field" Label="Select a Version" Outlined="true" @bind-Value="SelectedVersion.Id" TValue="int?">
+                                            <MatOption TValue="int?"></MatOption>
+                                            @foreach (var version in Versions)
+                                            {
+                                                <MatOption TValue="int?" value="@version.Id">@version.BuildVersion</MatOption>
+                                            }
+                                        </MatSelect>
+                                    }
+                                </div>
+                            </div>
+                            <div class="mat-layout-grid-inner">
+                                <div class="mat-layout-grid-cell mat-layout-grid-cell-span-3">
+                                    @if (Certifiers == null)
+                                    {
+                                        <p><em>Certifiers Loading...</em></p>
+                                    }
+                                    else
+                                    {
+                                        <MatSelect Class="select-field" Label="Select a Certifier" Outlined="true" @bind-Value="SelectedCertifier.Id" TValue="int?">
+                                            <MatOption TValue="int?"></MatOption>
+                                            @foreach (var certifier in Certifiers)
+                                            {
+                                                <MatOption TValue="int?" value="@certifier.Id">@certifier.Name</MatOption>
+                                            }
+                                        </MatSelect>
+                                    }
+                                </div>
+                                <div class="mat-layout-grid-cell mat-layout-grid-cell-span-3">
+                                    @if (ModelFamilies == null)
+                                    {
+                                        <p><em>Model Families Loading...</em></p>
+                                    }
+                                    else
+                                    {
+                                        <MatSelect Class="select-field" Label="Select a Model Family" Outlined="true" @bind-Value="SelectedModelFamily.Id" TValue="int?">
+                                            <MatOption TValue="int?"></MatOption>
+                                            @foreach (var modelFamily in ModelFamilies)
+                                            {
+                                                <MatOption TValue="int?" value="@modelFamily.Id">@modelFamily.Name</MatOption>
+                                            }
+                                        </MatSelect>
+                                    }
+                                </div>
+                                <div class="mat-layout-grid-cell mat-layout-grid-cell-span-3">
+                                    @if (Distributors == null)
+                                    {
+                                        <p><em>Distributors Loading...</em></p>
+                                    }
+                                    else
+                                    {
+                                        <MatSelect Class="select-field" Label="Select a Distributor" Outlined="true" @bind-Value="SelectedDistributor.Id" TValue="int?">
+                                            <MatOption TValue="int?"></MatOption>
+                                            @foreach (var distributor in Distributors)
+                                            {
+                                                <MatOption TValue="int?" value="@distributor.Id">@distributor.Name</MatOption>
+                                            }
+                                        </MatSelect>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </MatExpansionPanelDetails>
+        </MatExpansionPanel>
+    </MatAccordion>
+}
+
+<div>
+    <MatButton Icon="save" Raised="true" @onclick="@(async () => await OnConfirm())">Confirm</MatButton>
+</div>

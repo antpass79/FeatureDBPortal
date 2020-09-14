@@ -12,6 +12,7 @@ namespace FeatureDBPortal.Client.Services
         Task<IEnumerable<VersionDTO>> GetVersionsAsync();
         Task<IEnumerable<ModelDTO>> GetModelsAsync();
         Task<IEnumerable<ModelFamilyDTO>> GetModelFamiliesAsync();
+        Task<IEnumerable<PhysicalModelDTO>> GetPhysicalModelsAsync();
         Task<IEnumerable<OptionDTO>> GetOptionsAsync();
         Task<IEnumerable<KitDTO>> GetKitsAsync();
         Task<IEnumerable<DistributorDTO>> GetDistributorsAsync();

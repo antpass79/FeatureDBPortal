@@ -1,12 +1,13 @@
-﻿using FeatureDBPortal.Client.Services;
+﻿using FeatureDBPortal.Client.Services.RuleManagement;
 using FeatureDBPortal.Shared;
+using FeatureDBPortal.Shared.RuleManagement;
 using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FeatureDBPortal.Client.Pages.Rules
+namespace FeatureDBPortal.Client.Pages.RuleManagement
 {
     public class BlockedFeaturesCountriesRdDataModel : ComponentBase
     {
