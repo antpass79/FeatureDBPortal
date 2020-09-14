@@ -7,6 +7,7 @@ using FeatureDBPortal.Server.Options;
 using FeatureDBPortal.Server.Providers;
 using FeatureDBPortal.Server.Repositories;
 using FeatureDBPortal.Server.Services;
+using FeatureDBPortal.Server.Services.RuleManagement;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -66,7 +67,7 @@ namespace FeatureDBPortal.Server
                 _ => throw new NotSupportedException("DbContext not supported")
             };
 
-            // Feature Services
+            // Repository Services
             services
                 .AddScoped<IGenericRepository<Application>, GenericRepository<FeaturesContext, Application>>()
                 .AddScoped<IGenericRepository<Country>, GenericRepository<FeaturesContext, Country>>()
@@ -77,7 +78,12 @@ namespace FeatureDBPortal.Server
                 .AddScoped<IGenericRepository<Probe>, GenericRepository<FeaturesContext, Probe>>()
                 .AddScoped<IGenericRepository<Distributor>, GenericRepository<FeaturesContext, Distributor>>()
                 .AddScoped<IGenericRepository<Certifier>, GenericRepository<FeaturesContext, Certifier>>();
-            
+
+            // Rule Services
+            services
+                .AddScoped<IBlockedFeaturesCountriesRdRuleService, BlockedFeaturesCountriesRdRuleService>()
+                .AddScoped<IMinorVersionRuleService, MinorVersionRuleService>();
+
             services
                 .AddSingleton<IFilterCache, FilterCache>();
             services

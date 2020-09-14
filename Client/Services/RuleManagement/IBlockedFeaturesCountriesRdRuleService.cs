@@ -1,8 +1,9 @@
 ﻿using FeatureDBPortal.Shared;
+using FeatureDBPortal.Shared.RuleManagement;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace FeatureDBPortal.Client.Services
+namespace FeatureDBPortal.Client.Services.RuleManagement
 {
     public interface IBlockedFeaturesCountriesRdRuleService
     {

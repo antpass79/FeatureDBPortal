@@ -1,11 +1,13 @@
 ﻿using FeatureDBPortal.Shared;
+using FeatureDBPortal.Shared.RuleManagement;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace FeatureDBPortal.Client.Services
+namespace FeatureDBPortal.Client.Services.RuleManagement
 {
     public class BlockedFeaturesCountriesRdRuleService : IBlockedFeaturesCountriesRdRuleService
     {
@@ -72,8 +74,7 @@ namespace FeatureDBPortal.Client.Services
 
         async public Task InsertAsync(BlockedFeaturesCountriesRdRuleDTO rule)
         {
-            var content = new StringContent(JsonSerializer.Serialize(rule), Encoding.UTF8, "application/json");
-            await _httpClient.PostAsync(RULE_ENDPOINT, content);
+            await _httpClient.PostAsJsonAsync(RULE_ENDPOINT, rule);
         }
     }
 }
