@@ -1,0 +1,74 @@
+﻿@page "/rules/minorversion"
+@inherits MinorVersionDataModel
+
+<style>
+    .feature-logo {
+        display: flex;
+        align-self: center;
+    }
+
+    .feature-logo-text {
+        flex: 1;
+        align-self: center;
+        margin: 15px;
+    }
+
+    tr:hover {
+        background-color: lightgray;
+    }
+
+    .selected-row {
+        font-weight: bold;
+        font-style: italic;
+    }
+
+    .new-version-rule {
+        display: flex;
+    }
+
+</style>
+
+@if (Busy)
+{
+    <div class="feature-logo">
+        <SpinKitCircle />
+        <p class="feature-logo-text"><em>Loading Filters...</em></p>
+    </div>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Major</th>
+                <th>Minor</th>
+                <th>Patch</th>
+                <th>Build Version</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var rule in VersionRules)
+            {
+                var style = rule == SelectedVersionRule ? "selected-row" : "";
+                <tr @onclick="@(async () => await OnEdit(rule))" class="@style">
+                    <td>@rule.Major</td>
+                    <td>@rule.Minor</td>
+                    <td>@rule.Patch</td>
+                    <td>@rule.BuildVersion</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div>
+        <div class="new-version-rule">
+            <MatTextField TValue="int?" @bind-Value="@EditableVersionRule.Major"></MatTextField>
+            <MatTextField TValue="int?" @bind-Value="@EditableVersionRule.Minor"></MatTextField>
+            <MatTextField TValue="int?" @bind-Value="@EditableVersionRule.Patch"></MatTextField>
+            <MatTextField TValue="int?" @bind-Value="@EditableVersionRule.BuildVersion"></MatTextField>
+            <MatButton Icon="new" Raised="true" @onclick="@(async () => await OnNew())">New</MatButton>
+        </div>
+        <MatButton Disabled="@EditableVersionRule.Invalid" Icon="save" Raised="true" @onclick="@(async () => await OnConfirm())">Confirm</MatButton>
+    </div>
+
+}

@@ -1,4 +1,4 @@
-﻿namespace FeatureDBPortal.Shared
+﻿namespace FeatureDBPortal.Shared.RuleManagement
 {
     public class BlockedFeaturesCountriesRdRuleDTO
     {

@@ -1,6 +1,7 @@
 using Blazored.LocalStorage;
 using FeatureDBPortal.Client.Components;
 using FeatureDBPortal.Client.Services;
+using FeatureDBPortal.Client.Services.RuleManagement;
 using Grpc.Net.Client;
 using Grpc.Net.Client.Web;
 using GrpcCombination;
@@ -60,6 +61,8 @@ namespace FeatureDBPortal.Client
             builder.Services.AddTransient<IAvailabilityCombinationService, AvailabilityCombinationService>();
 
             builder.Services.AddTransient<IBlockedFeaturesCountriesRdRuleService, BlockedFeaturesCountriesRdRuleService>();
+            builder.Services.AddTransient<IMinorVersionRuleService, MinorVersionRuleService>();
+            builder.Services.AddTransient<IRequirementRuleService, RequirementRuleService>();
 
             await builder.Build().RunAsync();
 

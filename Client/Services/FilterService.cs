@@ -14,6 +14,7 @@ namespace FeatureDBPortal.Client.Services
         const string VERSION_ENDPOINT = "api/version";
         const string MODEL_ENDPOINT = "api/model";
         const string MODEL_FAMILY_ENDPOINT = "api/modelfamily";
+        const string PHYSICAL_MODEL_ENDPOINT = "api/physicalmodel";
         const string OPTION_ENDPOINT = "api/option";
         const string KIT_ENDPOINT = "api/kit";
         const string DISTRIBUTOR_ENDPOINT = "api/distributor";
@@ -55,6 +56,11 @@ namespace FeatureDBPortal.Client.Services
         public Task<IEnumerable<ModelFamilyDTO>> GetModelFamiliesAsync()
         {
             return _httpClient.GetFromJsonAsync<IEnumerable<ModelFamilyDTO>>(MODEL_FAMILY_ENDPOINT);
+        }
+
+        public Task<IEnumerable<PhysicalModelDTO>> GetPhysicalModelsAsync()
+        {
+            return _httpClient.GetFromJsonAsync<IEnumerable<PhysicalModelDTO>>(PHYSICAL_MODEL_ENDPOINT);
         }
 
         public Task<IEnumerable<OptionDTO>> GetOptionsAsync()

@@ -1,5 +1,5 @@
-﻿@page "/rules/blockedfeaturescountriesrd"
-@inherits BlockedFeaturesCountriesRdDataModel
+﻿@page "/rules/requirements"
+@inherits RequirementsDataModel
 
 <style>
     .feature-combination-filters-opened {
@@ -91,36 +91,6 @@ else
                                     }
                                 </div>
                                 <div class="mat-layout-grid-cell mat-layout-grid-cell-span-3">
-                                    @if (Countries == null)
-                                    {
-                                        <p><em>Countries Loading...</em></p>
-                                    }
-                                    else
-                                    {
-                                        <MatSelect Class="select-field" Label="Select a Country" Outlined="true" @bind-Value="SelectedCountry.Id" TValue="int?">
-                                            @foreach (var country in Countries)
-                                            {
-                                                <MatOption TValue="int?" Value="@country.Id">@country.Name</MatOption>
-                                            }
-                                        </MatSelect>
-                                    }
-                                </div>
-                                <div class="mat-layout-grid-cell mat-layout-grid-cell-span-3">
-                                    @if (UserLevels == null)
-                                    {
-                                        <p><em>User Levels Loading...</em></p>
-                                    }
-                                    else
-                                    {
-                                        <MatSelect Class="select-field" Label="Select an User Level" Outlined="true" @bind-Value="SelectedUserLevelText" TValue="string">
-                                            @foreach (var userLevel in UserLevels)
-                                            {
-                                                <MatOption TValue="string" Value="@userLevel.ToString()">@userLevel</MatOption>
-                                            }
-                                        </MatSelect>
-                                    }
-                                </div>
-                                <div class="mat-layout-grid-cell mat-layout-grid-cell-span-3">
                                     @if (Applications == null)
                                     {
                                         <p><em>Applications Loading...</em></p>
@@ -205,49 +175,17 @@ else
                             </div>
                             <div class="mat-layout-grid-inner">
                                 <div class="mat-layout-grid-cell mat-layout-grid-cell-span-3">
-                                    @if (Certifiers == null)
+                                    @if (PhysicalModels == null)
                                     {
-                                        <p><em>Certifiers Loading...</em></p>
+                                        <p><em>Physical Models Loading...</em></p>
                                     }
                                     else
                                     {
-                                        <MatSelect Class="select-field" Label="Select a Certifier" Outlined="true" @bind-Value="SelectedCertifier.Id" TValue="int?">
+                                        <MatSelect Class="select-field" Label="Select a Model Family" Outlined="true" @bind-Value="SelectedPhysicalModel.Id" TValue="int?">
                                             <MatOption TValue="int?"></MatOption>
-                                            @foreach (var certifier in Certifiers)
+                                            @foreach (var physicalModel in PhysicalModels)
                                             {
-                                                <MatOption TValue="int?" value="@certifier.Id">@certifier.Name</MatOption>
-                                            }
-                                        </MatSelect>
-                                    }
-                                </div>
-                                <div class="mat-layout-grid-cell mat-layout-grid-cell-span-3">
-                                    @if (ModelFamilies == null)
-                                    {
-                                        <p><em>Model Families Loading...</em></p>
-                                    }
-                                    else
-                                    {
-                                        <MatSelect Class="select-field" Label="Select a Model Family" Outlined="true" @bind-Value="SelectedModelFamily.Id" TValue="int?">
-                                            <MatOption TValue="int?"></MatOption>
-                                            @foreach (var modelFamily in ModelFamilies)
-                                            {
-                                                <MatOption TValue="int?" value="@modelFamily.Id">@modelFamily.Name</MatOption>
-                                            }
-                                        </MatSelect>
-                                    }
-                                </div>
-                                <div class="mat-layout-grid-cell mat-layout-grid-cell-span-3">
-                                    @if (Distributors == null)
-                                    {
-                                        <p><em>Distributors Loading...</em></p>
-                                    }
-                                    else
-                                    {
-                                        <MatSelect Class="select-field" Label="Select a Distributor" Outlined="true" @bind-Value="SelectedDistributor.Id" TValue="int?">
-                                            <MatOption TValue="int?"></MatOption>
-                                            @foreach (var distributor in Distributors)
-                                            {
-                                                <MatOption TValue="int?" value="@distributor.Id">@distributor.Name</MatOption>
+                                                <MatOption TValue="int?" value="@physicalModel.Id">@physicalModel.Name</MatOption>
                                             }
                                         </MatSelect>
                                     }
@@ -262,5 +200,5 @@ else
 }
 
 <div>
-    <MatButton Class="mat-component" Icon="search" Raised="true" @onclick="@(async () => await OnConfirm())">Confirm</MatButton>
+    <MatButton Icon="save" Raised="true" @onclick="@(async () => await OnConfirm())">Confirm</MatButton>
 </div>
