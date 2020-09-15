@@ -84,6 +84,10 @@ namespace FeatureDBPortal.Server
                 .AddScoped<IBlockedFeaturesCountriesRdRuleService, BlockedFeaturesCountriesRdRuleService>()
                 .AddScoped<IMinorVersionRuleService, MinorVersionRuleService>();
 
+            // Rule Services
+            services
+                .AddScoped<IAsyncDatabaseService, DatabaseService>();
+
             services
                 .AddSingleton<IFilterCache, FilterCache>();
             services

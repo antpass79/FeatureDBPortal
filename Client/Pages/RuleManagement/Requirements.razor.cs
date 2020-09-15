@@ -1,10 +1,9 @@
-﻿using FeatureDBPortal.Client.Services.RuleManagement;
+﻿using FeatureDBPortal.Client.Models;
+using FeatureDBPortal.Client.Services.RuleManagement;
 using FeatureDBPortal.Shared;
 using FeatureDBPortal.Shared.RuleManagement;
 using Microsoft.AspNetCore.Components;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace FeatureDBPortal.Client.Pages.RuleManagement
@@ -18,8 +17,7 @@ namespace FeatureDBPortal.Client.Pages.RuleManagement
 
         protected bool FiltersBusy { get; set; }
 
-        protected IEnumerable<VersionDTO> Versions { get; set; }
-        protected VersionDTO SelectedVersion { get; private set; } = new VersionDTO();
+        protected int? IncrementalVersion { get; set; }
 
         protected IEnumerable<ApplicationDTO> Applications { get; set; }
         protected ApplicationDTO SelectedApplication { get; private set; } = new ApplicationDTO();
@@ -39,6 +37,8 @@ namespace FeatureDBPortal.Client.Pages.RuleManagement
         protected IEnumerable<KitDTO> Kits { get; set; }
         protected KitDTO SelectedKit { get; private set; } = new KitDTO();
 
+        protected EditableRequirementRule EditableRule { get; private set; } = new EditableRequirementRule();
+
         #endregion
 
         #region Protected Functions
@@ -47,7 +47,6 @@ namespace FeatureDBPortal.Client.Pages.RuleManagement
         {
             FiltersBusy = true;
 
-            Versions = await RuleService.GetVersionsAsync();
             Applications = await RuleService.GetApplicationsAsync();
             Probes = await RuleService.GetProbesAsync();
             Models = await RuleService.GetModelsAsync();
@@ -62,7 +61,7 @@ namespace FeatureDBPortal.Client.Pages.RuleManagement
         {
             await RuleService.InsertAsync(new RequirementRuleDTO
             {
-                Version = SelectedVersion,
+                IncrementalVersion = IncrementalVersion.Value,
                 Application = SelectedApplication,
                 Kit = SelectedKit,
                 Model = SelectedModel,

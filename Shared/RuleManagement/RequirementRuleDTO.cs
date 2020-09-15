@@ -2,7 +2,7 @@
 {
     public class RequirementRuleDTO
     {
-        public VersionDTO Version { get; set; }
+        public int IncrementalVersion { get; set; }
         public OptionDTO Option { get; set; }
         public ApplicationDTO Application { get; set; }
         public ProbeDTO Probe { get; set; }

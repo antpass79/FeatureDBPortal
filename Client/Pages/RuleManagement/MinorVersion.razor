@@ -43,7 +43,7 @@ else
                 <th>Major</th>
                 <th>Minor</th>
                 <th>Patch</th>
-                <th>Build Version</th>
+                <th>Build</th>
             </tr>
         </thead>
         <tbody>
@@ -62,13 +62,13 @@ else
 
     <div>
         <div class="new-version-rule">
-            <MatTextField TValue="int?" @bind-Value="@EditableVersionRule.Major"></MatTextField>
-            <MatTextField TValue="int?" @bind-Value="@EditableVersionRule.Minor"></MatTextField>
-            <MatTextField TValue="int?" @bind-Value="@EditableVersionRule.Patch"></MatTextField>
-            <MatTextField TValue="int?" @bind-Value="@EditableVersionRule.BuildVersion"></MatTextField>
+            <MatInputTextComponent Label="Major" TValue="int?" @bind-Value="@EditableRule.Major"></MatInputTextComponent>
+            <MatInputTextComponent Label="Minor" TValue="int?" @bind-Value="@EditableRule.Minor"></MatInputTextComponent>
+            <MatInputTextComponent Label="Patch" TValue="int?" @bind-Value="@EditableRule.Patch"></MatInputTextComponent>
+            <MatInputTextComponent Label="Build" TValue="int?" @bind-Value="@EditableRule.BuildVersion"></MatInputTextComponent>
             <MatButton Icon="new" Raised="true" @onclick="@(async () => await OnNew())">New</MatButton>
         </div>
-        <MatButton Disabled="@EditableVersionRule.Invalid" Icon="save" Raised="true" @onclick="@(async () => await OnConfirm())">Confirm</MatButton>
+        <MatButton Disabled="@EditableRule.Invalid" Icon="save" Raised="true" @onclick="@(async () => await OnConfirm())">Confirm</MatButton>
     </div>
 
 }
