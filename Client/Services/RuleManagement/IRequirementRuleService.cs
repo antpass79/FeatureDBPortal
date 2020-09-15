@@ -7,7 +7,6 @@ namespace FeatureDBPortal.Client.Services.RuleManagement
 {
     public interface IRequirementRuleService
     {
-        Task<IEnumerable<VersionDTO>> GetVersionsAsync();
         Task<IEnumerable<OptionDTO>> GetOptionsAsync();
         Task<IEnumerable<ApplicationDTO>> GetApplicationsAsync();
         Task<IEnumerable<ProbeDTO>> GetProbesAsync();

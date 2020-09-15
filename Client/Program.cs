@@ -56,13 +56,15 @@ namespace FeatureDBPortal.Client
             builder.Services.AddSingleton<SpinnerService>();
 
             builder.Services.AddTransient(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
-            
+
             builder.Services.AddTransient<IFilterService, FilterService>();
             builder.Services.AddTransient<IAvailabilityCombinationService, AvailabilityCombinationService>();
 
             builder.Services.AddTransient<IBlockedFeaturesCountriesRdRuleService, BlockedFeaturesCountriesRdRuleService>();
             builder.Services.AddTransient<IMinorVersionRuleService, MinorVersionRuleService>();
             builder.Services.AddTransient<IRequirementRuleService, RequirementRuleService>();
+
+            builder.Services.AddTransient<IDatabaseService, DatabaseService>();
 
             await builder.Build().RunAsync();
 

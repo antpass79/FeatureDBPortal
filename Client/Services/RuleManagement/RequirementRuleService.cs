@@ -22,11 +22,6 @@ namespace FeatureDBPortal.Client.Services.RuleManagement
             _filterService = filterService;
         }
 
-        async public Task<IEnumerable<VersionDTO>> GetVersionsAsync()
-        {
-            return await _filterService.GetVersionsAsync();
-        }
-
         async public Task<IEnumerable<ApplicationDTO>> GetApplicationsAsync()
         {
             return await _filterService.GetApplicationsAsync();
