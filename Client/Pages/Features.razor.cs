@@ -1,25 +1,33 @@
-﻿using FeatureDBPortal.Client.Extensions;
+﻿using BlazorInputFile;
+using FeatureDBPortal.Client.Extensions;
 using FeatureDBPortal.Client.Models;
 using FeatureDBPortal.Client.Services;
 using FeatureDBPortal.Shared;
 using FeatureDBPortal.Shared.Utilities;
 using Microsoft.AspNetCore.Components;
 using System;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace FeatureDBPortal.Client.Pages
 {
     public class FeaturesDataModel : ComponentBase, IDisposable
     {
+        const string BUTTON_ACTION_CONNECT_TO_LOCAL_DB = "BUTTON_ACTION_CONNECT_TO_LOCAL_DB";
         const string BUTTON_ACTION_EXPORT_TO_CSV = "BUTTON_ACTION_EXPORT_TO_CSV";
         const string BUTTON_ACTION_SYNC_RA = "BUTTON_ACTION_SYNC_RA";
+
+        MemoryStream _localDatabase;
 
         [Inject]
         protected IAvailabilityCombinationService AvailabilityCombinationService { get; set; }
         [Inject]
-        protected ToolbarButtonsService ButtonsService { get; set; }
-        [Inject]
         protected ICsvExportService CsvExportService { get; set; }
+        [Inject]
+        protected IDatabaseService DatabaseService { get; set; }
+        [Inject]
+        protected ToolbarButtonsService ButtonsService { get; set; }
 
         protected bool CombinationsBusy { get; set; }
         protected string ErrorMessage { get; private set; }
@@ -36,9 +44,11 @@ namespace FeatureDBPortal.Client.Pages
         }
         protected bool KeepOpen { get; set; }
         protected string CombinationContainerClass { get; set; } = "feature-combination-filters-opened";
-
+        
         protected bool ShowCsvExportDialog { get; set; }
         protected CsvExportSettingsDTO CsvExportSettings = new CsvExportSettingsDTO();
+
+        protected bool ShowConnectToLocalDbDialog { get; set; }
 
         protected SearchFilters SearchFilters = new SearchFilters();
         private CombinationSearchDTO LastSearch { get; set; }
@@ -120,6 +130,12 @@ namespace FeatureDBPortal.Client.Pages
         {
             ButtonsService.Actions.Add(new ButtonAction
             {
+                Id = BUTTON_ACTION_CONNECT_TO_LOCAL_DB,
+                Label = "Connecto to local db",
+                IconName = "data_usage"
+            });
+            ButtonsService.Actions.Add(new ButtonAction
+            {
                 Id = BUTTON_ACTION_EXPORT_TO_CSV,
                 Label = "Export to CSV",
                 IconName = "import_export"
@@ -135,6 +151,10 @@ namespace FeatureDBPortal.Client.Pages
             {
                 switch (action.Id)
                 {
+                    case BUTTON_ACTION_CONNECT_TO_LOCAL_DB:
+                        ShowConnectToLocalDbDialog = true;
+                        StateHasChanged();
+                        break;
                     case BUTTON_ACTION_EXPORT_TO_CSV:
                         CsvExportSettings.FileName = string.Empty;
                         ShowCsvExportDialog = true;
@@ -160,6 +180,22 @@ namespace FeatureDBPortal.Client.Pages
                 Combination = Combination.ToDTO(),
                 Settings = CsvExportSettings
             });
+        }
+
+        async protected Task OnLocalDbConnect()
+        {
+            ShowConnectToLocalDbDialog = false;
+            await DatabaseService.UploadAsync(_localDatabase.GetBuffer());
+        }
+
+        async protected Task HandleSelection(IFileListEntry[] files)
+        {
+            var file = files.FirstOrDefault();
+            if (file != null)
+            {
+                _localDatabase = new MemoryStream();
+                await file.Data.CopyToAsync(_localDatabase);
+            }
         }
     }
 }

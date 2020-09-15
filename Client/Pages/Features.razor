@@ -83,3 +83,15 @@
         <MatButton OnClick="@(e => { ShowCsvExportDialog = false; })">Cancel</MatButton>
     </MatDialogActions>
 </MatDialog>
+
+<MatDialog @bind-IsOpen="@ShowConnectToLocalDbDialog">
+    <MatDialogTitle>Connecto to...</MatDialogTitle>
+    <MatDialogContent>
+        <p>Choose the database file name</p>
+        <InputFile OnChange="HandleSelection" />
+    </MatDialogContent>
+    <MatDialogActions>
+        <MatButton OnClick="@OnLocalDbConnect">Connect</MatButton>
+        <MatButton OnClick="@(e => { ShowConnectToLocalDbDialog = false; })">Cancel</MatButton>
+    </MatDialogActions>
+</MatDialog>

@@ -16,7 +16,7 @@ namespace FeatureDBPortal.Client.Pages.RuleManagement
 
         protected IEnumerable<MinorVersionRuleDTO> VersionRules { get; set; }
         protected MinorVersionRuleDTO SelectedVersionRule { get; set; }
-        protected EditableVersionRule EditableVersionRule { get; private set; } = new EditableVersionRule();
+        protected EditableVersionRule EditableRule { get; private set; } = new EditableVersionRule();
 
         #region Protected Functions
 
@@ -33,11 +33,11 @@ namespace FeatureDBPortal.Client.Pages.RuleManagement
         {
             await RuleService.InsertAsync(new MinorVersionRuleDTO
             {
-                Id = EditableVersionRule.Id.Value,
-                Major = EditableVersionRule.Major.Value,
-                Minor = EditableVersionRule.Minor.Value,
-                Patch = EditableVersionRule.Patch.Value,
-                BuildVersion = EditableVersionRule.BuildVersion.Value
+                Id = EditableRule.Id.Value,
+                Major = EditableRule.Major.Value,
+                Minor = EditableRule.Minor.Value,
+                Patch = EditableRule.Patch.Value,
+                BuildVersion = EditableRule.BuildVersion.Value
             });
         }
 
@@ -45,18 +45,18 @@ namespace FeatureDBPortal.Client.Pages.RuleManagement
         {
             SelectedVersionRule = rule;
 
-            EditableVersionRule.Id = SelectedVersionRule.Id;
-            EditableVersionRule.Major = SelectedVersionRule.Major;
-            EditableVersionRule.Minor = SelectedVersionRule.Minor;
-            EditableVersionRule.Patch = SelectedVersionRule.Patch;
-            EditableVersionRule.BuildVersion = SelectedVersionRule.BuildVersion;
+            EditableRule.Id = SelectedVersionRule.Id;
+            EditableRule.Major = SelectedVersionRule.Major;
+            EditableRule.Minor = SelectedVersionRule.Minor;
+            EditableRule.Patch = SelectedVersionRule.Patch;
+            EditableRule.BuildVersion = SelectedVersionRule.BuildVersion;
 
             await Task.CompletedTask;
         }
 
         async protected Task OnNew()
         {
-            EditableVersionRule = new EditableVersionRule();
+            EditableRule = new EditableVersionRule();
             await Task.CompletedTask;
         }
 
