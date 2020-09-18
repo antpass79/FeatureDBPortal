@@ -17,7 +17,6 @@ namespace FeatureDBPortal.Server.Controllers
         where TController: BaseInputFilterController<TEntity, TDTO, TController>
     {
         private readonly ILogger<TController> _logger;
-        private readonly IMapper _mapper;
         private readonly IGenericRepository<TEntity> _repository;
         private readonly IFilterCache _filterCache;
 
@@ -28,23 +27,21 @@ namespace FeatureDBPortal.Server.Controllers
             IFilterCache filterCache)
         {
             _logger = logger;
-            _mapper = mapper;
             _repository = repository;
             _filterCache = filterCache;
         }
 
         [HttpGet]
-        async public Task<IEnumerable<TDTO>> Get()
+        public Task<IEnumerable<TDTO>> Get()
         {
             var query = PreManipulation(_repository.Query());
-
-            var items = await Task.FromResult(
-                _mapper
-                    .Map<IEnumerable<TDTO>>(query.ToList()));
+            var items = query.ToList();
 
             PutInCache(items);
 
-            return PostManipulation(items);
+            var result = PostManipulation(items);
+            
+            return Task.FromResult(result);
         }
 
         abstract protected IQueryable<TDTO> PreManipulation(IQueryable<TEntity> query);

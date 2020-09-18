@@ -2,6 +2,7 @@ using AutoMapper;
 using FeatureDBPortal.Server.ActiveDirectory;
 using FeatureDBPortal.Server.Builders;
 using FeatureDBPortal.Server.Data.Models.RD;
+using FeatureDBPortal.Server.Extensions;
 using FeatureDBPortal.Server.gRPC;
 using FeatureDBPortal.Server.Options;
 using FeatureDBPortal.Server.Providers;
@@ -11,6 +12,7 @@ using FeatureDBPortal.Server.Services.RuleManagement;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -47,31 +49,16 @@ namespace FeatureDBPortal.Server
                     _configuration.GetSection(nameof(ActiveDirectoryOptions)).Bind(options);
                 });
 
-            // Configuration
-            var databaseOptions = new DatabaseOptions();
-            _configuration.GetSection(nameof(DatabaseOptions)).Bind(databaseOptions);
-            databaseOptions.DefaultSqlServerConnectionString = _configuration.GetConnectionString("DefaultSqlServerConnectionString");
-            databaseOptions.DefaultSqliteConnectionString = _configuration.GetConnectionString("DefaultSqliteConnectionString");
-
             // Database
-            _ = databaseOptions.DatabaseType switch
-            {
-                DatabaseType.SqlServer =>
-                    services.AddDbContext<FeaturesContext>(
-                        options => options.UseSqlServer(databaseOptions.DefaultSqlServerConnectionString),
-                        ServiceLifetime.Scoped),
-                DatabaseType.Sqlite =>
-                    services.AddDbContext<FeaturesContext>(
-                        options => options.UseSqlite(databaseOptions.DefaultSqliteConnectionString),
-                        ServiceLifetime.Scoped),
-                _ => throw new NotSupportedException("DbContext not supported")
-            };
+            services
+                .AddRuntimeDbContext<FeaturesContext>(_configuration);
 
             // Repository Services
             services
                 .AddScoped<IGenericRepository<Application>, GenericRepository<FeaturesContext, Application>>()
                 .AddScoped<IGenericRepository<Country>, GenericRepository<FeaturesContext, Country>>()
                 .AddScoped<IGenericRepository<LogicalModel>, GenericRepository<FeaturesContext, LogicalModel>>()
+                .AddScoped<IGenericRepository<PhysicalModel>, GenericRepository<FeaturesContext, PhysicalModel>>()
                 .AddScoped<IGenericRepository<MinorVersionAssociation>, GenericRepository<FeaturesContext, MinorVersionAssociation>>()
                 .AddScoped<IGenericRepository<BiopsyKits>, GenericRepository<FeaturesContext, BiopsyKits>>()
                 .AddScoped<IGenericRepository<Option>, GenericRepository<FeaturesContext, Option>>()
@@ -82,11 +69,12 @@ namespace FeatureDBPortal.Server
             // Rule Services
             services
                 .AddScoped<IBlockedFeaturesCountriesRdRuleService, BlockedFeaturesCountriesRdRuleService>()
-                .AddScoped<IMinorVersionRuleService, MinorVersionRuleService>();
+                .AddScoped<IMinorVersionRuleService, MinorVersionRuleService>()
+                .AddScoped<IRequirementRuleService, RequirementRuleService>();
 
             // Rule Services
             services
-                .AddScoped<IAsyncDatabaseService, DatabaseService>();
+                .AddSingleton<IAsyncPerUserDatabaseService, PerUserDatabaseService>();
 
             services
                 .AddSingleton<IFilterCache, FilterCache>();

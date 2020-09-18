@@ -73,7 +73,7 @@ else
                 }
                 else
                 {
-                    <MatSelect Class="select-field" Label="Select an Option" Outlined="true" @bind-Value="SelectedOption.Id" TValue="int?">
+                    <MatSelect Class="select-field" Label="Select an Option" Outlined="true" @bind-Value="EditableRule.Option.Id" TValue="int?">
                         <MatOption TValue="int?"></MatOption>
                         @foreach (var option in Options)
                         {
@@ -89,7 +89,7 @@ else
                 }
                 else
                 {
-                    <MatSelect Class="select-field" Label="Select an Application" Outlined="true" @bind-Value="SelectedApplication.Id" TValue="int?">
+                    <MatSelect Class="select-field" Label="Select an Application" Outlined="true" @bind-Value="EditableRule.Application.Id" TValue="int?">
                         <MatOption TValue="int?"></MatOption>
                         @foreach (var application in Applications)
                         {
@@ -105,7 +105,7 @@ else
                 }
                 else
                 {
-                    <MatSelect Class="select-field" Label="Select a Probe" Outlined="true" @bind-Value="SelectedProbe.Id" TValue="int?">
+                    <MatSelect Class="select-field" Label="Select a Probe" Outlined="true" @bind-Value="EditableRule.Probe.Id" TValue="int?">
                         <MatOption TValue="int?"></MatOption>
                         @foreach (var probe in Probes)
                         {
@@ -123,7 +123,7 @@ else
                 }
                 else
                 {
-                    <MatSelect Class="select-field" Label="Select a Kit" Outlined="true" @bind-Value="SelectedKit.Id" TValue="int?">
+                    <MatSelect Class="select-field" Label="Select a Kit" Outlined="true" @bind-Value="EditableRule.Kit.Id" TValue="int?">
                         <MatOption TValue="int?"></MatOption>
                         @foreach (var kit in Kits)
                         {
@@ -139,7 +139,7 @@ else
                 }
                 else
                 {
-                    <MatSelect Class="select-field" Label="Select a Model" Outlined="true" @bind-Value="SelectedModel.Id" TValue="int?">
+                    <MatSelect Class="select-field" Label="Select a Model" Outlined="true" @bind-Value="EditableRule.Model.Id" TValue="int?">
                         @foreach (var model in Models)
                         {
                             <MatOption TValue="int?" Value="@model.Id">@model.Name</MatOption>
@@ -154,7 +154,7 @@ else
                 }
                 else
                 {
-                    <MatSelect Class="select-field" Label="Select a Physical Model" Outlined="true" @bind-Value="SelectedPhysicalModel.Id" TValue="int?">
+                    <MatSelect Class="select-field" Label="Select a Physical Model" Outlined="true" @bind-Value="EditableRule.PhysicalModel.Id" TValue="int?">
                         <MatOption TValue="int?"></MatOption>
                         @foreach (var physicalModel in PhysicalModels)
                         {

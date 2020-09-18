@@ -15,5 +15,20 @@ namespace FeatureDBPortal.Client.Models
         public LayoutTypeDTO RowLayout { get; set; }
         public LayoutTypeDTO ColumnLayout { get; set; }
         public LayoutTypeDTO CellLayout { get; set; }
-    }
+
+        public void Reset()
+        {
+            Application = new ApplicationDTO();
+            Probe = new ProbeDTO();
+            Country = new CountryDTO();
+            Version = new VersionDTO();
+            Model = new ModelDTO();
+            Option = new OptionDTO();
+            Kit = new KitDTO();
+            UserLevel = UserLevelDTO.None;
+            RowLayout = LayoutTypeDTO.None;
+            ColumnLayout = LayoutTypeDTO.None;
+            CellLayout = LayoutTypeDTO.None;
+        }
+}
 }
