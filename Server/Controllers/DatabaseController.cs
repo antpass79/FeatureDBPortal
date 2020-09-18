@@ -9,33 +9,41 @@ namespace FeatureDBPortal.Server.Controllers
     [Route("api/[controller]")]
     public class DatabaseController : ControllerBase
     {
-        private readonly IAsyncDatabaseService _databaseService;
+        private readonly IAsyncPerUserDatabaseService _perUserDatabaseService;
 
-        public DatabaseController(IAsyncDatabaseService databaseService)
+        public DatabaseController(IAsyncPerUserDatabaseService perUserDatabaseService)
         {
-            _databaseService = databaseService;
+            _perUserDatabaseService = perUserDatabaseService;
         }
 
         [HttpGet]
         async public Task<IEnumerable<string>> Get()
         {
-            return await _databaseService.GetDatabaseNamesAsync();
+            return await _perUserDatabaseService.GetDatabaseNamesAsync();
         }
 
         [HttpPost]
         [Route("Upload")]
         async public Task<IActionResult> Upload([FromBody] byte[] database)
         {
-            await _databaseService.UploadAsync(database);
-
-            return await Task.FromResult(Ok());
+            var result = await _perUserDatabaseService.UploadAsync(User, database);
+            return Ok(result);
         }
 
         [HttpPost]
         [Route("Connect")]
         async public Task<IActionResult> Connect([FromBody] string databaseName)
         {
-            await _databaseService.ConnectAsync(databaseName);
+            await _perUserDatabaseService.ConnectAsync(User, databaseName);
+
+            return await Task.FromResult(Ok());
+        }
+
+        [HttpDelete]
+        [Route("Disconnect")]
+        async public Task<IActionResult> Disconnect()
+        {
+            await _perUserDatabaseService.DisconnectAsync(User);
 
             return await Task.FromResult(Ok());
         }
