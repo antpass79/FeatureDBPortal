@@ -2,8 +2,9 @@
 {
     public class DatabaseOptions
     {
-        public DatabaseType DatabaseType { get; set; }
         public string DefaultSqlServerConnectionString { get; set; }
         public string DefaultSqliteConnectionString { get; set; }
+        public DatabaseType DatabaseType { get; set; }
+        public bool PerUser { get; set; }
     }
 }

@@ -33,5 +33,9 @@
     <ProjectReference Include="..\Shared\FeatureDBPortal.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Databases\" />
+  </ItemGroup>
+
 
 </Project>

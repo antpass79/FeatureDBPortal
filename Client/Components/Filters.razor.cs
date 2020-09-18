@@ -11,7 +11,9 @@ using System.Threading.Tasks;
 namespace FeatureDBPortal.Client.Components
 {
     public class FiltersDataModel : ComponentBase
-    {
+    {        
+        [Inject]
+        protected IDatabaseService DatabaseService { get; set; }
         [Inject]
         protected IFilterService FilterService { get; set; }
         [Parameter]
@@ -101,26 +103,70 @@ namespace FeatureDBPortal.Client.Components
         protected bool DisableCountry => SearchFilters.IsOutputLayoutTypeSelected(LayoutTypeDTO.Country);
         protected bool DisableUserLevel => SearchFilters.IsOutputLayoutTypeSelected(LayoutTypeDTO.UserLevel);
 
-        protected override async Task OnInitializedAsync()
+        async protected override Task OnInitializedAsync()
         {
+            await UpdateDataAsync();
+
+            DatabaseService.DatabaseConnectionChanged += async (sender, args) =>
+            {
+                if (args.Connected)
+                    Console.WriteLine($"Connected to database {args.CurrentDatabase}");
+                else
+                    Console.WriteLine($"Disconnected from database");
+
+                await UpdateDataAsync();
+            };
+        }
+
+        async private Task UpdateDataAsync()
+        {
+            Console.WriteLine($"UpdateData {DatabaseService.Connected}");
+
             Busy = true;
 
-            Applications = await FilterService.GetApplicationsAsync();
-            Probes = await FilterService.GetProbesAsync();
-            Countries = await FilterService.GetCountriesAsync();
-            Versions = await FilterService.GetVersionsAsync();
-            Models = await FilterService.GetModelsAsync();
-            Options = await FilterService.GetOptionsAsync();
-            Kits = await FilterService.GetKitsAsync();
-            UserLevels = Enum.GetValues(typeof(UserLevelDTO)).Cast<UserLevelDTO>().OrderBy(item => item.ToString());
-            LayoutViews = Enum.GetValues(typeof(LayoutTypeDTO)).Cast<LayoutTypeDTO>();
+            if (DatabaseService.Connected)
+            {
+                Applications = await FilterService.GetApplicationsAsync();
+                Probes = await FilterService.GetProbesAsync();
+                Countries = await FilterService.GetCountriesAsync();
+                Versions = await FilterService.GetVersionsAsync();
+                Models = await FilterService.GetModelsAsync();
+                Options = await FilterService.GetOptionsAsync();
+                Kits = await FilterService.GetKitsAsync();
+                UserLevels = Enum.GetValues(typeof(UserLevelDTO)).Cast<UserLevelDTO>().OrderBy(item => item.ToString());
+                LayoutViews = Enum.GetValues(typeof(LayoutTypeDTO)).Cast<LayoutTypeDTO>();
 
-            SearchFilters.Model = Models.FirstOrDefault();
-            SearchFilters.Country = Countries.FirstOrDefault();
-            SearchFilters.UserLevel = UserLevels.FirstOrDefault();
-            SelectedUserLevelText = SearchFilters.UserLevel.ToString();
+                SearchFilters.Reset();
+                SearchFilters.Model = Models.FirstOrDefault();
+                SearchFilters.Country = Countries.FirstOrDefault();
+                SearchFilters.UserLevel = UserLevels.FirstOrDefault();
+                SelectedUserLevelText = SearchFilters.UserLevel.ToString();
+                SelectedRowLayoutText = SearchFilters.RowLayout.ToString();
+                SelectedColumnLayoutText = SearchFilters.ColumnLayout.ToString();
+                SelectedCellLayoutText = SearchFilters.CellLayout.ToString();
+            }
+            else
+            {
+                Applications = null;
+                Probes = null;
+                Countries = null;
+                Versions = null;
+                Models = null;
+                Options = null;
+                Kits = null;
+                UserLevels = null;
+                LayoutViews = null;
+
+                SearchFilters.Reset();
+                SelectedUserLevelText = UserLevelDTO.None.ToString();
+                SelectedRowLayoutText = LayoutTypeDTO.None.ToString();
+                SelectedColumnLayoutText = LayoutTypeDTO.None.ToString();
+                SelectedCellLayoutText = LayoutTypeDTO.None.ToString();
+            }
 
             Busy = false;
+
+            StateHasChanged();
         }
     }
 }

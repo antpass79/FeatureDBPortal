@@ -3,6 +3,7 @@ using FeatureDBPortal.Client.Services.RuleManagement;
 using FeatureDBPortal.Shared;
 using FeatureDBPortal.Shared.RuleManagement;
 using Microsoft.AspNetCore.Components;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -20,22 +21,11 @@ namespace FeatureDBPortal.Client.Pages.RuleManagement
         protected int? IncrementalVersion { get; set; }
 
         protected IEnumerable<ApplicationDTO> Applications { get; set; }
-        protected ApplicationDTO SelectedApplication { get; private set; } = new ApplicationDTO();
-
         protected IEnumerable<ProbeDTO> Probes { get; set; }
-        protected ProbeDTO SelectedProbe { get; private set; } = new ProbeDTO();
-
         protected IEnumerable<ModelDTO> Models { get; set; }
-        protected ModelDTO SelectedModel { get; set; } = new ModelDTO();
-
         protected IEnumerable<PhysicalModelDTO> PhysicalModels { get; set; }
-        protected PhysicalModelDTO SelectedPhysicalModel { get; set; } = new PhysicalModelDTO();
-
         protected IEnumerable<OptionDTO> Options { get; set; }
-        protected OptionDTO SelectedOption { get; private set; } = new OptionDTO();
-
         protected IEnumerable<KitDTO> Kits { get; set; }
-        protected KitDTO SelectedKit { get; private set; } = new KitDTO();
 
         protected EditableRequirementRule EditableRule { get; private set; } = new EditableRequirementRule();
 
@@ -59,16 +49,27 @@ namespace FeatureDBPortal.Client.Pages.RuleManagement
 
         async protected Task OnConfirm()
         {
+            try
+            {
             await RuleService.InsertAsync(new RequirementRuleDTO
             {
-                IncrementalVersion = IncrementalVersion.Value,
-                Application = SelectedApplication,
-                Kit = SelectedKit,
-                Model = SelectedModel,
-                PhysicalModel = SelectedPhysicalModel,
-                Option = SelectedOption,
-                Probe = SelectedProbe
+                IncrementalVersion = EditableRule.IncrementalVersion.Value,
+                Application = EditableRule.Application,
+                Kit = EditableRule.Kit,
+                Model = EditableRule.Model,
+                PhysicalModel = EditableRule.PhysicalModel,
+                Option = EditableRule.Option,
+                Probe = EditableRule.Probe
             });
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            finally
+            {
+                this.EditableRule = new EditableRequirementRule();
+            }
         }
 
         #endregion

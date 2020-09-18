@@ -6,6 +6,7 @@ using FeatureDBPortal.Shared;
 using FeatureDBPortal.Shared.Utilities;
 using Microsoft.AspNetCore.Components;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,7 +15,9 @@ namespace FeatureDBPortal.Client.Pages
 {
     public class FeaturesDataModel : ComponentBase, IDisposable
     {
-        const string BUTTON_ACTION_CONNECT_TO_LOCAL_DB = "BUTTON_ACTION_CONNECT_TO_LOCAL_DB";
+        const string BUTTON_ACTION_CONNECT_TO_DATABASE = "BUTTON_ACTION_CONNECT_TO_DATABASE";
+        const string BUTTON_ACTION_DISCONNECT_FROM_DATABASE = "BUTTON_ACTION_DISCONNECT_FROM_DATABASE";
+        const string BUTTON_ACTION_UPLOAD_DATABASE = "BUTTON_ACTION_UPLOAD_DATABASE";
         const string BUTTON_ACTION_EXPORT_TO_CSV = "BUTTON_ACTION_EXPORT_TO_CSV";
         const string BUTTON_ACTION_SYNC_RA = "BUTTON_ACTION_SYNC_RA";
 
@@ -48,8 +51,11 @@ namespace FeatureDBPortal.Client.Pages
         protected bool ShowCsvExportDialog { get; set; }
         protected CsvExportSettingsDTO CsvExportSettings = new CsvExportSettingsDTO();
 
-        protected bool ShowConnectToLocalDbDialog { get; set; }
-
+        protected bool ShowUploadDatabaseDialog { get; set; }
+        protected bool ShowConnectToDatabaseDialog { get; set; }
+        protected IEnumerable<string> Databases { get; set; }
+        protected string SelectedDatabase { get; set; }
+        protected string UploadedDatabase { get; set; }        
         protected SearchFilters SearchFilters = new SearchFilters();
         private CombinationSearchDTO LastSearch { get; set; }
 
@@ -67,6 +73,15 @@ namespace FeatureDBPortal.Client.Pages
         protected override async Task OnInitializedAsync()
         {
             BuildToolbar();
+
+            DatabaseService.DatabaseConnectionChanged += (sender, args) =>
+            {
+                Console.WriteLine($"HEREEE");
+                Combination = null;
+            };
+
+            await UpdateDatabaseNames();
+
             await Task.CompletedTask;
         }
 
@@ -130,8 +145,20 @@ namespace FeatureDBPortal.Client.Pages
         {
             ButtonsService.Actions.Add(new ButtonAction
             {
-                Id = BUTTON_ACTION_CONNECT_TO_LOCAL_DB,
-                Label = "Connecto to local db",
+                Id = BUTTON_ACTION_CONNECT_TO_DATABASE,
+                Label = "Connect to database",
+                IconName = "data_usage"
+            });
+            ButtonsService.Actions.Add(new ButtonAction
+            {
+                Id = BUTTON_ACTION_DISCONNECT_FROM_DATABASE,
+                Label = "Disconnect from database",
+                IconName = "data_usage"
+            });
+            ButtonsService.Actions.Add(new ButtonAction
+            {
+                Id = BUTTON_ACTION_UPLOAD_DATABASE,
+                Label = "Upload database",
                 IconName = "data_usage"
             });
             ButtonsService.Actions.Add(new ButtonAction
@@ -147,28 +174,36 @@ namespace FeatureDBPortal.Client.Pages
                 IconName = "sync"
             });
 
-            ButtonsService.FireAction = (action) =>
+            ButtonsService.FireAction = async (action) =>
             {
                 switch (action.Id)
                 {
-                    case BUTTON_ACTION_CONNECT_TO_LOCAL_DB:
-                        ShowConnectToLocalDbDialog = true;
-                        StateHasChanged();
+                    case BUTTON_ACTION_CONNECT_TO_DATABASE:
+                        ShowConnectToDatabaseDialog = true;
+                        break;
+                    case BUTTON_ACTION_DISCONNECT_FROM_DATABASE:
+                        await DatabaseService.DisconnectAsync();
+                        break;
+                    case BUTTON_ACTION_UPLOAD_DATABASE:
+                        UploadedDatabase = string.Empty;
+                        ShowUploadDatabaseDialog = true;
                         break;
                     case BUTTON_ACTION_EXPORT_TO_CSV:
                         CsvExportSettings.FileName = string.Empty;
                         ShowCsvExportDialog = true;
-                        StateHasChanged();
                         break;
                     case BUTTON_ACTION_SYNC_RA:
                         break;
                 }
+
+                StateHasChanged();
             };
         }
 
         public void Dispose()
         {
             ButtonsService.Actions.Clear();
+            DatabaseService.DisconnectAsync();
         }
 
         async protected Task OnDownload()
@@ -182,10 +217,10 @@ namespace FeatureDBPortal.Client.Pages
             });
         }
 
-        async protected Task OnLocalDbConnect()
+        async protected Task OnDatabaseUpload()
         {
-            ShowConnectToLocalDbDialog = false;
-            await DatabaseService.UploadAsync(_localDatabase.GetBuffer());
+            UploadedDatabase = await DatabaseService.UploadAsync(_localDatabase.GetBuffer());
+            await UpdateDatabaseNames();
         }
 
         async protected Task HandleSelection(IFileListEntry[] files)
@@ -195,6 +230,24 @@ namespace FeatureDBPortal.Client.Pages
             {
                 _localDatabase = new MemoryStream();
                 await file.Data.CopyToAsync(_localDatabase);
+            }
+        }
+
+        async protected Task OnDatabaseConnect()
+        {
+            ShowConnectToDatabaseDialog = false;
+            await DatabaseService.ConnectAsync(SelectedDatabase);
+        }
+
+        private async Task UpdateDatabaseNames()
+        {
+            try
+            {
+                Databases = await DatabaseService.GetDatabaseNamesAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
             }
         }
     }

@@ -37,40 +37,47 @@
     }
 </style>
 
-<MatAccordion>
-    <MatExpansionPanel @bind-Expanded="@FiltersOpened">
-        <MatExpansionPanelSummary>
-            <MatExpansionPanelHeader>Filters</MatExpansionPanelHeader>
-            <MatExpansionPanelSubHeader Class="feature-accordion-header">
-                <MatCheckbox Class="feature-accordion-header-content feature-checkbox" @bind-Value="@KeepOpen">Keep Open</MatCheckbox>
-            </MatExpansionPanelSubHeader>
-        </MatExpansionPanelSummary>
-        <MatExpansionPanelDetails>
+@if (DatabaseService.Connected)
+{
+    <MatAccordion>
+        <MatExpansionPanel @bind-Expanded="@FiltersOpened">
+            <MatExpansionPanelSummary>
+                <MatExpansionPanelHeader>Filters</MatExpansionPanelHeader>
+                <MatExpansionPanelSubHeader Class="feature-accordion-header">
+                    <MatCheckbox Class="feature-accordion-header-content feature-checkbox" @bind-Value="@KeepOpen">Keep Open</MatCheckbox>
+                </MatExpansionPanelSubHeader>
+            </MatExpansionPanelSummary>
+            <MatExpansionPanelDetails>
 
-            <div class="mat-layout-grid feature-layout-grid">
-                <div class="mat-layout-grid-inner">
-                    <div class="mat-layout-grid-cell mat-layout-grid-cell-span-11">
-                        <Filters SearchFilters="@SearchFilters"></Filters>
-                    </div>
-                    <div class="mat-layout-grid-cell mat-layout-grid-cell-span-1">
-                        <MatButton Class="mat-component" Icon="search" Raised="true" @onclick="@(async () => await OnSearch())">Search</MatButton>
+                <div class="mat-layout-grid feature-layout-grid">
+                    <div class="mat-layout-grid-inner">
+                        <div class="mat-layout-grid-cell mat-layout-grid-cell-span-11">
+                            <Filters SearchFilters="@SearchFilters"></Filters>
+                        </div>
+                        <div class="mat-layout-grid-cell mat-layout-grid-cell-span-1">
+                            <MatButton Class="mat-component" Icon="search" Raised="true" @onclick="@(async () => await OnSearch())">Search</MatButton>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </MatExpansionPanelDetails>
-    </MatExpansionPanel>
-</MatAccordion>
+            </MatExpansionPanelDetails>
+        </MatExpansionPanel>
+    </MatAccordion>
 
-<div class="@CombinationContainerClass">
-    @if (string.IsNullOrWhiteSpace(ErrorMessage))
-    {
-        <CombinationMatrix Busy="@CombinationsBusy" Combination="@Combination" Filters="@CombinationFilters"></CombinationMatrix>
-    }
-    else
-    {
-        <p class="feature-error-message"><em>Unsupported Combination</em></p>
-    }
-</div>
+    <div class="@CombinationContainerClass">
+        @if (string.IsNullOrWhiteSpace(ErrorMessage))
+        {
+            <CombinationMatrix Busy="@CombinationsBusy" Combination="@Combination" Filters="@CombinationFilters"></CombinationMatrix>
+        }
+        else
+        {
+            <p class="feature-error-message"><em>Unsupported Combination</em></p>
+        }
+    </div>
+}
+else
+{
+    <p class="feature-error-message"><em>Connect to a database</em></p>
+}
 
 <MatDialog @bind-IsOpen="@ShowCsvExportDialog">
     <MatDialogTitle>Download csv</MatDialogTitle>
@@ -84,14 +91,41 @@
     </MatDialogActions>
 </MatDialog>
 
-<MatDialog @bind-IsOpen="@ShowConnectToLocalDbDialog">
-    <MatDialogTitle>Connecto to...</MatDialogTitle>
+<MatDialog @bind-IsOpen="@ShowUploadDatabaseDialog">
+    <MatDialogTitle>Upload...</MatDialogTitle>
     <MatDialogContent>
-        <p>Choose the database file name</p>
+        <p>Choose a database file</p>
         <InputFile OnChange="HandleSelection" />
+        <div>
+            <span>Saved with name: @UploadedDatabase</span>
+        </div>
     </MatDialogContent>
     <MatDialogActions>
-        <MatButton OnClick="@OnLocalDbConnect">Connect</MatButton>
-        <MatButton OnClick="@(e => { ShowConnectToLocalDbDialog = false; })">Cancel</MatButton>
+        <MatButton OnClick="@OnDatabaseUpload">Upload</MatButton>
+        <MatButton OnClick="@(e => { ShowUploadDatabaseDialog = false; })">Close</MatButton>
+    </MatDialogActions>
+</MatDialog>
+
+<MatDialog @bind-IsOpen="@ShowConnectToDatabaseDialog">
+    <MatDialogTitle>Connect to...</MatDialogTitle>
+    <MatDialogContent>
+        <p>Choose the database name</p>
+        @if (Databases == null)
+        {
+            <p><em>Databases Loading...</em></p>
+        }
+        else
+        {
+            <MatSelect Class="select-field" Label="Select a Database" Outlined="true" @bind-Value="@SelectedDatabase" TValue="string">
+                @foreach (var database in Databases)
+                {
+                    <MatOption TValue="string" Value="@database">@database</MatOption>
+                }
+            </MatSelect>
+        }
+    </MatDialogContent>
+    <MatDialogActions>
+        <MatButton OnClick="@OnDatabaseConnect">Connect</MatButton>
+        <MatButton OnClick="@(e => { ShowConnectToDatabaseDialog = false; })">Close</MatButton>
     </MatDialogActions>
 </MatDialog>

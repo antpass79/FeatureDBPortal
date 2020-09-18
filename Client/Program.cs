@@ -64,7 +64,7 @@ namespace FeatureDBPortal.Client
             builder.Services.AddTransient<IMinorVersionRuleService, MinorVersionRuleService>();
             builder.Services.AddTransient<IRequirementRuleService, RequirementRuleService>();
 
-            builder.Services.AddTransient<IDatabaseService, DatabaseService>();
+            builder.Services.AddSingleton<IDatabaseService, DatabaseService>();
 
             await builder.Build().RunAsync();
 
