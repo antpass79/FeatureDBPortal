@@ -1,4 +1,5 @@
 ﻿using FeatureDBPortal.Server.Utils;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -54,7 +55,7 @@ namespace FeatureDBPortal.Server.Services
             return await Task.FromResult(databases);
         }
 
-        async public Task<string> UploadAsync(ClaimsPrincipal user, byte[] database)
+        async public Task<string> UploadAsync(ClaimsPrincipal user, IFormFile database)
         {
             var userName = user
                 .FindFirstValue(ClaimTypes.Name)
@@ -64,7 +65,12 @@ namespace FeatureDBPortal.Server.Services
             string generatedDate = DateTime.UtcNow.ToString("yyyy-MM-ddTHH_mm_ssZ");
             string generatedFileName = $"{userName}-{generatedDate}.db";
 
-            await File.WriteAllBytesAsync($@"{databasesFolder}\{generatedFileName}", database);
+            string fullPath = $@"{databasesFolder}\{generatedFileName}";
+
+            using (var stream = new FileStream(fullPath, FileMode.Create))
+            {
+                await database.CopyToAsync(stream);
+            }
 
             return generatedFileName;
         }

@@ -1,6 +1,7 @@
 ﻿using FeatureDBPortal.Server.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace FeatureDBPortal.Server.Controllers
@@ -24,9 +25,12 @@ namespace FeatureDBPortal.Server.Controllers
 
         [HttpPost]
         [Route("Upload")]
-        async public Task<IActionResult> Upload([FromBody] byte[] database)
+        [RequestFormLimits(MultipartBodyLengthLimit = 609715200)]
+        [RequestSizeLimit(609715200)]
+        async public Task<IActionResult> Upload()
         {
-            var result = await _perUserDatabaseService.UploadAsync(User, database);
+            var file = Request.Form.Files[0];
+            var result = await _perUserDatabaseService.UploadAsync(User, file);
             return Ok(result);
         }
 
