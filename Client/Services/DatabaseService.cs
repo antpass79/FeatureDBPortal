@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 
@@ -42,9 +44,14 @@ namespace FeatureDBPortal.Client.Services
             }
         }
 
-        async public Task<string> UploadAsync(byte[] database)
+        async public Task<string> UploadAsync(Stream database)
         {
-            var result = await _httpClient.PostAsJsonAsync(DATABASE_ENDPOINT_UPLOAD, database);
+            var content = new MultipartFormDataContent();
+            content.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data");
+            content.Add(new StreamContent(database, Convert.ToInt32(database.Length)), "database");
+
+            var result = await _httpClient.PostAsync(DATABASE_ENDPOINT_UPLOAD, content);
+
             return await result.Content.ReadAsStringAsync();
         }
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Http;
+using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -9,7 +10,7 @@ namespace FeatureDBPortal.Server.Services
         string this[string userName] { get; }
         Task<IEnumerable<string>> GetDatabaseNamesAsync();
         Task ConnectAsync(ClaimsPrincipal user, string databaseName);
-        Task<string> UploadAsync(ClaimsPrincipal user, byte[] database);
+        Task<string> UploadAsync(ClaimsPrincipal user, IFormFile database);
         Task DisconnectAsync(ClaimsPrincipal user);
     }
 }
