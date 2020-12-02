@@ -219,7 +219,7 @@ namespace FeatureDBPortal.Client.Pages
 
         async protected Task OnDatabaseUpload()
         {
-            UploadedDatabase = await DatabaseService.UploadAsync(_localDatabase.GetBuffer());
+            UploadedDatabase = await DatabaseService.UploadAsync(_localDatabase);
             await UpdateDatabaseNames();
         }
 
